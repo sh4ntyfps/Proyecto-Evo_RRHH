@@ -1,0 +1,63 @@
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="mb-4">
+    <h3>Bienvenido, @User.Identity?.Name</h3>
+    <p class="text-muted">Sistema de Gestión de Recursos Humanos</p>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4 col-sm-6">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Empleados</h5>
+                <p class="display-6 mb-0">@Model.Empleados</p>
+                <a asp-controller="Empleado" asp-action="Index" class="text-white text-decoration-none">Ir a Personal &rarr;</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="card text-bg-secondary">
+            <div class="card-body">
+                <h5 class="card-title">Personas</h5>
+                <p class="display-6 mb-0">@Model.Personas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Asistencias hoy</h5>
+                <p class="display-6 mb-0">@Model.asistenciasHoy</p>
+                <a asp-controller="Asistencia" asp-action="Index" class="text-white text-decoration-none">Ir a Asistencia &rarr;</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="card text-bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Áreas</h5>
+                <p class="display-6 mb-0">@Model.Areas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="card text-bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Cargos</h5>
+                <p class="display-6 mb-0">@Model.Cargos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="card text-bg-dark">
+            <div class="card-body">
+                <h5 class="card-title">Catálogos</h5>
+                <p class="display-6 mb-0">@CatalogoNavegacion.Items.Count</p>
+                <a asp-controller="Catalogo" asp-action="Index" asp-route-tabla="Cargo" class="text-white text-decoration-none">Abrir Mantenimiento &rarr;</a>
+            </div>
+        </div>
+    </div>
+</div>

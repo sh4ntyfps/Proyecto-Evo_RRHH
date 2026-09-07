@@ -1,0 +1,76 @@
+@model CatalogoViewModel
+@{
+    ViewData["Title"] = $"Catálogos - {Model.Titulo}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>@Model.Titulo</h3>
+    @if (Model.Editable)
+    {
+        <a asp-action="Nuevo" asp-route-tabla="@Model.Tabla" class="btn btn-success">
+            <i class="bi bi-plus"></i> Nuevo
+        </a>
+    }
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <label class="form-label fw-bold">Seleccionar catálogo</label>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var item in CatalogoNavegacion.Items)
+            {
+                var activo = item.Key == Model.Tabla;
+                <a asp-action="Index" asp-route-tabla="@item.Key"
+                   class="btn btn-sm @(activo ? "btn-primary" : "btn-outline-secondary")">@item.Value</a>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.Filas.Count == 0)
+{
+    <div class="alert alert-info">Sin registros.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    @foreach (var col in Model.Columnas.Where(c => !c.EsArchivo))
+                    {
+                        <th>@col.Nombre</th>
+                    }
+                    @if (Model.Editable)
+                    {
+                        <th style="width:120px">Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fila in Model.Filas)
+                {
+                    var id = string.Join("|", Model.Claves.Select(c => fila[c]?.ToString() ?? ""));
+                    <tr>
+                        @foreach (var col in Model.Columnas.Where(c => !c.EsArchivo))
+                        {
+                            <td class="@(col.EsClave ? "fw-semibold" : "")">@(fila[col.Nombre] ?? "&nbsp;")</td>
+                        }
+                        @if (Model.Editable)
+                        {
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="Editar" asp-route-tabla="@Model.Tabla" asp-route-ids="@id">Editar</a>
+                                    <form asp-action="Eliminar" asp-route-tabla="@Model.Tabla" asp-route-ids="@id" method="post"
+                                          onsubmit="return confirm('¿Seguro de eliminar este registro?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

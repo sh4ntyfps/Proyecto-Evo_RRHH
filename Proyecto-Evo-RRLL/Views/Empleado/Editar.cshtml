@@ -1,0 +1,70 @@
+@model Empleado
+@{
+    ViewData["Title"] = $"Editar Empleado {Model.IdEmpleado}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Editar Empleado #@Model.IdEmpleado</h3>
+    <a asp-action="Detalles" asp-route-id="@Model.IdEmpleado" class="btn btn-outline-secondary">Volver</a>
+</div>
+
+<form asp-action="Editar" asp-route-id="@Model.IdEmpleado" method="post" enctype="multipart/form-data">
+    <div class="card">
+        <div class="card-body">
+            <input type="hidden" asp-for="IdEmpleado" />
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Fecha de ingreso</label>
+                    <input asp-for="FechaIngreso" type="date" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Estado</label>
+                    <input asp-for="Estado" class="form-control" placeholder="Activo / Inactivo..." />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Horario</label>
+                    <select asp-for="idHorario" class="form-select">
+                        <option value="">(sin asignar)</option>
+                        @foreach (var h in ViewBag.Horarios as List<Horario> ?? new List<Horario>())
+                        {
+                            <option value="@h.idHorario">@h.Descrip_Horario</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Local</label>
+                    <select asp-for="idLocal" class="form-select">
+                        <option value="">(sin asignar)</option>
+                        @foreach (var l in ViewBag.Locales as List<Local> ?? new List<Local>())
+                        {
+                            <option value="@l.idLocal">@l.NombreLocal</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Cargo</label>
+                    <select asp-for="IdCargo" class="form-select">
+                        <option value="">(sin asignar)</option>
+                        @foreach (var c in ViewBag.Cargos as List<Cargo> ?? new List<Cargo>())
+                        {
+                            <option value="@c.IdCargo">@c.Descripcion</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Foto</label>
+                    <input type="file" name="foto" class="form-control" accept="image/*" />
+                    <small class="text-muted">Si no selecciona archivo se conserva la foto actual.</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

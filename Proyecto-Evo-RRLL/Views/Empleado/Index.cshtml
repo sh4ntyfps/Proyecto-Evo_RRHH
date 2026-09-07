@@ -1,0 +1,73 @@
+@model EmpleadoViewModel
+@{
+    ViewData["Title"] = "Empleados";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Empleados</h3>
+    <form asp-action="Index" method="get" class="d-flex gap-2">
+        <input type="text" name="q" value="@Model.Busqueda" class="form-control" placeholder="Buscar por nombre o DNI..." />
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        @if (!string.IsNullOrEmpty(Model.Busqueda))
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+        }
+    </form>
+</div>
+
+@if (Model.Empleados.Count == 0)
+{
+    <div class="alert alert-info">No se encontraron empleados.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Foto</th>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>DNI</th>
+                    <th>Cargo</th>
+                    <th>Área</th>
+                    <th>Estado</th>
+                    <th>Ingreso</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var emp in Model.Empleados)
+                {
+                    <tr>
+                        <td>
+                            @if (emp.TieneFoto)
+                            {
+                                <img src="@Url.Action("MostrarFoto", "Empleado", new { id = emp.IdEmpleado })"
+                                     alt="Foto" style="width:36px;height:36px;object-fit:cover;border-radius:50%" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td class="fw-semibold">@emp.IdEmpleado</td>
+                        <td>@emp.Nombres</td>
+                        <td>@emp.NumDoc</td>
+                        <td>@emp.Cargo</td>
+                        <td>@emp.Area</td>
+                        <td>@emp.Estado</td>
+                        <td>@(emp.FechaIngreso?.ToString("dd/MM/yyyy"))</td>
+                        <td>
+                            <a asp-action="Detalles" asp-route-id="@emp.IdEmpleado" class="btn btn-sm btn-outline-primary">Ver</a>
+                            <a asp-action="Editar" asp-route-id="@emp.IdEmpleado" class="btn btn-sm btn-outline-secondary">Editar</a>
+                            <a asp-controller="FamiliaSalud" asp-action="Index" asp-route-idEmpleado="@emp.IdEmpleado" class="btn btn-sm btn-outline-success">Fam./Salud</a>
+                            <a asp-controller="Vivienda" asp-action="Index" asp-route-idEmpleado="@emp.IdEmpleado" class="btn btn-sm btn-outline-info">Vivienda</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="text-muted">Mostrando hasta @Model.Empleados.Count registros.</p>
+}

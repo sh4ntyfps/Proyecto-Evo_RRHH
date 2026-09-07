@@ -1,0 +1,20 @@
+## .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+
+## IDE
+.idea/
+*.swp
+*.sln.ide
+
+## Logs y temporales
+*.log
+*.tmp
