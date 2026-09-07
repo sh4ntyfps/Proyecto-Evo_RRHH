@@ -20,6 +20,20 @@ Sistema de Recursos Humanos (RR.HH.) en ASP.NET Core MVC (net10.0), arquitectura
    - **Usuario:** `admin`
    - **Contraseña:** `Admin.2026`
 
-## Conexión
+## Conexión a la base de datos
 
-La cadena de conexión `RRHHNuevo` está en `appsettings.json`. Si no tienes LocalDB instalado, apunta la cadena a tu instancia de SQL Server.
+El único archivo que hay que editar es `Proyecto-Evo-RRLL/appsettings.json`:
+
+```json
+"ConnectionStrings": {
+  "RRHHNuevo": "Server=(localdb)\\MSSQLLocalDB;Database=RRHH_Nuevo;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
+}
+```
+
+Cambia el valor de `Server=` según tu caso:
+
+- LocalDB/instalado en tu PC: `Server=LOCALHOST` o `Server=NOMBRE-PC\SQLEXPRESS`
+- Otra máquina: `Server=IP_O_NOMBRE,1433`
+- Con usuario/contraseña en vez de Windows: `Server=...;User Id=sa;Password=tuclave;`
+
+La clase de conexión (`EvoRRLDbContext`) está en `Capa Datos` y recibe esta cadena automáticamente; no hay que tocar nada más.
