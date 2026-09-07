@@ -85,3 +85,152 @@
         </div>
     </div>
 </div>
+
+<div class="row g-3 mb-2">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3"><i class="bi bi-diagram-3 me-2 text-primary"></i>Empleados por área</h6>
+                <canvas id="chartAreas"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3"><i class="bi bi-clock-history me-2 text-success"></i>Asistencias últimos 7 días</h6>
+                <canvas id="chartAsistencia"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3"><i class="bi bi-person-badge me-2 text-warning"></i>Empleados por estado</h6>
+                <canvas id="chartEstados"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/chart.js/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            var oscuro = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            var etiquetaColor = oscuro ? '#e2e8f0' : '#475569';
+            var grillaColor = oscuro ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)';
+            var indigo = '#4f6ef7';
+            var verde = '#10b981';
+            var paleta = ['#4f6ef7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#64748b'];
+
+            // Empleados por área (barra horizontal)
+            new Chart(document.getElementById('chartAreas'), {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AreasNombres)),
+                    datasets: [{
+                        label: 'Empleados',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmpleadosPorArea)),
+                        backgroundColor: indigo + 'cc',
+                        borderColor: indigo,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: oscuro ? '#1e293b' : 'rgba(0,0,0,.8)' }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: grillaColor } },
+                        y: { ticks: { color: etiquetaColor, autoSkip: false }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Asistencias últimos 7 días (línea)
+            new Chart(document.getElementById('chartAsistencia'), {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DiasAsistencia)),
+                    datasets: [{
+                        label: 'Asistencias',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AsistenciasPorDia)),
+                        borderColor: verde,
+                        backgroundColor: verde + '22',
+                        fill: true,
+                        tension: .35,
+                        pointBackgroundColor: verde
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: oscuro ? '#1e293b' : 'rgba(0,0,0,.8)' }
+                    },
+                    scales: {
+                        x: { ticks: { color: etiquetaColor }, grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0, color: etiquetaColor }, grid: { color: grillaColor } }
+                    }
+                }
+            });
+
+            // Empleados por estado (dona)
+            new Chart(document.getElementById('chartEstados'), {
+                type: 'doughnut',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EstadosNombres)),
+                    datasets: [{
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmpleadosPorEstado)),
+                        backgroundColor: Model.EmpleadosPorEstado.Select((_, i) => paleta[i % paleta.Length]).ToArray(),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '62%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: etiquetaColor, padding: 12 } },
+                        tooltip: { backgroundColor: oscuro ? '#1e293b' : 'rgba(0,0,0,.8)' }
+                    }
+                }
+            });
+
+            // Re-dibujar con colores correctos al cambiar de tema
+            var toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.addEventListener('click', function () { setTimeout(function () { location.reload(); }, 350); });
+        })();
+    </script>
+}
+
+<div class="row g-3 mb-2">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3"><i class="bi bi-diagram-3 me-2 text-primary"></i>Empleados por área</h6>
+                <canvas id="chartAreas"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3"><i class="bi bi-clock-history me-2 text-success"></i>Asistencias (últimos 7 días)</h6>
+                <canvas id="chartAsistencia"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3"><i class="bi bi-person-badge me-2 text-warning"></i>Empleados por estado</h6>
+                <canvas id="chartEstados"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

@@ -11,4 +11,16 @@ public class DashboardViewModel
     public int Areas { get; set; }
 
     public int Cargos { get; set; }
+
+    // Empleados por área (primer gráfico)
+    public List<string> AreasNombres { get; set; } = new();
+    public List<int> EmpleadosPorArea { get; set; } = new();
+
+    // Asistencias en los últimos 7 días (segundo gráfico)
+    public List<string> DiasAsistencia { get; set; } = new();
+    public List<int> AsistenciasPorDia { get; set; } = new();
+
+    // Distribución por estado del empleado (tercer gráfico)
+    public List<string> EstadosNombres { get; set; } = new();
+    public List<int> EmpleadosPorEstado { get; set; } = new();
 }
