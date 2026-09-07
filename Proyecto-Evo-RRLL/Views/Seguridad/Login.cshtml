@@ -4,35 +4,67 @@
     Layout = "_Layout";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Iniciar sesión</h3>
+<div class="auth-page">
+    <aside class="auth-panel p-5 flex-column justify-content-center position-relative">
+        <div class="position-relative" style="z-index:1">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span class="brand-logo" style="width:44px;height:44px;font-size:1.3rem"><i class="bi bi-person-badge-fill"></i></span>
+                <div>
+                    <div class="fw-bold fs-4">EVO RRHH</div>
+                    <div class="opacity-75 small">Gestión de Recursos Humanos</div>
+                </div>
+            </div>
+            <h1 class="fs-3 fw-semibold mb-3">Sistema integral de gestión del personal</h1>
+            <p class="opacity-75 mb-4">
+                Administra tus colaboradores, su asistencia, familias, salud, vivienda y mucho más.
+                Diseñado con una arquitectura de capas, seguro y moderno.
+            </p>
+            <ul class="list-unstyled small d-flex flex-column gap-2">
+                <li><i class="bi bi-check-circle-fill me-2"></i>Ficha personal, familiar y social</li>
+                <li><i class="bi bi-check-circle-fill me-2"></i>Registro y control de asistencia</li>
+                <li><i class="bi bi-check-circle-fill me-2"></i>Catálogos bajo mantenimiento centralizado</li>
+            </ul>
+        </div>
+    </aside>
+
+    <div class="auth-form-wrap">
+        <div class="card auth-login-card shadow-lg border-0">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <span class="brand-logo"><i class="bi bi-person-badge-fill"></i></span>
+                    <h4 class="mb-0">Bienvenido</h4>
+                </div>
+                <p class="text-secondary mb-4">Ingresa tus credenciales para acceder al sistema.</p>
 
                 @if (!string.IsNullOrEmpty(Model.Error))
                 {
-                    <div class="alert alert-danger">@Model.Error</div>
+                    <div class="alert alert-danger py-2 small"><i class="bi bi-exclamation-triangle me-1"></i>@Model.Error</div>
                 }
 
                 <form asp-action="Login" method="post">
                     <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
                     <div class="mb-3">
-                        <label asp-for="Login" class="form-label"></label>
-                        <input asp-for="Login" class="form-control" autofocus placeholder="Usuario" />
-                        <span asp-validation-for="Login" class="text-danger"></span>
-                    </div>
-                    <div class="mb-3">
-                        <label asp-for="Clave" class="form-label"></label>
+                        <label asp-for="Login" class="form-label fw-semibold"></label>
                         <div class="input-group">
-                            <input asp-for="Clave" type="password" class="form-control" placeholder="Clave" />
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input asp-for="Login" class="form-control" autofocus placeholder="Usuario" />
+                        </div>
+                        <span asp-validation-for="Login" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Clave" class="form-label fw-semibold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input asp-for="Clave" class="form-control" placeholder="Clave" />
                             <button type="button" class="btn btn-outline-secondary" data-toggle-password="#Clave">Mostrar</button>
                         </div>
-                        <span asp-validation-for="Clave" class="text-danger"></span>
+                        <span asp-validation-for="Clave" class="text-danger small"></span>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
+                    </button>
                 </form>
             </div>
         </div>

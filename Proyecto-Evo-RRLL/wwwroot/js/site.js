@@ -11,6 +11,8 @@
         initPasswordToggle();
         initCopyButtons();
         initAutoAlerts();
+        initSidebar();
+        initTooltips();
     });
 
     /* ---------- Modo oscuro ---------- */
@@ -31,9 +33,9 @@
 
         function aplicar(t) {
             root.setAttribute('data-bs-theme', t);
-            localStorage.setItem(STORE, t);
-            var icono = toggle.querySelector('svg use');
-            if (icono) icono.setAttribute('href', t === 'dark' ? '#i-sun' : '#i-moon');
+            try { localStorage.setItem(STORE, t); } catch (e) { }
+            var icono = document.getElementById('themeIcon');
+            if (icono) icono.className = t === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
         }
     }
 
@@ -140,6 +142,38 @@
                     setTimeout(function () { if (alerta.parentNode) alerta.remove(); }, 300);
                 }
             }, 5000);
+        });
+    }
+
+    /* ---------- Menú móvil (sidebar) ---------- */
+    function initSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        var backdrop = document.getElementById('sidebarBackdrop');
+        var btn = document.getElementById('btnMenu');
+        if (!sidebar || !backdrop || !btn) return;
+
+        function abrir() {
+            sidebar.classList.add('open');
+            backdrop.classList.add('open');
+        }
+        function cerrar() {
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('open');
+        }
+        btn.addEventListener('click', abrir);
+        backdrop.addEventListener('click', cerrar);
+        // Cierra al navegar (click en enlace del sidebar) en móvil
+        sidebar.querySelectorAll('a.sidebar-link, a.sidebar-sublink').forEach(function (enlace) {
+            enlace.addEventListener('click', function () {
+                if (window.innerWidth < 992) cerrar();
+            });
+        });
+    }
+
+    /* ---------- Tooltips ---------- */
+    function initTooltips() {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            bootstrap.Tooltip.getOrCreateInstance(el);
         });
     }
 

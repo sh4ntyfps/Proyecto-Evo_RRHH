@@ -7,10 +7,10 @@
     <h3>Empleados</h3>
     <form asp-action="Index" method="get" class="d-flex gap-2">
         <input type="text" name="q" value="@Model.Busqueda" class="form-control" placeholder="Buscar por nombre o DNI..." />
-        <button type="submit" class="btn btn-primary">Buscar</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Buscar</button>
         @if (!string.IsNullOrEmpty(Model.Busqueda))
         {
-            <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+            <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x-lg me-1"></i>Limpiar</a>
         }
     </form>
 </div>
@@ -59,10 +59,10 @@ else
                         <td>@emp.Estado</td>
                         <td>@(emp.FechaIngreso?.ToString("dd/MM/yyyy"))</td>
                         <td>
-                            <a asp-action="Detalles" asp-route-id="@emp.IdEmpleado" class="btn btn-sm btn-outline-primary">Ver</a>
-                            <a asp-action="Editar" asp-route-id="@emp.IdEmpleado" class="btn btn-sm btn-outline-secondary">Editar</a>
-                            <a asp-controller="FamiliaSalud" asp-action="Index" asp-route-idEmpleado="@emp.IdEmpleado" class="btn btn-sm btn-outline-success">Fam./Salud</a>
-                            <a asp-controller="Vivienda" asp-action="Index" asp-route-idEmpleado="@emp.IdEmpleado" class="btn btn-sm btn-outline-info">Vivienda</a>
+                            <a asp-action="Detalles" asp-route-id="@emp.IdEmpleado" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                            <a asp-action="Editar" asp-route-id="@emp.IdEmpleado" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <a asp-controller="FamiliaSalud" asp-action="Index" asp-route-idEmpleado="@emp.IdEmpleado" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Familia y salud"><i class="bi bi-heart-pulse"></i></a>
+                            <a asp-controller="Vivienda" asp-action="Index" asp-route-idEmpleado="@emp.IdEmpleado" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="Vivienda"><i class="bi bi-house"></i></a>
                         </td>
                     </tr>
                 }
