@@ -26,7 +26,10 @@
                     </div>
                     <div class="mb-3">
                         <label asp-for="Clave" class="form-label"></label>
-                        <input asp-for="Clave" class="form-control" placeholder="Clave" />
+                        <div class="input-group">
+                            <input asp-for="Clave" type="password" class="form-control" placeholder="Clave" />
+                            <button type="button" class="btn btn-outline-secondary" data-toggle-password="#Clave">Mostrar</button>
+                        </div>
                         <span asp-validation-for="Clave" class="text-danger"></span>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Entrar</button>

@@ -44,6 +44,11 @@ namespace Proyecto_Evo_RRLL.Controllers
             return View(model);
         }
 
+        public IActionResult Ayuda()
+        {
+            return View();
+        }
+
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

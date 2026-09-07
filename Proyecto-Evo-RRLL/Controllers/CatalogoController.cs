@@ -67,7 +67,15 @@ public class CatalogoController : Controller
     public async Task<IActionResult> Nuevo(string tabla, IFormCollection form)
     {
         var datos = FormAAccion(form);
-        await _repositorio.Crear(tabla, datos);
+        try
+        {
+            await _repositorio.Crear(tabla, datos);
+            TempData["MensajeExito"] = $"{CatalogoNavegacion.Items[tabla]}: registro creado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            TempData["MensajeError"] = $"No se pudo crear el registro: {ex.Message}";
+        }
         return RedirectToAction("Index", new { tabla });
     }
 
@@ -101,7 +109,15 @@ public class CatalogoController : Controller
     {
         var separados = ids.Split('|');
         var datos = FormAAccion(form);
-        await _repositorio.Actualizar(tabla, separados, datos);
+        try
+        {
+            await _repositorio.Actualizar(tabla, separados, datos);
+            TempData["MensajeExito"] = $"{CatalogoNavegacion.Items[tabla]}: registro actualizado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            TempData["MensajeError"] = $"No se pudo actualizar el registro: {ex.Message}";
+        }
         return RedirectToAction("Index", new { tabla });
     }
 
@@ -109,7 +125,15 @@ public class CatalogoController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Eliminar(string tabla, string ids)
     {
-        await _repositorio.Eliminar(tabla, ids.Split('|'));
+        try
+        {
+            await _repositorio.Eliminar(tabla, ids.Split('|'));
+            TempData["MensajeExito"] = $"{CatalogoNavegacion.Items[tabla]}: registro eliminado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            TempData["MensajeError"] = $"No se pudo eliminar el registro: {ex.Message}";
+        }
         return RedirectToAction("Index", new { tabla });
     }
 

@@ -49,6 +49,7 @@ public class SeguridadController : Controller
             modelo.Error = "Usuario o clave incorrectos.";
             return View(modelo);
         }
+        TempData["MensajeExito"] = $"Bienvenido, {usuario.Login!.Trim()}.";
 
         var roles = await _usuarioData.ObtenerRoles(usuario.IdUsuario);
 
