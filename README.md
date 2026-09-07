@@ -15,7 +15,7 @@ Sistema de Recursos Humanos (RR.HH.) en ASP.NET Core MVC (net10.0), arquitectura
    - Crea la base de datos `RRHH_Nuevo` con sus 76 tablas y claves foráneas.
 3. Descomprimir `Scripts/bd-Datos.zip` y ejecutar el `bd-Datos.sql` resultante sobre `RRHH_Nuevo`.
    - Carga los datos del sistema (puede tardar unos minutos).
-4. Abrir el proyecto en Visual Studio y presionar **F5** (o ejecutar `dotnet run` en la raíz del proyecto web).
+4. Abrir el proyecto en Visual Studio y presionar **F5**
 5. Iniciar sesión con el usuario creado automáticamente al arrancar:
    - **Usuario:** `admin`
    - **Contraseña:** `Admin.2026`
