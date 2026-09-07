@@ -4,37 +4,15 @@
     Layout = "_Layout";
 }
 
-<div class="auth-page">
-    <aside class="auth-panel p-5 flex-column justify-content-center position-relative">
-        <div class="position-relative" style="z-index:1">
-            <div class="d-flex align-items-center gap-3 mb-4">
-                <span class="brand-logo" style="width:44px;height:44px;font-size:1.3rem"><i class="bi bi-person-badge-fill"></i></span>
-                <div>
-                    <div class="fw-bold fs-4">EVO RRHH</div>
-                    <div class="opacity-75 small">Gestión de Recursos Humanos</div>
-                </div>
-            </div>
-            <h1 class="fs-3 fw-semibold mb-3">Sistema integral de gestión del personal</h1>
-            <p class="opacity-75 mb-4">
-                Administra tus colaboradores, su asistencia, familias, salud, vivienda y mucho más.
-                Diseñado con una arquitectura de capas, seguro y moderno.
-            </p>
-            <ul class="list-unstyled small d-flex flex-column gap-2">
-                <li><i class="bi bi-check-circle-fill me-2"></i>Ficha personal, familiar y social</li>
-                <li><i class="bi bi-check-circle-fill me-2"></i>Registro y control de asistencia</li>
-                <li><i class="bi bi-check-circle-fill me-2"></i>Catálogos bajo mantenimiento centralizado</li>
-            </ul>
-        </div>
-    </aside>
-
-    <div class="auth-form-wrap">
+<div class="auth-page justify-content-center">
+    <div class="auth-form-wrap" style="max-width:480px">
         <div class="card auth-login-card shadow-lg border-0">
             <div class="card-body p-4 p-md-5">
-                <div class="d-flex align-items-center gap-2 mb-4">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
                     <span class="brand-logo"><i class="bi bi-person-badge-fill"></i></span>
                     <h4 class="mb-0">Bienvenido</h4>
                 </div>
-                <p class="text-secondary mb-4">Ingresa tus credenciales para acceder al sistema.</p>
+                <p class="text-secondary text-center mb-4">Inicia sesión para continuar.</p>
 
                 @if (!string.IsNullOrEmpty(Model.Error))
                 {
