@@ -33,11 +33,14 @@
 }
 else
 {
+    var columnasVisibles = Model.Columnas.Where(c => !c.EsArchivo).Take(9).ToList();
+    var columnasOcultas = Model.Columnas.Count(c => !c.EsArchivo) - columnasVisibles.Count;
+
     <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle" data-search-target>
-            <thead class="table-light">
+        <table class="table table-hover align-middle" data-search-target>
+            <thead>
                 <tr>
-                    @foreach (var col in Model.Columnas.Where(c => !c.EsArchivo))
+                    @foreach (var col in columnasVisibles)
                     {
                         <th>@col.Nombre</th>
                     }
@@ -52,7 +55,7 @@ else
                 {
                     var id = string.Join("|", Model.Claves.Select(c => fila[c]?.ToString() ?? ""));
                     <tr>
-                        @foreach (var col in Model.Columnas.Where(c => !c.EsArchivo))
+                        @foreach (var col in columnasVisibles)
                         {
                             <td class="@(col.EsClave ? "fw-semibold" : "")">@(fila[col.Nombre] ?? "&nbsp;")</td>
                         }
@@ -73,4 +76,15 @@ else
             </tbody>
         </table>
     </div>
+    <p class="text-muted">
+        @Model.Filas.Count registro(s) (@Model.Columnas.Count(c => !c.EsArchivo) columna(s) en total,
+        @if (columnasOcultas > 0)
+        {
+            <span>mostrando las primeras @columnasVisibles.Count — las restantes @columnasOcultas solo se muestran al editar.</span>
+        }
+        else
+        {
+            <span>todas visibles.</span>
+        })
+    </p>
 }
