@@ -4,6 +4,7 @@
     'use strict';
 
     document.addEventListener('DOMContentLoaded', function () {
+        initSplash();
         initTheme();
         initSearch();
         initBackToTop();
@@ -14,6 +15,17 @@
         initSidebar();
         initTooltips();
     });
+
+    /* ---------- Splash de carga ---------- */
+    function initSplash() {
+        var splash = document.getElementById('splashLoader');
+        if (!splash) return;
+        var ocultar = function () { splash.classList.add('hidden'); };
+        if (document.readyState === 'complete') setTimeout(ocultar, 600);
+        else window.addEventListener('load', function () { setTimeout(ocultar, 600); });
+        // Respaldo por si 'load' tarda demasiado
+        setTimeout(ocultar, 3000);
+    }
 
     /* ---------- Modo oscuro ---------- */
     function initTheme() {
