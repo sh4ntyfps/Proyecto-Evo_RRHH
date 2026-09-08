@@ -96,6 +96,18 @@ namespace Proyecto_Evo_RRLL.Controllers
 
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult PaginaNoEncontrada(int statusCode = 404)
+        {
+            return View(statusCode);
+        }
+
+        public IActionResult Privacidad()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

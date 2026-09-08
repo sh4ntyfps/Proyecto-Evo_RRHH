@@ -538,3 +538,55 @@ html[data-bs-theme="dark"] .sidebar {
 }
 
 ::selection { background: rgba(37, 99, 235, .22); }
+
+/* ---------- Página 404 ---------- */
+.codigo-404 {
+  width: 190px;
+  height: 120px;
+  gap: .35rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 4.8rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1.25rem;
+  background: var(--bs-secondary-bg);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+}
+
+.codigo-404-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  height: 74px;
+  border-radius: 1rem;
+  background: var(--evo-primary-soft);
+  font-size: 2.4rem;
+  animation: compassSpin 4s linear infinite;
+}
+
+@keyframes compassSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ---------- Página de privacidad ---------- */
+.privacy-section {
+  border: 1px solid var(--bs-border-color);
+  border-radius: .8rem;
+  padding: 1.1rem 1.25rem;
+  background: var(--bs-secondary-bg);
+}
+
+.privacy-section i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: .6rem;
+  background: var(--evo-primary-soft);
+  color: var(--evo-primary);
+  font-size: 1.05rem;
+}
