@@ -52,6 +52,13 @@
                     <i class="bi bi-briefcase"></i><span>Historial Laboral</span>
                 </a>
 
+                <div class="sidebar-section">SEGURIDAD</div>
+                <div class="sidebar-submenu">
+                    <a class="sidebar-link @(controlador == "SeguridadAdmin" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Usuarios">
+                        <i class="bi bi-person-gear"></i><span>Usuarios y roles</span>
+                    </a>
+                </div>
+
                 <div class="sidebar-section">ADMINISTRACIÓN</div>
                 <div class="sidebar-submenu">
                     <a class="sidebar-link @(controlador == "Catalogo" ? "active" : "")" data-bs-toggle="collapse" href="#menuCatalogo" role="button" aria-expanded="false" aria-controls="menuCatalogo">
