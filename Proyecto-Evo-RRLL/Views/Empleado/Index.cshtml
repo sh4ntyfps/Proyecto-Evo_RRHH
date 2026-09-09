@@ -1,73 +1,82 @@
 @model EmpleadoViewModel
 @{
-    ViewData["Title"] = "Empleados";
+    ViewData["Title"] = "Personal";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Empleados</h3>
-    <form asp-action="Index" method="get" class="d-flex gap-2">
-        <input type="text" name="q" value="@Model.Busqueda" class="form-control" placeholder="Buscar por nombre o DNI..." />
-        <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Buscar</button>
-        @if (!string.IsNullOrEmpty(Model.Busqueda))
-        {
-            <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x-lg me-1"></i>Limpiar</a>
-        }
-    </form>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div>
+        <h3 class="mb-0">Empleados</h3>
+        <span class="text-secondary small">@Model.Empleados.Count registro(s)</span>
+    </div>
 </div>
 
-@if (Model.Empleados.Count == 0)
-{
-    <div class="alert alert-info">No se encontraron empleados.</div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-hover align-middle" data-search-target>
-            <thead>
+<form method="get" class="mb-3 d-flex align-items-center gap-2">
+    <input type="search" name="q" class="form-control" style="max-width:320px" placeholder="Buscar por nombre o documento..." value="@Model.Busqueda" />
+    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>Buscar</button>
+    @if (!string.IsNullOrWhiteSpace(Model.Busqueda))
+    {
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x-lg me-1"></i>Limpiar</a>
+    }
+</form>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle" data-search-target>
+        <thead>
+            <tr>
+                <th style="width:56px">Foto</th>
+                <th>Empleado</th>
+                <th>N° documento</th>
+                <th>Cargo</th>
+                <th>Área</th>
+                <th>Ingreso</th>
+                <th>Estado</th>
+                <th style="width:70px">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Empleados.Count == 0)
+            {
+                <tr><td colspan="8" class="text-center text-secondary py-4">Sin empleados.</td></tr>
+            }
+            @foreach (var e in Model.Empleados)
+            {
                 <tr>
-                    <th>Foto</th>
-                    <th>Id</th>
-                    <th>Nombre</th>
-                    <th>DNI</th>
-                    <th>Cargo</th>
-                    <th>Área</th>
-                    <th>Estado</th>
-                    <th>Ingreso</th>
-                    <th></th>
+                    <td>
+                        @if (e.TieneFoto)
+                        {
+                            <img src="@Url.Action("MostrarFoto", new { id = e.IdEmpleado })" alt="Foto" class="rounded-circle overflow-hidden object-fit-cover" style="width:40px;height:40px" />
+                        }
+                        else
+                        {
+                            <div class="rounded-circle bg-body-tertiary d-inline-flex align-items-center justify-content-center text-secondary" style="width:40px;height:40px;font-size:1rem">
+                                <i class="bi bi-person"></i>
+                            </div>
+                        }
+                    </td>
+                    <td class="fw-semibold">@e.Nombres</td>
+                    <td>@e.NumDoc</td>
+                    <td>@e.Cargo</td>
+                    <td>@e.Area</td>
+                    <td>@e.FechaIngreso?.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (e.Estado == "A")
+                        {
+                            <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Activo</span>
+                        }
+                        else if (e.Estado == "I")
+                        {
+                            <span class="badge rounded-pill text-bg-secondary"><i class="bi bi-dash-circle me-1"></i>Inactivo</span>
+                        }
+                        else
+                        {
+                            @e.Estado
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Detalles" asp-route-id="@e.IdEmpleado" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver ficha"><i class="bi bi-eye"></i></a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var emp in Model.Empleados)
-                {
-                    <tr>
-                        <td>
-                            @if (emp.TieneFoto)
-                            {
-                                <img src="@Url.Action("MostrarFoto", "Empleado", new { id = emp.IdEmpleado })"
-                                     alt="Foto" style="width:36px;height:36px;object-fit:cover;border-radius:50%" />
-                            }
-                            else
-                            {
-                                <span class="text-muted">-</span>
-                            }
-                        </td>
-                        <td class="fw-semibold">@emp.IdEmpleado</td>
-                        <td>@emp.Nombres</td>
-                        <td>@emp.NumDoc</td>
-                        <td>@emp.Cargo</td>
-                        <td>@emp.Area</td>
-                        <td>@emp.Estado</td>
-                        <td>@(emp.FechaIngreso?.ToString("dd/MM/yyyy"))</td>
-                        <td>
-                            <a asp-action="Detalles" asp-route-id="@emp.IdEmpleado" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver detalle"><i class="bi bi-eye"></i></a>
-                            <a asp-action="Editar" asp-route-id="@emp.IdEmpleado" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                            <a asp-controller="FamiliaSalud" asp-action="Index" asp-route-idEmpleado="@emp.IdEmpleado" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Familia y salud"><i class="bi bi-heart-pulse"></i></a>
-                            <a asp-controller="Vivienda" asp-action="Index" asp-route-idEmpleado="@emp.IdEmpleado" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="Vivienda"><i class="bi bi-house"></i></a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    <p class="text-muted">Mostrando hasta @Model.Empleados.Count registros.</p>
-}
+            }
+        </tbody>
+    </table>
+</div>

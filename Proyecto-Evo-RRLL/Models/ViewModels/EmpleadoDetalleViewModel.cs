@@ -1,18 +1,18 @@
+using Capa_Entidades;
+
 namespace Proyecto_Evo_RRLL.Models.ViewModels;
 
 public class EmpleadoDetalleViewModel
 {
     public int IdEmpleado { get; set; }
 
+    public Empleado? Empleado { get; set; }
+
+    public Persona? Persona { get; set; }
+
     public string? NombresCompletos { get; set; }
 
     public string? TipoDoc { get; set; }
-
-    public string? NumDoc { get; set; }
-
-    public string? Sexo { get; set; }
-
-    public string? EstadoCivil { get; set; }
 
     public string? Cargo { get; set; }
 
@@ -24,7 +24,17 @@ public class EmpleadoDetalleViewModel
 
     public string? Estado { get; set; }
 
-    public DateTime? FechaIngreso { get; set; }
+    public string? AFP { get; set; }
+
+    public string? EstadoCivil { get; set; }
+
+    public string? TipoSangre { get; set; }
+
+    public string? Discapacidad { get; set; }
+
+    public string? ViveCon { get; set; }
+
+    public string? Nacionalidad { get; set; }
 
     public string? TipoTrabajador { get; set; }
 
