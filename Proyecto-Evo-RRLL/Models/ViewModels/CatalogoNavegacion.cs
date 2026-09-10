@@ -20,6 +20,12 @@ public static class CatalogoNavegacion
         ["Discapacidad"] = "Discapacidades",
         ["Limitacion"] = "Limitaciones",
         ["TipoComportamiento"] = "Tipos de Comportamiento",
-        ["TipoResolucion"] = "Tipos de Resolución"
+        ["TipoResolucion"] = "Tipos de Resolución",
+        ["Familia"] = "Clasificación de Familias",
+        ["TipoFamiliar"] = "Tipos de Familiar",
+        ["RRHH_TipoFamilia"] = "Tipos de Familia",
+        ["RRHH_RelacPareja"] = "Relación con Pareja",
+        ["RRHH_RelacPH"] = "Relación con Jefe de Hogar",
+        ["RRHH_RelacHermano"] = "Relación con Hermanos"
     };
 }

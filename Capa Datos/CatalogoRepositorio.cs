@@ -15,7 +15,9 @@ public class CatalogoRepositorio
         "Cargo", "MotivoBaja", "EstadoCivil", "TipoDocID", "TipoTrabajador",
         "TipoSangre", "Nacionalidad", "RegimenPension", "ViveCon", "TipoPermiso",
         "Motivo_Perm", "TipoEstudio", "TipoInstitucion", "Discapacidad",
-        "Limitacion", "TipoComportamiento", "TipoResolucion"
+        "Limitacion", "TipoComportamiento", "TipoResolucion", "Familia",
+        "TipoFamiliar", "RRHH_TipoFamilia", "RRHH_RelacPareja", "RRHH_RelacPH",
+        "RRHH_RelacHermano"
     };
 
     private readonly EvoRRLDbContext _contexto;
