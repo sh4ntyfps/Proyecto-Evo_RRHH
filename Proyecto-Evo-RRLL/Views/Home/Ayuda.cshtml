@@ -1,71 +1,325 @@
 @{
     ViewData["Title"] = "Ayuda";
 }
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <h1 class="h3 mb-4">Preguntas frecuentes</h1>
 
-        <div class="accordion" id="faqAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                        ¿Cómo inicio sesión?
-                    </button>
-                </h2>
-                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        Usa el menú de seguridad con el usuario <code>admin</code> y la contraseña <code>Admin.2026</code>. Si olvidaste la clave, contacta al administrador del sistema.
+<style>
+    :root {
+        --rrhh-primary: #1E3A8A;
+        --rrhh-secondary: #2563EB;
+        --rrhh-primary-soft: #EFF6FF;
+        --rrhh-bg: #F8FAFC;
+        --rrhh-surface: #FFFFFF;
+        --rrhh-border: #E2E8F0;
+        --rrhh-text: #1E293B;
+        --rrhh-muted: #64748B;
+    }
+
+    .help-page {
+        padding: 1rem 0 2rem;
+    }
+
+    .help-header {
+        background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.16);
+    }
+
+    .help-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: .5rem;
+    }
+
+    .help-header p {
+        margin: 0;
+        opacity: .9;
+        font-size: .98rem;
+    }
+
+    .faq-title {
+        color: var(--rrhh-text);
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    #faqAccordion {
+        display: flex;
+        flex-direction: column;
+        gap: .8rem;
+    }
+
+    #faqAccordion .accordion-item {
+        border: 1px solid var(--rrhh-border);
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: var(--rrhh-surface);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    #faqAccordion .accordion-button {
+        font-weight: 600;
+        color: var(--rrhh-text);
+        background-color: var(--rrhh-surface);
+        padding: 1.15rem 1.25rem;
+        box-shadow: none;
+        transition: all .2s ease;
+    }
+
+    #faqAccordion .accordion-button:hover {
+        background-color: var(--rrhh-primary-soft);
+        color: var(--rrhh-primary);
+    }
+
+    #faqAccordion .accordion-button:not(.collapsed) {
+        color: var(--rrhh-primary);
+        background-color: var(--rrhh-primary-soft);
+        box-shadow: none;
+    }
+
+    #faqAccordion .accordion-button:focus {
+        box-shadow: 0 0 0 .2rem rgba(37, 99, 235, 0.12);
+        border-color: transparent;
+    }
+
+    #faqAccordion .accordion-button::after {
+        filter: none;
+    }
+
+    #faqAccordion .accordion-body {
+        color: var(--rrhh-muted);
+        line-height: 1.7;
+        padding: 1.2rem 1.25rem;
+        background-color: var(--rrhh-surface);
+        border-top: 1px solid var(--rrhh-border);
+    }
+
+    #faqAccordion code {
+        color: var(--rrhh-primary);
+        background-color: var(--rrhh-primary-soft);
+        padding: .15rem .4rem;
+        border-radius: 5px;
+        font-size: .88em;
+    }
+
+    .help-footer {
+        margin-top: 2rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px;
+        background-color: var(--rrhh-primary-soft);
+        border: 1px solid #DBEAFE;
+        color: var(--rrhh-text);
+    }
+
+    .help-footer strong {
+        color: var(--rrhh-primary);
+    }
+
+    /* Compatibilidad básica con modo oscuro */
+    [data-bs-theme="dark"] .help-page {
+        --rrhh-bg: #0F172A;
+        --rrhh-surface: #1E293B;
+        --rrhh-border: #334155;
+        --rrhh-text: #F1F5F9;
+        --rrhh-muted: #CBD5E1;
+        --rrhh-primary-soft: #172554;
+    }
+
+    [data-bs-theme="dark"] #faqAccordion .accordion-button,
+    [data-bs-theme="dark"] #faqAccordion .accordion-body,
+    [data-bs-theme="dark"] #faqAccordion .accordion-item {
+        background-color: var(--rrhh-surface);
+    }
+
+    [data-bs-theme="dark"] #faqAccordion .accordion-button:not(.collapsed),
+    [data-bs-theme="dark"] #faqAccordion .accordion-button:hover {
+        background-color: var(--rrhh-primary-soft);
+        color: #93C5FD;
+    }
+
+    [data-bs-theme="dark"] .help-footer {
+        background-color: #172554;
+        border-color: #1E3A8A;
+        color: #E2E8F0;
+    }
+
+    [data-bs-theme="dark"] .help-footer strong {
+        color: #93C5FD;
+    }
+</style>
+
+<div class="help-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Encabezado -->
+            <div class="help-header">
+                <h1>Centro de ayuda</h1>
+                <p>
+                    Encuentra respuestas rápidas sobre el uso y configuración
+                    del Sistema de Recursos Humanos.
+                </p>
+            </div>
+
+            <h2 class="faq-title">Preguntas frecuentes</h2>
+
+            <div class="accordion" id="faqAccordion">
+
+                <!-- FAQ 1 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq1"
+                                aria-expanded="true"
+                                aria-controls="faq1">
+                            ¿Cómo inicio sesión?
+                        </button>
+                    </h2>
+
+                    <div id="faq1"
+                         class="accordion-collapse collapse show"
+                         data-bs-parent="#faqAccordion">
+
+                        <div class="accordion-body">
+                            Ingresa desde el menú de seguridad utilizando las
+                            credenciales asignadas por el administrador del sistema.
+
+                            Si olvidaste tu contraseña o no puedes acceder,
+                            comunícate con el administrador.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                        ¿Cómo cambio el tema claro/oscuro?
-                    </button>
-                </h2>
-                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        En la barra superior, junto a tu usuario, está el botón con el ícono de luna/sol. La preferencia se guarda en tu navegador y se recuerda la próxima vez que ingreses.
+
+                <!-- FAQ 2 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq2"
+                                aria-expanded="false"
+                                aria-controls="faq2">
+                            ¿Cómo cambio el tema claro u oscuro?
+                        </button>
+                    </h2>
+
+                    <div id="faq2"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#faqAccordion">
+
+                        <div class="accordion-body">
+                            En la barra superior, junto a tu usuario, encontrarás
+                            el botón con el ícono de luna o sol.
+
+                            La preferencia se guarda en tu navegador y se recuerda
+                            la próxima vez que ingreses.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                        ¿Para qué sirve el buscador de la barra superior?
-                    </button>
-                </h2>
-                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        Filtra en tiempo real las tablas y listados de la página actual (Personal, Asistencia, Mantenimiento, etc.). Escribe y verás solo los registros que coinciden.
+
+                <!-- FAQ 3 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq3"
+                                aria-expanded="false"
+                                aria-controls="faq3">
+                            ¿Para qué sirve el buscador de la barra superior?
+                        </button>
+                    </h2>
+
+                    <div id="faq3"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#faqAccordion">
+
+                        <div class="accordion-body">
+                            El buscador permite filtrar en tiempo real las tablas
+                            y listados de la página actual, como Personal,
+                            Asistencia y Mantenimiento.
+
+                            Escribe parte del nombre, código o información que
+                            buscas y se mostrarán únicamente los registros
+                            coincidentes.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                        ¿Qué hago si los datos no coinciden con mi base de datos?
-                    </button>
-                </h2>
-                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        La conexión se configura en <code>appsettings.json</code> (clave <code>RRHHNuevo</code>). Asegúrate de haberte ejecutado el script de esquema <code>bd-evo-RRLL.sql</code> y luego cargar los datos.
+
+                <!-- FAQ 4 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq4"
+                                aria-expanded="false"
+                                aria-controls="faq4">
+                            ¿Qué hago si encuentro información incorrecta?
+                        </button>
+                    </h2>
+
+                    <div id="faq4"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#faqAccordion">
+
+                        <div class="accordion-body">
+                            Verifica primero que estés consultando el módulo,
+                            trabajador y período correctos.
+
+                            Si la información continúa siendo incorrecta,
+                            comunícate con el administrador del sistema o con el
+                            responsable de Recursos Humanos para realizar la
+                            validación correspondiente.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                        ¿El sistema acepta cambios de otros desarrolladores?
-                    </button>
-                </h2>
-                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        Sí. La rama <code>testing</code> es para que el equipo haga sus pruebas; los cambios aprobados se fusionan a <code>main</code>. Así el sistema base queda siempre estable.
+
+                <!-- FAQ 5 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq5"
+                                aria-expanded="false"
+                                aria-controls="faq5">
+                            ¿Cómo reporto un problema en el sistema?
+                        </button>
+                    </h2>
+
+                    <div id="faq5"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#faqAccordion">
+
+                        <div class="accordion-body">
+                            Al reportar un problema, indica el módulo donde ocurrió,
+                            describe lo que estabas realizando y, de ser posible,
+                            adjunta una captura de pantalla.
+
+                            Esta información ayudará al equipo encargado a
+                            identificar y resolver el inconveniente.
+                        </div>
                     </div>
                 </div>
+
             </div>
+
+            <!-- Soporte -->
+            <div class="help-footer">
+                <strong>¿Necesitas más ayuda?</strong>
+                <div class="mt-1">
+                    Si no encuentras la respuesta que necesitas, comunícate con
+                    el administrador del sistema o con el área responsable de
+                    Recursos Humanos.
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
