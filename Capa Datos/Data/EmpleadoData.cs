@@ -11,6 +11,9 @@ public class EmpleadoData
 
     public async Task<List<Empleado>> Listar() => await _contexto.Set<Empleado>().ToListAsync();
 
+    public async Task<List<Empleado>> ListarPorIds(IEnumerable<int> ids)
+        => await _contexto.Set<Empleado>().Where(e => ids.Contains(e.IdEmpleado)).ToListAsync();
+
     public async Task<Empleado?> Obtener(int IdEmpleadoParam)
     {
         return await _contexto.Set<Empleado>().FindAsync(IdEmpleadoParam);

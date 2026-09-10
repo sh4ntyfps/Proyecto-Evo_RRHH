@@ -11,6 +11,10 @@ public class CapacitacionLogica
 
     public async Task<List<Capacitacion>> Listar() => await _data.Listar();
 
+    public async Task<int> CountAsync() => await _data.CountAsync();
+
+    public async Task<List<Capacitacion>> ListarPaged(int pageIndex, int pageSize) => await _data.ListarPaged(pageIndex, pageSize);
+
     public async Task<Capacitacion?> Obtener(int IdCapacitacionParam) => await _data.Obtener(IdCapacitacionParam);
 
     public async Task Crear(Capacitacion registro) => await _data.Crear(registro);

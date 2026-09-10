@@ -11,6 +11,15 @@ public class CapacitacionData
 
     public async Task<List<Capacitacion>> Listar() => await _contexto.Set<Capacitacion>().ToListAsync();
 
+    public async Task<int> CountAsync() => await _contexto.Set<Capacitacion>().CountAsync();
+
+    public async Task<List<Capacitacion>> ListarPaged(int pageIndex, int pageSize)
+        => await _contexto.Set<Capacitacion>()
+            .OrderBy(c => c.IdCapacitacion)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
     public async Task<Capacitacion?> Obtener(int IdCapacitacionParam)
     {
         return await _contexto.Set<Capacitacion>().FindAsync(IdCapacitacionParam);

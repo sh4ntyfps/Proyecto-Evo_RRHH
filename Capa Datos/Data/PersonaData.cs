@@ -33,4 +33,7 @@ public class PersonaData
         _contexto.Set<Persona>().Remove(registro);
         await _contexto.SaveChangesAsync();
     }
+
+    public async Task<List<Persona>> ListarPorIds(IEnumerable<int> ids)
+        => await _contexto.Set<Persona>().Where(p => ids.Contains(p.IdPersona)).ToListAsync();
 }

@@ -1,0 +1,106 @@
+@model List<Capa_Entidades.Capacitacion>
+
+@{
+    ViewData["Title"] = "Capacitaciones";
+    var nombres = ViewBag.Nombres as Dictionary<int, string?> ?? new Dictionary<int, string?>();
+}
+
+<h2>Capacitaciones</h2>
+
+<p>
+    <a class="btn btn-primary" asp-action="CapacitacionForm">Nueva capacitación</a>
+    <a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Volver</a>
+</p>
+
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Curso</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Horas</th>
+            <th>Institución</th>
+            <th>Empleado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.IdCapacitacion</td>
+                <td>@item.NombreCurso</td>
+                <td>@item.FechaInicio?.ToString("yyyy-MM-dd")</td>
+                <td>@item.FechaFin?.ToString("yyyy-MM-dd")</td>
+                <td>@item.NumHoras</td>
+                <td>@item.InstitucionOrganizadora</td>
+                <td>@(nombres.ContainsKey(item.IdCapacitacion) ? nombres[item.IdCapacitacion] : null)</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-action="Detalles" asp-route-id="@item.IdCapacitacion">Ver</a>
+                    <a class="btn btn-sm btn-primary" asp-action="CapacitacionForm" asp-route-id="@item.IdCapacitacion">Editar</a>
+                    <form asp-action="Eliminar" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@item.IdCapacitacion" />
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Eliminar registro?');">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var current = ViewBag.CurrentPage as int? ?? 1;
+    var total = ViewBag.TotalPages as int? ?? 1;
+    var maxButtons = 5; // max page number buttons to show
+    var half = maxButtons / 2;
+    var start = current - half;
+    var end = current + half;
+    if (start < 1) { end += 1 - start; start = 1; }
+    if (end > total) { start -= end - total; end = total; }
+    if (start < 1) start = 1;
+}
+
+<nav aria-label="Page navigation">
+    <ul class="pagination flex-wrap">
+        <li class="page-item @(current <= 1 ? "disabled" : "")">
+            <a class="page-link" asp-action="Index" asp-route-page="@(current - 1)">Anterior</a>
+        </li>
+
+        @* First page + ellipsis if needed *@
+        @if (start > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-page="1">1</a>
+            </li>
+            @if (start > 2)
+            {
+                <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+            }
+        }
+
+        @for (int p = start; p <= end; p++)
+        {
+            <li class="page-item @(p == current ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+            </li>
+        }
+
+        @* Last page + ellipsis if needed *@
+        @if (end < total)
+        {
+            if (end < total - 1)
+            {
+                <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+            }
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-page="@total">@total</a>
+            </li>
+        }
+
+        <li class="page-item @(current >= total ? "disabled" : "")">
+            <a class="page-link" asp-action="Index" asp-route-page="@(current + 1)">Siguiente</a>
+        </li>
+    </ul>
+</nav>
