@@ -48,6 +48,8 @@
             try { localStorage.setItem(STORE, t); } catch (e) { }
             var icono = document.getElementById('themeIcon');
             if (icono) icono.className = t === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+            // Avisa a quien lo necesite (p. ej. los gráficos del dashboard) para recolorear sin recargar
+            document.dispatchEvent(new CustomEvent('evo:theme', { detail: { tema: t } }));
         }
     }
 

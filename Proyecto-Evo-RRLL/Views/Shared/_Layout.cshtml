@@ -25,6 +25,15 @@
     @if (User.Identity?.IsAuthenticated == true)
     {
         var controlador = ViewContext.RouteData.Values["controller"]?.ToString();
+        var nombreUsuario = User.Identity?.Name ?? "";
+        var partesNombre = nombreUsuario.Split(new[] { ' ', '.', '_', '-' }, StringSplitOptions.RemoveEmptyEntries);
+        string inicialesUsuario;
+        if (partesNombre.Length >= 2)
+            inicialesUsuario = (partesNombre[0].Substring(0, 1) + partesNombre[1].Substring(0, 1)).ToUpper();
+        else if (partesNombre.Length == 1)
+            inicialesUsuario = (partesNombre[0].Length >= 2 ? partesNombre[0].Substring(0, 2) : partesNombre[0].Substring(0, 1)).ToUpper();
+        else
+            inicialesUsuario = "?";
 
         <aside class="sidebar" id="sidebar">
             <a class="sidebar-brand d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
@@ -103,17 +112,17 @@
                 <div class="flex-grow-1 d-none d-md-block page-title">@ViewData["Title"]</div>
                 <div class="d-flex align-items-center gap-2 ms-auto">
                     <form class="d-flex me-2 d-none d-lg-inline-flex" role="search" onsubmit="return false;">
-                        <div class="input-group input-group-sm search-box">
+                        <div class="input-group search-box">
                             <span class="input-group-text"><i class="bi bi-search"></i></span>
                             <input id="siteSearch" type="search" class="form-control" placeholder="Buscar en esta página..." aria-label="Buscar en esta página" />
                         </div>
                     </form>
-                    <button id="themeToggle" class="icon-btn" type="button" aria-label="Cambiar tema">
+                    <button id="themeToggle" class="icon-btn" type="button" aria-label="Cambiar tema" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cambiar tema">
                         <i id="themeIcon" class="bi bi-moon-stars"></i>
                     </button>
                     <div class="dropdown">
-                        <button class="user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle"></i>
+                        <button class="user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Mi cuenta">
+                            <span class="user-avatar">@inicialesUsuario</span>
                             <span class="d-none d-sm-inline">@User.Identity.Name</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">
