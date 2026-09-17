@@ -19,6 +19,10 @@
   --bs-secondary-bg: #f8fafc;
   --bs-border-color: #e2e8f0;
   --evo-topbar-bg: #ffffff;
+
+  /* Superficie de los controles de la barra superior (búsqueda, tema, usuario) */
+  --evo-control-bg: #f1f5f9;
+  --evo-control-hover: #e2e8f0;
 }
 
 html[data-bs-theme="dark"] {
@@ -30,6 +34,10 @@ html[data-bs-theme="dark"] {
   --bs-border-color: #1e293b;
   --bs-secondary-color: #94a3b8;
   --evo-topbar-bg: #111c33;
+
+  /* En oscuro, un tono más claro que la barra para que los controles se distingan */
+  --evo-control-bg: #1c2842;
+  --evo-control-hover: #26324f;
 }
 
 html {
@@ -283,36 +291,78 @@ html[data-bs-theme="dark"] .sidebar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: .6rem;
   border: 1px solid var(--bs-border-color);
-  background: transparent;
+  background: var(--evo-control-bg);
   color: var(--bs-body-color);
   font-size: 1rem;
-  transition: color .15s ease, background-color .15s ease;
+  transition: color .15s ease, background-color .15s ease, border-color .15s ease;
 }
-.icon-btn:hover { color: var(--evo-primary); background: var(--bs-secondary-bg); }
+.icon-btn:hover { color: var(--evo-primary); background: var(--evo-control-hover); border-color: var(--evo-primary); }
 
 .user-chip {
   display: inline-flex;
   align-items: center;
   gap: .5rem;
-  padding: .4rem .75rem;
+  padding: .4rem .8rem;
+  height: 38px;
   border-radius: .6rem;
   border: 1px solid var(--bs-border-color);
-  background: transparent;
+  background: var(--evo-control-bg);
   color: var(--bs-body-color);
   font-weight: 500;
   font-size: .92rem;
+  transition: background-color .15s ease, border-color .15s ease;
 }
 .user-chip i { font-size: 1.05rem; color: var(--evo-primary); }
-.user-chip:hover { background: var(--bs-secondary-bg); }
+.user-chip:hover { background: var(--evo-control-hover); border-color: var(--evo-primary); }
 
-.search-box { max-width: 280px; }
-.search-box .input-group-text { background: var(--bs-secondary-bg); border-right: 0; color: var(--bs-secondary-color); }
-.search-box .form-control { border-left: 0; }
-.search-box .form-control:focus { box-shadow: none; }
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--evo-primary);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  flex: 0 0 26px;
+}
+.user-chip::after { margin-left: .1rem; opacity: .6; }
+
+.search-box { width: 340px; max-width: 340px; }
+.search-box .input-group-text {
+  height: 38px;
+  background: var(--evo-control-bg);
+  border-color: var(--bs-border-color);
+  border-right: 0;
+  color: var(--bs-secondary-color);
+}
+.search-box .form-control {
+  height: 38px;
+  background: var(--evo-control-bg);
+  border-color: var(--bs-border-color);
+  border-left: 0;
+  color: var(--bs-body-color);
+}
+.search-box .form-control::placeholder { color: var(--bs-secondary-color); opacity: 1; }
+.search-box .form-control:focus {
+  background: var(--evo-control-bg);
+  box-shadow: none;
+  border-color: var(--bs-border-color);
+}
+/* Al enfocar la búsqueda, resalta toda la caja con el color primario */
+.search-box:focus-within .input-group-text,
+.search-box:focus-within .form-control {
+  border-color: var(--evo-primary);
+}
+.search-box:focus-within .input-group-text { color: var(--evo-primary); }
 
 /* ---------- Layout principal ---------- */
 @media (min-width: 992px) {
@@ -344,7 +394,11 @@ html[data-bs-theme="dark"] .sidebar {
 .card {
   border: 1px solid var(--bs-border-color);
   border-radius: 1rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .06), 0 6px 16px rgba(15, 23, 42, .07);
+}
+
+html[data-bs-theme="dark"] .card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .45), 0 8px 20px rgba(0, 0, 0, .3);
 }
 
 .stat-icon {
@@ -360,9 +414,41 @@ html[data-bs-theme="dark"] .sidebar {
   color: var(--evo-primary);
 }
 
-.stat-card > .card-footer {
-  border-top: 1px solid var(--bs-border-color);
-  background: transparent;
+/* Tarjeta de estadística: transición base para todas */
+.stat-card {
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+/* Solo las tarjetas que son enlace (navegables) reaccionan al pasar el mouse */
+a.stat-card {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+}
+a.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, .14);
+  border-color: var(--evo-primary);
+}
+html[data-bs-theme="dark"] a.stat-card:hover {
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .5);
+}
+
+.stat-arrow {
+  margin-left: auto;
+  align-self: center;
+  color: var(--bs-secondary-color);
+  transition: transform .15s ease, color .15s ease;
+}
+a.stat-card:hover .stat-arrow {
+  color: var(--evo-primary);
+  transform: translateX(3px);
+}
+
+/* Alto uniforme para todos los gráficos del dashboard */
+.chart-box {
+  position: relative;
+  height: 300px;
 }
 
 /* ---------- Tablas (compactas) ---------- */
