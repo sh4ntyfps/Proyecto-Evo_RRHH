@@ -218,6 +218,64 @@ public class EmpleadoController : Controller
         return RedirectToAction(nameof(Detalles), new { id });
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Nuevo()
+    {
+        await CargarCatalogosEdicion();
+        return View(new EmpleadoNuevoViewModel
+        {
+            Empleado = new Empleado
+            {
+                Year = DateTime.Now.Year,
+                Estado = "A",
+                FechaIngreso = DateTime.Today
+            }
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Nuevo(EmpleadoNuevoViewModel modelo, IFormFile? foto)
+    {
+        var persona = modelo.Persona;
+        if (string.IsNullOrWhiteSpace(persona.Nombres))
+            ModelState.AddModelError(nameof(modelo.Persona.Nombres), "El nombre es obligatorio.");
+        if (string.IsNullOrWhiteSpace(persona.Apellido_Paterno))
+            ModelState.AddModelError(nameof(modelo.Persona.Apellido_Paterno), "El apellido paterno es obligatorio.");
+        if (persona.TipoDocID is not null && string.IsNullOrWhiteSpace(persona.NumDocID))
+            ModelState.AddModelError(nameof(modelo.Persona.NumDocID), "Ingrese el número del documento.");
+
+        if (!string.IsNullOrWhiteSpace(persona.NumDocID))
+        {
+            var personas = await _personaData.Listar();
+            if (personas.Any(p => p.NumDocID == persona.NumDocID))
+                ModelState.AddModelError(nameof(modelo.Persona.NumDocID), "Ya existe una persona con ese número de documento.");
+        }
+
+        if (ModelState.IsValid)
+        {
+            var personas = await _personaData.Listar();
+            persona.IdPersona = personas.Count > 0 ? personas.Max(p => p.IdPersona) + 1 : 1;
+            persona.FechaRegistro = DateTime.Now;
+            await _personaData.Crear(persona);
+
+            var empleados = await _empleadoData.Listar();
+            var empleado = modelo.Empleado;
+            empleado.IdEmpleado = empleados.Count > 0 ? empleados.Max(e => e.IdEmpleado) + 1 : 1;
+            empleado.IdPersona = persona.IdPersona;
+            empleado.Foto = foto is not null && foto.Length > 0 ? await LeerArchivo(foto) : null;
+            if (string.IsNullOrWhiteSpace(empleado.Estado))
+                empleado.Estado = "A";
+            await _empleadoData.Crear(empleado);
+
+            TempData["MensajeExito"] = "Empleado registrado.";
+            return RedirectToAction(nameof(Detalles), new { id = empleado.IdEmpleado });
+        }
+
+        await CargarCatalogosEdicion();
+        return View(modelo);
+    }
+
     private async Task CargarCatalogosEdicion()
     {
         ViewBag.Cargos = await _cargoData.Listar();
@@ -232,6 +290,7 @@ public class EmpleadoController : Controller
         ViewBag.Discapacidades = await _discapacidadData.Listar();
         ViewBag.ViveCon = await _viveConData.Listar();
         ViewBag.Nacionalidades = await _nacionalidadData.Listar();
+        ViewBag.TiposDocumento = await _tipoDocData.Listar();
     }
 
     [HttpGet]

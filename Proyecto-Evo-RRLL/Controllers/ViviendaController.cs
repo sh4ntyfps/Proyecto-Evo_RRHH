@@ -48,12 +48,18 @@ public class ViviendaController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(int idEmpleado)
+    public async Task<IActionResult> Index(int? idEmpleado)
     {
-        if (await _empleadoData.Obtener(idEmpleado) is null)
+        ViewBag.Empleados = await EmpleadosAsync();
+
+        if (idEmpleado is null)
+            return View("Indice", ViewBag.Empleados);
+
+        int id = idEmpleado.Value;
+        if (await _empleadoData.Obtener(id) is null)
             return NotFound();
 
-        var registro = (await _viviendaData.Listar()).FirstOrDefault(v => v.IdEmpleado == idEmpleado);
+        var registro = (await _viviendaData.Listar()).FirstOrDefault(v => v.IdEmpleado == id);
 
         var tipos = await _tipoVivData.Listar();
         var tenencias = await _tenenciaVivData.Listar();
@@ -66,8 +72,8 @@ public class ViviendaController : Controller
 
         var vm = new ViviendaViewModel
         {
-            IdEmpleado = idEmpleado,
-            NombreEmpleado = await NombreEmpleadoAsync(idEmpleado),
+            IdEmpleado = id,
+            NombreEmpleado = await NombreEmpleadoAsync(id),
             Registro = registro,
             Tenencia = registro?.IdTenencia is null ? null : tenencias.FirstOrDefault(t => t.IdTenencia == registro.IdTenencia)?.DescripTenencia,
             Tipo = registro?.IdTipo is null ? null : tipos.FirstOrDefault(t => t.IdTipo == registro.IdTipo)?.DescripTipo,
@@ -135,6 +141,20 @@ public class ViviendaController : Controller
     }
 
     // ---------- Utilidades ----------
+
+    private async Task<List<(int Id, string Nombre)>> EmpleadosAsync()
+    {
+        var empleados = await _empleadoData.Listar();
+        var personas = await _personaData.Listar();
+        return empleados.Select(e =>
+        {
+            var persona = e.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == e.IdPersona);
+            var nombre = persona is null
+                ? $"(Empleado {e.IdEmpleado})"
+                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+            return (e.IdEmpleado, nombre);
+        }).OrderBy(x => x.nombre).ToList();
+    }
 
     private async Task<string?> NombreEmpleadoAsync(int idEmpleado)
     {
