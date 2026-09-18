@@ -13,6 +13,7 @@
 </div>
 
 <form asp-action="@(esNuevo ? "Nuevo" : "Editar")" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     <div class="card mb-3">
         <div class="card-header fw-semibold"><i class="bi bi-exclamation-octagon me-2"></i>Datos del inconveniente</div>
         <div class="card-body">

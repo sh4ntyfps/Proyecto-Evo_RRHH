@@ -12,6 +12,7 @@
 </div>
 
 <form asp-action="@(Model.idFeriado > 0 ? "Editar" : "Nuevo")" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     @if (Model.idFeriado > 0)
     {
         <input type="hidden" asp-for="idFeriado" />

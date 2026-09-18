@@ -14,6 +14,7 @@
 </div>
 
 <form asp-action="@(Model.idComportamiento > 0 ? "Editar" : "Nuevo")" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     @if (Model.idComportamiento > 0)
     {
         <input type="hidden" asp-for="idComportamiento" />

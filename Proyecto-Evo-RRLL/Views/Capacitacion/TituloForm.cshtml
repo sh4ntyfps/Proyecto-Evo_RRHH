@@ -12,6 +12,7 @@
 </div>
 
 <form asp-action="@(esNuevo ? "TituloNuevo" : "TituloEditar")" asp-route-numColegiatura="@(esNuevo ? null : Model.NumColegiatura)" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     <div class="card">
         <div class="card-body">
             <div class="row g-3">

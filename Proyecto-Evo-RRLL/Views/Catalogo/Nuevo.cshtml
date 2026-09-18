@@ -10,6 +10,7 @@
 </div>
 
 <form asp-action="@(esEdicion ? "Editar" : "Nuevo")" asp-route-tabla="@Model.Tabla" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     @Html.AntiForgeryToken()
     @if (esEdicion)
     {

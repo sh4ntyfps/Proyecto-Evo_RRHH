@@ -13,6 +13,7 @@
 </div>
 
 <form asp-action="Salud" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     @Html.AntiForgeryToken()
     <input type="hidden" name="IdEmpleado" value="@ViewBag.IdEmpleado" />
 

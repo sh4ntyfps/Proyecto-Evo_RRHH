@@ -13,6 +13,7 @@
 </div>
 
 <form asp-action="@(esEdicion ? "AseguradoEditar" : "AseguradoCrear")" method="post">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
     @Html.AntiForgeryToken()
     <div class="card">
         <div class="card-body">

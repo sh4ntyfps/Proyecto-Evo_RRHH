@@ -1,13 +1,13 @@
 using Capa_Datos;
 using Capa_Entidades;
-using Capa_Logica;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Proyecto_Evo_RRLL.Filtros;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => options.Filters.Add<RegistrarExcepcionFilter>());
 
 builder.Services.AddDbContext<EvoRRLDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RRHHNuevo")));
@@ -109,84 +109,6 @@ builder.Services.AddScoped<CatalogoRepositorio>();
 builder.Services.AddScoped<SecuenciaService>();
 builder.Services.AddScoped<Proyecto_Evo_RRLL.Services.EmpleadoServicio>();
 
-// Capa Logica (76)
-builder.Services.AddScoped<AFPLogica>();
-builder.Services.AddScoped<AguaVivLogica>();
-builder.Services.AddScoped<AlumbradoVivLogica>();
-builder.Services.AddScoped<AsistenciaLogica>();
-builder.Services.AddScoped<CapacitacionLogica>();
-builder.Services.AddScoped<CargoLogica>();
-builder.Services.AddScoped<ComportamientoLogica>();
-builder.Services.AddScoped<ConservacionVivLogica>();
-builder.Services.AddScoped<DiscapacidadLogica>();
-builder.Services.AddScoped<EmpleadoLogica>();
-builder.Services.AddScoped<Empleado_AreaLogica>();
-builder.Services.AddScoped<EstadoCivilLogica>();
-builder.Services.AddScoped<EstadoEstudioLogica>();
-builder.Services.AddScoped<EstructOrganizLogica>();
-builder.Services.AddScoped<EstudiosRealizadoLogica>();
-builder.Services.AddScoped<ExcretasVivLogica>();
-builder.Services.AddScoped<ExpLaboralLogica>();
-builder.Services.AddScoped<FamiliaLogica>();
-builder.Services.AddScoped<FamiliarLogica>();
-builder.Services.AddScoped<HorarioLogica>();
-builder.Services.AddScoped<HorarioTemporalLogica>();
-builder.Services.AddScoped<InconvenienteLogica>();
-builder.Services.AddScoped<InstitucionLogica>();
-builder.Services.AddScoped<LimitacionLogica>();
-builder.Services.AddScoped<LocalLogica>();
-builder.Services.AddScoped<MarcacionLogica>();
-builder.Services.AddScoped<MaterialVivLogica>();
-builder.Services.AddScoped<MotivoBajaLogica>();
-builder.Services.AddScoped<Motivo_PermLogica>();
-builder.Services.AddScoped<NacionalidadLogica>();
-builder.Services.AddScoped<PeriodoLaboralLogica>();
-builder.Services.AddScoped<PermisoLogica>();
-builder.Services.AddScoped<PersonaLogica>();
-builder.Services.AddScoped<RegAsisDiarioLogica>();
-builder.Services.AddScoped<RegimenPensionLogica>();
-builder.Services.AddScoped<ResolucionLogica>();
-builder.Services.AddScoped<ResponsableXUOLogica>();
-builder.Services.AddScoped<RolLogica>();
-builder.Services.AddScoped<Rol_AccesoLogica>();
-builder.Services.AddScoped<RotacionLogica>();
-builder.Services.AddScoped<RRHH_AcudeEnfermLogica>();
-builder.Services.AddScoped<RRHH_AseguradoLogica>();
-builder.Services.AddScoped<RRHH_AspSocioLogica>();
-builder.Services.AddScoped<RRHH_DinamicaFamiliarLogica>();
-builder.Services.AddScoped<RRHH_FeriadoLogica>();
-builder.Services.AddScoped<RRHH_FuncFamLogica>();
-builder.Services.AddScoped<RRHH_RelacHermanoLogica>();
-builder.Services.AddScoped<RRHH_RelacParejaLogica>();
-builder.Services.AddScoped<RRHH_RelacPHLogica>();
-builder.Services.AddScoped<RRHH_SaludLogica>();
-builder.Services.AddScoped<RRHH_TipoFamiliaLogica>();
-builder.Services.AddScoped<SistemaOpcionLogica>();
-builder.Services.AddScoped<TenenciaVivLogica>();
-builder.Services.AddScoped<TipoComportamientoLogica>();
-builder.Services.AddScoped<TipoDocLogica>();
-builder.Services.AddScoped<TipoDocIDLogica>();
-builder.Services.AddScoped<TipoEstudioLogica>();
-builder.Services.AddScoped<TipoFamiliarLogica>();
-builder.Services.AddScoped<TipoInstitucionLogica>();
-builder.Services.AddScoped<TipoMonedaLogica>();
-builder.Services.AddScoped<TipoMovimientoLogica>();
-builder.Services.AddScoped<TipoPermisoLogica>();
-builder.Services.AddScoped<TipoRecursoLogica>();
-builder.Services.AddScoped<TipoResolucionLogica>();
-builder.Services.AddScoped<TipoSangreLogica>();
-builder.Services.AddScoped<TipoTrabajadorLogica>();
-builder.Services.AddScoped<TipoTransaccionLogica>();
-builder.Services.AddScoped<TipoVivLogica>();
-builder.Services.AddScoped<TitulosEmpleadoLogica>();
-builder.Services.AddScoped<UbicacionVivLogica>();
-builder.Services.AddScoped<UbigeoLogica>();
-builder.Services.AddScoped<UnidadMedidaLogica>();
-builder.Services.AddScoped<UsuarioLogica>();
-builder.Services.AddScoped<Usuario_RolLogica>();
-builder.Services.AddScoped<ViveConLogica>();
-builder.Services.AddScoped<ViviendaLogica>();
-
 var app = builder.Build();
 
 // Seed: usuario administrador inicial en BD existente
@@ -197,7 +119,11 @@ using (var scope = app.Services.CreateScope())
     await SeedAdminAsync(db, adminClave);
 }
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
