@@ -13,10 +13,12 @@ namespace Proyecto_Evo_RRLL.Controllers;
 public class SeguridadController : Controller
 {
     private readonly UsuarioData _usuarioData;
+    private readonly BitacoraData _bitacora;
 
-    public SeguridadController(UsuarioData usuarioData)
+    public SeguridadController(UsuarioData usuarioData, BitacoraData bitacora)
     {
         _usuarioData = usuarioData;
+        _bitacora = bitacora;
     }
 
     [HttpGet]
@@ -50,6 +52,7 @@ public class SeguridadController : Controller
             return View(modelo);
         }
         TempData["MensajeExito"] = $"Bienvenido, {usuario.Login!.Trim()}.";
+        await _bitacora.Registrar(usuario.Login.Trim(), "IniciarSesion", "Seguridad", "Acceso correcto al sistema");
 
         var roles = await _usuarioData.ObtenerRoles(usuario.IdUsuario);
 

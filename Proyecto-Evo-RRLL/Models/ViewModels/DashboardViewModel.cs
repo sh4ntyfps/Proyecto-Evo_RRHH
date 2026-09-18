@@ -4,6 +4,12 @@ public class DashboardViewModel
 {
     public int Empleados { get; set; }
 
+    public int EmpleadosActivos { get; set; }
+
+    public int FeriadosDelMes { get; set; }
+
+    public List<string> FeriadosMes { get; set; } = new();
+
     public int Personas { get; set; }
 
     public int asistenciasHoy { get; set; }

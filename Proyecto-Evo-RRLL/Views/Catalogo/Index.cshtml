@@ -6,12 +6,20 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>@Model.Titulo</h3>
-    @if (puedeEditar)
-    {
-        <a asp-action="Nuevo" asp-route-tabla="@Model.Tabla" class="btn btn-success">
-            <i class="bi bi-plus-lg me-1"></i> Nuevo
-        </a>
-    }
+    <div class="d-flex gap-2">
+        @if (User.IsInRole("Administrador"))
+        {
+            <a asp-action="Exportar" asp-route-tabla="@Model.Tabla" class="btn btn-outline-secondary">
+                <i class="bi bi-download me-1"></i> Exportar CSV
+            </a>
+        }
+        @if (puedeEditar)
+        {
+            <a asp-action="Nuevo" asp-route-tabla="@Model.Tabla" class="btn btn-success">
+                <i class="bi bi-plus-lg me-1"></i> Nuevo
+            </a>
+        }
+    </div>
 </div>
 
 <div class="card mb-3">

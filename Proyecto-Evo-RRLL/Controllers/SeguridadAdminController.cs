@@ -19,6 +19,7 @@ public class SeguridadAdminController : Controller
     private readonly PersonaData _personaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
+    private readonly BitacoraData _bitacora;
 
     public SeguridadAdminController(
         UsuarioData usuarioData,
@@ -29,7 +30,8 @@ public class SeguridadAdminController : Controller
         EmpleadoData empleadoData,
         PersonaData personaData,
         SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados)
+        Services.EmpleadoServicio empleados,
+        BitacoraData bitacora)
     {
         _usuarioData = usuarioData;
         _usuarioRolData = usuarioRolData;
@@ -40,6 +42,7 @@ public class SeguridadAdminController : Controller
         _personaData = personaData;
         _secuencia = secuencia;
         _empleados = empleados;
+        _bitacora = bitacora;
     }
 
     // ---------- Usuarios ----------
@@ -115,6 +118,7 @@ public class SeguridadAdminController : Controller
             if (guardo)
             {
                 TempData["MensajeExito"] = "Usuario creado.";
+                await _bitacora.Registrar(User.Identity?.Name ?? "?", "Crear", "Usuario", $"login={modelo.Login}");
                 return RedirectToAction(nameof(Usuarios));
             }
             ModelState.AddModelError("", "No se pudo crear el usuario: intente nuevamente.");
@@ -158,6 +162,7 @@ public class SeguridadAdminController : Controller
                 actual.PasswordHash = new PasswordHasher<Usuario>().HashPassword(actual, clave);
             await _usuarioData.Actualizar(actual);
             TempData["MensajeExito"] = "Usuario actualizado.";
+            await _bitacora.Registrar(User.Identity?.Name ?? "?", "Editar", "Usuario", $"id={actual.IdUsuario}, login={actual.Login}");
             return RedirectToAction(nameof(Usuarios));
         }
 
@@ -177,6 +182,7 @@ public class SeguridadAdminController : Controller
                 await _usuarioRolData.Eliminar(r);
             await _usuarioData.Eliminar(actual);
             TempData["MensajeExito"] = "Usuario eliminado.";
+            await _bitacora.Registrar(User.Identity?.Name ?? "?", "Eliminar", "Usuario", $"id={id}, login={actual.Login}");
         }
         return RedirectToAction(nameof(Usuarios));
     }
@@ -264,6 +270,7 @@ public class SeguridadAdminController : Controller
             if (guardo)
             {
                 TempData["MensajeExito"] = "Rol creado.";
+                await _bitacora.Registrar(User.Identity?.Name ?? "?", "Crear", "Rol", $"id={modelo.IdRol}, descripcion={modelo.Descripcion}");
                 return RedirectToAction(nameof(Roles));
             }
             ModelState.AddModelError("", "No se pudo crear el rol: intente nuevamente.");
@@ -292,6 +299,7 @@ public class SeguridadAdminController : Controller
         actual.IdSistema = modelo.IdSistema;
         await _rolData.Actualizar(actual);
         TempData["MensajeExito"] = "Rol actualizado.";
+        await _bitacora.Registrar(User.Identity?.Name ?? "?", "Editar", "Rol", $"id={actual.IdRol}, descripcion={actual.Descripcion}");
         return RedirectToAction(nameof(Roles));
     }
 
@@ -312,6 +320,7 @@ public class SeguridadAdminController : Controller
 
             await _rolData.Eliminar(actual);
             TempData["MensajeExito"] = "Rol eliminado.";
+            await _bitacora.Registrar(User.Identity?.Name ?? "?", "Eliminar", "Rol", $"id={id}, descripcion={actual.Descripcion}");
         }
         return RedirectToAction(nameof(Roles));
     }
@@ -362,6 +371,14 @@ public class SeguridadAdminController : Controller
 
         TempData["MensajeExito"] = "Permisos del rol actualizados.";
         return RedirectToAction(nameof(Roles));
+    }
+
+    // ---------- Bitacora de actividad ----------
+
+    public async Task<IActionResult> Actividad()
+    {
+        var registros = await _bitacora.Ultimas(100);
+        return View(registros);
     }
 
     // ---------- Utilidades ----------

@@ -5,6 +5,7 @@ public class EvoRRLDbContext : DbContext
 {
     public EvoRRLDbContext(DbContextOptions<EvoRRLDbContext> options) : base(options) { }
         public DbSet<AFP> AFP { get; set; } = null!;
+        public DbSet<Bitacora> Bitacora { get; set; } = null!;
         public DbSet<AguaViv> AguaViv { get; set; } = null!;
         public DbSet<AlumbradoViv> AlumbradoViv { get; set; } = null!;
         public DbSet<Asistencia> Asistencia { get; set; } = null!;
@@ -84,6 +85,9 @@ public class EvoRRLDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<AFP>(entity =>
+            {
+            });
+            modelBuilder.Entity<Bitacora>(entity =>
             {
             });
             modelBuilder.Entity<AguaViv>(entity =>

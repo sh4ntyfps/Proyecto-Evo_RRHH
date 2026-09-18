@@ -66,32 +66,7 @@ public class EmpleadoController : Controller
     public async Task<IActionResult> Index(string? q, int pagina = 1)
     {
         const int tamanoPagina = 25;
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        var cargos = await _cargoData.Listar();
-        var areas = await _estructOrganizData.Listar();
-
-        var personasPorId = personas.ToDictionary(p => p.IdPersona);
-        var cargosPorId = cargos.ToDictionary(c => c.IdCargo);
-        var areasPorKey = areas.ToDictionary(a => $"{a.Year}|{a.idAreaOrganiz}");
-
-        var filtrados = new List<Empleado>();
-        if (string.IsNullOrWhiteSpace(q))
-        {
-            filtrados = empleados.OrderBy(e => e.IdEmpleado).ToList();
-        }
-        else
-        {
-            foreach (var e in empleados)
-            {
-                var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
-                var nombre = persona is null ? null : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-                if (nombre?.Contains(q, StringComparison.OrdinalIgnoreCase) == true
-                    || persona?.NumDocID?.Contains(q, StringComparison.OrdinalIgnoreCase) == true)
-                    filtrados.Add(e);
-            }
-            filtrados = filtrados.OrderBy(e => e.IdEmpleado).ToList();
-        }
+        var (filtrados, personasPorId, cargosPorId, areasPorKey) = await FiltrarEmpleadosAsync(q);
 
         var total = filtrados.Count;
         var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)tamanoPagina));
@@ -123,6 +98,74 @@ public class EmpleadoController : Controller
         }
 
         return View(vm);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Exportar(string? q)
+    {
+        var (filtrados, personasPorId, cargosPorId, areasPorKey) = await FiltrarEmpleadosAsync(q);
+
+        var filas = new List<string[]>
+        {
+            new[] { "IdEmpleado", "Nombres", "NumDoc", "Cargo", "Area", "Estado", "FechaIngreso" }
+        };
+
+        foreach (var e in filtrados)
+        {
+            var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
+            var nombre = persona is null ? null : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+            var cargo = e.IdCargo is null ? null : cargosPorId.GetValueOrDefault(e.IdCargo.Value)?.Descripcion;
+            var area = areasPorKey.TryGetValue($"{e.Year}|{e.idAreaOrganiz}", out var areaRegistro) ? areaRegistro.AreaOrganizacional : null;
+
+            filas.Add(new[]
+            {
+                e.IdEmpleado.ToString(),
+                nombre ?? string.Empty,
+                persona?.NumDocID ?? string.Empty,
+                cargo ?? string.Empty,
+                area ?? string.Empty,
+                e.Estado ?? string.Empty,
+                e.FechaIngreso?.ToString("dd/MM/yyyy") ?? string.Empty
+            });
+        }
+
+        var contenido = string.Join("\r\n", filas.Select(f => string.Join(";", f.Select(EscaparCsv))));
+        var nombreArchivo = $"empleados_{(string.IsNullOrWhiteSpace(q) ? "todos" : "filtro")}_{DateTime.Now:yyyyMMdd_HHmm}.csv";
+        return File(new System.Text.UTF8Encoding(true).GetBytes(contenido), "text/csv; charset=utf-8", nombreArchivo);
+    }
+
+    private async Task<(List<Empleado> Filtrados, Dictionary<int, Persona> Personas, Dictionary<int, Cargo> Cargos, Dictionary<string, EstructOrganiz> Areas)> FiltrarEmpleadosAsync(string? q)
+    {
+        var empleados = await _empleadoData.Listar();
+        var personas = await _personaData.Listar();
+        var cargos = await _cargoData.Listar();
+        var areas = await _estructOrganizData.Listar();
+
+        var personasPorId = personas.ToDictionary(p => p.IdPersona);
+        var cargosPorId = cargos.ToDictionary(c => c.IdCargo);
+        var areasPorKey = areas.ToDictionary(a => $"{a.Year}|{a.idAreaOrganiz}");
+
+        if (string.IsNullOrWhiteSpace(q))
+            return (empleados.OrderBy(e => e.IdEmpleado).ToList(), personasPorId, cargosPorId, areasPorKey);
+
+        var filtrados = new List<Empleado>();
+        foreach (var e in empleados)
+        {
+            var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
+            var nombre = persona is null ? null : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+            if (nombre?.Contains(q, StringComparison.OrdinalIgnoreCase) == true
+                || persona?.NumDocID?.Contains(q, StringComparison.OrdinalIgnoreCase) == true)
+                filtrados.Add(e);
+        }
+
+        return (filtrados.OrderBy(e => e.IdEmpleado).ToList(), personasPorId, cargosPorId, areasPorKey);
+    }
+
+    private static string EscaparCsv(string valor)
+    {
+        if (valor.Contains(';') || valor.Contains('"') || valor.Contains('\n') || valor.Contains('\r'))
+            return $"\"{valor.Replace("\"", "\"\"")}\"";
+        return valor;
     }
 
     [HttpGet]

@@ -8,7 +8,12 @@
         <h3 class="mb-0">Empleados</h3>
         <span class="text-secondary small">@Model.Total registro(s)</span>
     </div>
-    <a asp-action="Nuevo" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Nuevo empleado</a>
+    <div class="d-flex gap-2">
+        <a asp-action="Exportar" asp-route-q="@Model.Busqueda" class="btn btn-outline-secondary">
+            <i class="bi bi-download me-1"></i> Exportar CSV
+        </a>
+        <a asp-action="Nuevo" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Nuevo empleado</a>
+    </div>
 </div>
 
 <form method="get" class="mb-3 d-flex align-items-center gap-2">

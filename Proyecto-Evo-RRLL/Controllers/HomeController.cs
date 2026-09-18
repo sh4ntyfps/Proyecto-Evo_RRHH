@@ -14,21 +14,24 @@ namespace Proyecto_Evo_RRLL.Controllers
         private readonly PersonaData _personaData;
         private readonly AsistenciaData _asistenciaData;
         private readonly EstructOrganizData _estructOrganizData;
-        private readonly CargoData _cargoData;
+private readonly CargoData _cargoData;
+    private readonly RRHH_FeriadoData _feriadoData;
 
-        public HomeController(
-            EmpleadoData empleadoData,
-            PersonaData personaData,
-            AsistenciaData asistenciaData,
-            EstructOrganizData estructuraOrganizData,
-            CargoData cargoData)
-        {
-            _empleadoData = empleadoData;
-            _personaData = personaData;
-            _asistenciaData = asistenciaData;
-            _estructOrganizData = estructuraOrganizData;
-            _cargoData = cargoData;
-        }
+    public HomeController(
+        EmpleadoData empleadoData,
+        PersonaData personaData,
+        AsistenciaData asistenciaData,
+        EstructOrganizData estructuraOrganizData,
+        CargoData cargoData,
+        RRHH_FeriadoData feriadoData)
+    {
+        _empleadoData = empleadoData;
+        _personaData = personaData;
+        _asistenciaData = asistenciaData;
+        _estructOrganizData = estructuraOrganizData;
+        _cargoData = cargoData;
+        _feriadoData = feriadoData;
+    }
 
         public async Task<IActionResult> Index()
         {
@@ -74,6 +77,7 @@ namespace Proyecto_Evo_RRLL.Controllers
             var model = new DashboardViewModel
             {
                 Empleados = empleados.Count,
+                EmpleadosActivos = empleados.Count(e => e.Estado == "A"),
                 Personas = personas.Count,
                 asistenciasHoy = await _asistenciaData.ContarEntreFechas(hoy, hoy),
                 Areas = estructuras.Count,
@@ -83,9 +87,26 @@ namespace Proyecto_Evo_RRLL.Controllers
                 DiasAsistencia = ultimos7,
                 AsistenciasPorDia = asisUltimos7,
                 EstadosNombres = estadosNombres,
-                EmpleadosPorEstado = estadosCounts
+                EmpleadosPorEstado = estadosCounts,
+                FeriadosMes = await FeriadosDelMesAsync(hoy)
             };
             return View(model);
+        }
+
+        private async Task<List<string>> FeriadosDelMesAsync(DateTime hoy)
+        {
+            try
+            {
+                return (await _feriadoData.Listar())
+                    .Where(f => f.Fecha?.Year == hoy.Year && f.Fecha!.Value.Month == hoy.Month)
+                    .OrderBy(f => f.Fecha)
+                    .Select(f => string.IsNullOrWhiteSpace(f.Motivo) ? $"{f.Fecha:dd/MM}" : $"{f.Fecha:dd/MM} - {f.Motivo}")
+                    .ToList();
+            }
+            catch
+            {
+                return new List<string>();
+            }
         }
 
         public IActionResult Ayuda()

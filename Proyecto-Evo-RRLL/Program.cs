@@ -29,6 +29,7 @@ builder.Services.AddAuthorization(options =>
 // Capa Datos (76)
 builder.Services.AddScoped<AFPData>();
 builder.Services.AddScoped<AguaVivData>();
+builder.Services.AddScoped<BitacoraData>();
 builder.Services.AddScoped<AlumbradoVivData>();
 builder.Services.AddScoped<AsistenciaData>();
 builder.Services.AddScoped<CapacitacionData>();
