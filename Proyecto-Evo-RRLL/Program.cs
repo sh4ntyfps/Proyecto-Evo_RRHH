@@ -21,7 +21,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SoloAdministradores", p => p.RequireRole("Administrador"));
+});
 
 // Capa Datos (76)
 builder.Services.AddScoped<AFPData>();
@@ -188,7 +191,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<EvoRRLDbContext>();
-    await SeedAdminAsync(db);
+    var adminClave = builder.Configuration["Seguridad:AdminClave"] ?? "Admin.2026";
+    await SeedAdminAsync(db, adminClave);
 }
 
 if (!app.Environment.IsDevelopment())
@@ -214,7 +218,7 @@ app.MapControllerRoute(
 
 app.Run();
 
-static async Task SeedAdminAsync(EvoRRLDbContext db)
+static async Task SeedAdminAsync(EvoRRLDbContext db, string adminClave)
 {
     const string LoginAdmin = "admin";
     if (await db.Set<Usuario>().AnyAsync(u => u.Login != null && u.Login.Trim() == LoginAdmin))
@@ -229,7 +233,7 @@ static async Task SeedAdminAsync(EvoRRLDbContext db)
         Descripcion = "Administrador del Sistema",
         Fecha = DateTime.Now,
         Estado = true,
-        PasswordHash = hasher.HashPassword(new Usuario(), "Admin.2026")
+        PasswordHash = hasher.HashPassword(new Usuario(), adminClave)
     };
 
     var rol = await db.Set<Rol>().FirstOrDefaultAsync(r => r.Descripcion != null && r.Descripcion.Trim().Equals("Administrador"));

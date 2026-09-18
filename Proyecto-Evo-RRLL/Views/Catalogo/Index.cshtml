@@ -1,11 +1,12 @@
 @model CatalogoViewModel
 @{
     ViewData["Title"] = $"Catálogos - {Model.Titulo}";
+    var puedeEditar = Model.Editable && User.IsInRole("Administrador");
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>@Model.Titulo</h3>
-    @if (Model.Editable)
+    @if (puedeEditar)
     {
         <a asp-action="Nuevo" asp-route-tabla="@Model.Tabla" class="btn btn-success">
             <i class="bi bi-plus-lg me-1"></i> Nuevo
@@ -44,7 +45,7 @@ else
                     {
                         <th>@col.Nombre</th>
                     }
-                    @if (Model.Editable)
+                    @if (puedeEditar)
                     {
                         <th style="width:120px">Acciones</th>
                     }
@@ -59,7 +60,7 @@ else
                         {
                             <td class="@(col.EsClave ? "fw-semibold" : "")">@(fila[col.Nombre] ?? "&nbsp;")</td>
                         }
-                        @if (Model.Editable)
+                        @if (puedeEditar)
                         {
                             <td>
                                 <div class="d-flex gap-2">

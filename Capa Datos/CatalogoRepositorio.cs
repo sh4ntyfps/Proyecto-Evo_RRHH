@@ -73,6 +73,9 @@ public class CatalogoRepositorio
 
     public async Task Crear(string tabla, IReadOnlyDictionary<string, string> datos)
     {
+        if (!EsEditable(tabla))
+            throw new InvalidOperationException($"El catálogo {tabla} no es editable.");
+
         var tipo = ObtenerTipo(tabla);
         var entidad = Activator.CreateInstance(tipo)!;
         AplicarValores(tipo, entidad, datos);
@@ -82,6 +85,9 @@ public class CatalogoRepositorio
 
     public async Task Actualizar(string tabla, string[] ids, IReadOnlyDictionary<string, string> datos)
     {
+        if (!EsEditable(tabla))
+            throw new InvalidOperationException($"El catálogo {tabla} no es editable.");
+
         var tipo = ObtenerTipo(tabla);
         var actual = await ObtenerEntidadAsync(tipo, ConvertirClaves(tipo, ids))
             ?? throw new InvalidOperationException("Registro no encontrado");
@@ -91,6 +97,9 @@ public class CatalogoRepositorio
 
     public async Task Eliminar(string tabla, string[] ids)
     {
+        if (!EsEditable(tabla))
+            throw new InvalidOperationException($"El catálogo {tabla} no es editable.");
+
         var tipo = ObtenerTipo(tabla);
         var actual = await ObtenerEntidadAsync(tipo, ConvertirClaves(tipo, ids))
             ?? throw new InvalidOperationException("Registro no encontrado");

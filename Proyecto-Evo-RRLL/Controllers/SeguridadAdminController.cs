@@ -7,7 +7,7 @@ using Proyecto_Evo_RRLL.Models.ViewModels;
 
 namespace Proyecto_Evo_RRLL.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Administrador")]
 public class SeguridadAdminController : Controller
 {
     private readonly UsuarioData _usuarioData;

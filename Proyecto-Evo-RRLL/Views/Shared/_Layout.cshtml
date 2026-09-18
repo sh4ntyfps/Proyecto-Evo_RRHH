@@ -82,12 +82,15 @@
                     <i class="bi bi-diagram-3"></i><span>Estructura orgánica</span>
                 </a>
 
-                <div class="sidebar-section">SEGURIDAD</div>
-                <div class="sidebar-submenu">
-                    <a class="sidebar-link @(controlador == "SeguridadAdmin" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Usuarios">
-                        <i class="bi bi-person-gear"></i><span>Usuarios y roles</span>
-                    </a>
-                </div>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <div class="sidebar-section">SEGURIDAD</div>
+                    <div class="sidebar-submenu">
+                        <a class="sidebar-link @(controlador == "SeguridadAdmin" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Usuarios">
+                            <i class="bi bi-person-gear"></i><span>Usuarios y roles</span>
+                        </a>
+                    </div>
+                }
 
                 <div class="sidebar-section">ADMINISTRACIÓN</div>
                 <div class="sidebar-submenu">

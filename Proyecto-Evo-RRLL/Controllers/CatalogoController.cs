@@ -47,9 +47,10 @@ public class CatalogoController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Nuevo(string tabla)
     {
-        if (!CatalogoNavegacion.Items.ContainsKey(tabla))
+        if (!EsCatalogoEditable(tabla))
             return NotFound();
 
         return View(new CatalogoViewModel
@@ -64,8 +65,12 @@ public class CatalogoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Nuevo(string tabla, IFormCollection form)
     {
+        if (!EsCatalogoEditable(tabla))
+            return NotFound();
+
         var datos = FormAAccion(form);
         try
         {
@@ -80,8 +85,12 @@ public class CatalogoController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Editar(string tabla, string ids)
     {
+        if (!EsCatalogoEditable(tabla))
+            return NotFound();
+
         var separados = ids.Split('|');
         var entidad = await _repositorio.Obtener(tabla, separados);
         if (entidad is null)
@@ -105,8 +114,12 @@ public class CatalogoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Editar(string tabla, string ids, IFormCollection form)
     {
+        if (!EsCatalogoEditable(tabla))
+            return NotFound();
+
         var separados = ids.Split('|');
         var datos = FormAAccion(form);
         try
@@ -123,8 +136,12 @@ public class CatalogoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Eliminar(string tabla, string ids)
     {
+        if (!EsCatalogoEditable(tabla))
+            return NotFound();
+
         try
         {
             await _repositorio.Eliminar(tabla, ids.Split('|'));
@@ -144,4 +161,7 @@ public class CatalogoController : Controller
             dict[clave] = form[clave].ToString();
         return dict;
     }
+
+    private static bool EsCatalogoEditable(string tabla)
+        => CatalogoNavegacion.Items.ContainsKey(tabla) && CatalogoRepositorio.EsEditable(tabla);
 }
