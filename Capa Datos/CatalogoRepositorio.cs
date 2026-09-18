@@ -17,7 +17,9 @@ public class CatalogoRepositorio
         "Motivo_Perm", "TipoEstudio", "TipoInstitucion", "Discapacidad",
         "Limitacion", "TipoComportamiento", "TipoResolucion", "Familia",
         "TipoFamiliar", "RRHH_TipoFamilia", "RRHH_RelacPareja", "RRHH_RelacPH",
-        "RRHH_RelacHermano"
+        "RRHH_RelacHermano", "AFP", "AguaViv", "AlumbradoViv", "ConservacionViv",
+        "ExcretasViv", "MaterialViv", "TenenciaViv", "TipoViv", "UbicacionViv",
+        "RRHH_AcudeEnferm", "TipoMoneda", "TipoRecurso", "UnidadMedida", "Horario"
     };
 
     private readonly EvoRRLDbContext _contexto;

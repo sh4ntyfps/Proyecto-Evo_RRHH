@@ -26,6 +26,20 @@ public static class CatalogoNavegacion
         ["RRHH_TipoFamilia"] = "Tipos de Familia",
         ["RRHH_RelacPareja"] = "Relación con Pareja",
         ["RRHH_RelacPH"] = "Relación con Jefe de Hogar",
-        ["RRHH_RelacHermano"] = "Relación con Hermanos"
+        ["RRHH_RelacHermano"] = "Relación con Hermanos",
+        ["AFP"] = "AFPs",
+        ["AguaViv"] = "Servicio de Agua",
+        ["AlumbradoViv"] = "Servicio de Alumbrado",
+        ["ConservacionViv"] = "Conservación de Vivienda",
+        ["ExcretasViv"] = "Servicio de Excretas",
+        ["MaterialViv"] = "Material de Vivienda",
+        ["TenenciaViv"] = "Tenencia de Vivienda",
+        ["TipoViv"] = "Tipos de Vivienda",
+        ["UbicacionViv"] = "Ubicación de Vivienda",
+        ["RRHH_AcudeEnferm"] = "A quién acudir en enfermedad",
+        ["TipoMoneda"] = "Tipos de Moneda",
+        ["TipoRecurso"] = "Tipos de Recurso",
+        ["UnidadMedida"] = "Unidades de Medida",
+        ["Horario"] = "Horarios"
     };
 }
