@@ -63,28 +63,51 @@ public class EmpleadoController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(string? q)
+    public async Task<IActionResult> Index(string? q, int pagina = 1)
     {
+        const int tamanoPagina = 25;
         var empleados = await _empleadoData.Listar();
         var personas = await _personaData.Listar();
         var cargos = await _cargoData.Listar();
         var areas = await _estructOrganizData.Listar();
 
-        var vm = new EmpleadoViewModel { Busqueda = q };
+        var personasPorId = personas.ToDictionary(p => p.IdPersona);
+        var cargosPorId = cargos.ToDictionary(c => c.IdCargo);
+        var areasPorKey = areas.ToDictionary(a => $"{a.Year}|{a.idAreaOrganiz}");
 
-        foreach (var e in empleados)
+        var filtrados = new List<Empleado>();
+        if (string.IsNullOrWhiteSpace(q))
         {
-            var persona = e.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == e.IdPersona);
+            filtrados = empleados.OrderBy(e => e.IdEmpleado).ToList();
+        }
+        else
+        {
+            foreach (var e in empleados)
+            {
+                var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
+                var nombre = persona is null ? null : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+                if (nombre?.Contains(q, StringComparison.OrdinalIgnoreCase) == true
+                    || persona?.NumDocID?.Contains(q, StringComparison.OrdinalIgnoreCase) == true)
+                    filtrados.Add(e);
+            }
+            filtrados = filtrados.OrderBy(e => e.IdEmpleado).ToList();
+        }
+
+        var total = filtrados.Count;
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)tamanoPagina));
+        if (pagina < 1) pagina = 1;
+        if (pagina > totalPaginas) pagina = totalPaginas;
+
+        var vm = new EmpleadoViewModel { Busqueda = q, Pagina = pagina, TotalPaginas = totalPaginas, Total = total };
+
+        foreach (var e in filtrados.Skip((pagina - 1) * tamanoPagina).Take(tamanoPagina))
+        {
+            var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
             var nombre = persona is null
                 ? null
                 : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-            var cargo = e.IdCargo is null ? null : cargos.FirstOrDefault(c => c.IdCargo == e.IdCargo)?.Descripcion;
-            var area = areas.FirstOrDefault(a => a.Year == e.Year && a.idAreaOrganiz == e.idAreaOrganiz)?.AreaOrganizacional;
-
-            if (!string.IsNullOrWhiteSpace(q)
-                && !(nombre?.Contains(q, StringComparison.OrdinalIgnoreCase) == true)
-                && !(persona?.NumDocID?.Contains(q, StringComparison.OrdinalIgnoreCase) == true))
-                continue;
+            var cargo = e.IdCargo is null ? null : cargosPorId.GetValueOrDefault(e.IdCargo.Value)?.Descripcion;
+            var area = areasPorKey.TryGetValue($"{e.Year}|{e.idAreaOrganiz}", out var areaRegistro) ? areaRegistro.AreaOrganizacional : null;
 
             vm.Empleados.Add(new EmpleadoFila
             {
@@ -99,7 +122,6 @@ public class EmpleadoController : Controller
             });
         }
 
-        vm.Empleados = vm.Empleados.OrderBy(x => x.IdEmpleado).Take(500).ToList();
         return View(vm);
     }
 

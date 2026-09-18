@@ -13,19 +13,22 @@ public class ComportamientoController : Controller
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
     private readonly SecuenciaService _secuencia;
+    private readonly Services.EmpleadoServicio _empleados;
 
     public ComportamientoController(
         ComportamientoData comportamientoData,
         TipoComportamientoData tipoData,
         EmpleadoData empleadoData,
         PersonaData personaData,
-        SecuenciaService secuencia)
+        SecuenciaService secuencia,
+        Services.EmpleadoServicio empleados)
     {
         _comportamientoData = comportamientoData;
         _tipoData = tipoData;
         _empleadoData = empleadoData;
         _personaData = personaData;
         _secuencia = secuencia;
+        _empleados = empleados;
     }
 
     [HttpGet]
@@ -132,25 +135,8 @@ public class ComportamientoController : Controller
     // ---------- Utilidades ----------
 
     private async Task<List<(int Id, string Nombre)>> EmpleadosAsync()
-    {
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        return empleados.Select(e =>
-        {
-            var persona = e.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == e.IdPersona);
-            var nombre = persona is null
-                ? $"(Empleado {e.IdEmpleado})"
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-            return (e.IdEmpleado, nombre);
-        }).OrderBy(x => x.nombre).ToList();
-    }
+        => await _empleados.EmpleadosAsync();
 
     private async Task<string?> NombreEmpleadoAsync(int idEmpleado)
-    {
-        var empleado = await _empleadoData.Obtener(idEmpleado);
-        var persona = empleado?.IdPersona is null ? null : (await _personaData.Listar()).FirstOrDefault(p => p.IdPersona == empleado.IdPersona);
-        return persona is null
-            ? $"(Empleado {idEmpleado})"
-            : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-    }
+        => await _empleados.NombreEmpleadoAsync(idEmpleado);
 }

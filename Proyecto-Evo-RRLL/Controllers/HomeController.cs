@@ -34,7 +34,6 @@ namespace Proyecto_Evo_RRLL.Controllers
         {
             var empleados = await _empleadoData.Listar();
             var estructuras = await _estructOrganizData.Listar();
-            var asistencias = await _asistenciaData.Listar();
             var personas = await _personaData.Listar();
             var cargos = await _cargoData.Listar();
 
@@ -60,7 +59,7 @@ namespace Proyecto_Evo_RRLL.Controllers
             {
                 var fecha = hoy.AddDays(-d);
                 ultimos7.Add(fecha.ToString("dd/MM"));
-                asisUltimos7.Add(asistencias.Count(a => a.Fecha.Date == fecha));
+                asisUltimos7.Add(await _asistenciaData.ContarEntreFechas(fecha, fecha));
             }
 
             // Empleados por estado
@@ -76,7 +75,7 @@ namespace Proyecto_Evo_RRLL.Controllers
             {
                 Empleados = empleados.Count,
                 Personas = personas.Count,
-                asistenciasHoy = asistencias.Count(a => a.Fecha.Date == hoy),
+                asistenciasHoy = await _asistenciaData.ContarEntreFechas(hoy, hoy),
                 Areas = estructuras.Count,
                 Cargos = cargos.Count,
                 AreasNombres = areasNombres,

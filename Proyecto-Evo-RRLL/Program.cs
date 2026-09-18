@@ -107,6 +107,7 @@ builder.Services.AddScoped<ViviendaData>();
 // Repositorio generico de catalogos
 builder.Services.AddScoped<CatalogoRepositorio>();
 builder.Services.AddScoped<SecuenciaService>();
+builder.Services.AddScoped<Proyecto_Evo_RRLL.Services.EmpleadoServicio>();
 
 // Capa Logica (76)
 builder.Services.AddScoped<AFPLogica>();

@@ -17,6 +17,7 @@ public class AsistenciaController : Controller
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
     private readonly SecuenciaService _secuencia;
+    private readonly Services.EmpleadoServicio _empleados;
 
     public AsistenciaController(
         AsistenciaData asistenciaData,
@@ -26,7 +27,8 @@ public class AsistenciaController : Controller
         HorarioData horarioData,
         EmpleadoData empleadoData,
         PersonaData personaData,
-        SecuenciaService secuencia)
+        SecuenciaService secuencia,
+        Services.EmpleadoServicio empleados)
     {
         _asistenciaData = asistenciaData;
         _marcacionData = marcacionData;
@@ -36,6 +38,7 @@ public class AsistenciaController : Controller
         _empleadoData = empleadoData;
         _personaData = personaData;
         _secuencia = secuencia;
+        _empleados = empleados;
     }
 
     [HttpGet]
@@ -346,16 +349,5 @@ public class AsistenciaController : Controller
     // ---------- Utilidades ----------
 
     private async Task<List<(int Id, string Nombre)>> EmpleadosAsync()
-    {
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        return empleados.Select(e =>
-        {
-            var persona = e.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == e.IdPersona);
-            var nombre = persona is null
-                ? $"(Empleado {e.IdEmpleado})"
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-            return (e.IdEmpleado, nombre);
-        }).OrderBy(x => x.nombre).ToList();
-    }
+        => await _empleados.EmpleadosAsync();
 }

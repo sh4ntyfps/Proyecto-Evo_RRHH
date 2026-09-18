@@ -11,6 +11,9 @@ public class AsistenciaData
 
     public async Task<List<Asistencia>> Listar() => await _contexto.Set<Asistencia>().ToListAsync();
 
+    public async Task<int> ContarEntreFechas(DateTime desde, DateTime hasta)
+        => await _contexto.Set<Asistencia>().CountAsync(a => a.Fecha.Date >= desde.Date && a.Fecha.Date <= hasta.Date);
+
     public async Task<Asistencia?> Obtener(DateTime FechaParam, int IdEmpleadoParam)
     {
         return await _contexto.Set<Asistencia>().FindAsync(FechaParam, IdEmpleadoParam);

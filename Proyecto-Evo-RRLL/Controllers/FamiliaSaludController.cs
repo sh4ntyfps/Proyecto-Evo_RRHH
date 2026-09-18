@@ -28,6 +28,7 @@ public class FamiliaSaludController : Controller
     private readonly TipoSangreData _tipoSangreData;
     private readonly DiscapacidadData _discapacidadData;
     private readonly SecuenciaService _secuencia;
+    private readonly Services.EmpleadoServicio _empleados;
 
     public FamiliaSaludController(
         EmpleadoData empleadoData,
@@ -47,7 +48,8 @@ public class FamiliaSaludController : Controller
         EstadoCivilData estadoCivilData,
         TipoSangreData tipoSangreData,
         DiscapacidadData discapacidadData,
-        SecuenciaService secuencia)
+        SecuenciaService secuencia,
+        Services.EmpleadoServicio empleados)
     {
         _empleadoData = empleadoData;
         _personaData = personaData;
@@ -67,6 +69,7 @@ public class FamiliaSaludController : Controller
         _tipoSangreData = tipoSangreData;
         _discapacidadData = discapacidadData;
         _secuencia = secuencia;
+        _empleados = empleados;
     }
 
     [HttpGet]
@@ -372,15 +375,7 @@ public class FamiliaSaludController : Controller
     // ---------- Utilidades ----------
 
     private async Task<string?> NombreEmpleadoAsync(int idEmpleado)
-    {
-        var empleado = await _empleadoData.Obtener(idEmpleado);
-        if (empleado?.IdPersona is null)
-            return empleado is null ? null : $"(Empleado {idEmpleado})";
-        var persona = (await _personaData.Listar()).FirstOrDefault(p => p.IdPersona == empleado.IdPersona);
-        return persona is null
-            ? $"(Empleado {idEmpleado})"
-            : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-    }
+        => await _empleados.NombreEmpleadoAsync(idEmpleado);
 
     private static void CopiarDinamica(RRHH_DinamicaFamiliar destino, RRHH_DinamicaFamiliar origen)
     {

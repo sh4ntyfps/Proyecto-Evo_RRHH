@@ -18,6 +18,7 @@ public class CapacitacionController : Controller
     private readonly PersonaData _personaData;
     private readonly TipoInstitucionData _tipoInstitucionData;
     private readonly SecuenciaService _secuencia;
+    private readonly Services.EmpleadoServicio _empleados;
 
     public CapacitacionController(
         CapacitacionData capacitacionData,
@@ -29,7 +30,8 @@ public class CapacitacionController : Controller
         EmpleadoData empleadoData,
         PersonaData personaData,
         TipoInstitucionData tipoInstitucionData,
-        SecuenciaService secuencia)
+        SecuenciaService secuencia,
+        Services.EmpleadoServicio empleados)
     {
         _capacitacionData = capacitacionData;
         _estudiosData = estudiosData;
@@ -41,6 +43,7 @@ public class CapacitacionController : Controller
         _personaData = personaData;
         _tipoInstitucionData = tipoInstitucionData;
         _secuencia = secuencia;
+        _empleados = empleados;
     }
 
     // ---------- Cursos de capacitación ----------
@@ -387,25 +390,8 @@ public class CapacitacionController : Controller
     // ---------- Utilidades ----------
 
     private async Task<List<(int Id, string Nombre)>> EmpleadosAsync()
-    {
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        return empleados.Select(e =>
-        {
-            var persona = e.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == e.IdPersona);
-            var nombre = persona is null
-                ? $"(Empleado {e.IdEmpleado})"
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-            return (e.IdEmpleado, nombre);
-        }).OrderBy(x => x.nombre).ToList();
-    }
+        => await _empleados.EmpleadosAsync();
 
     private async Task<string?> NombreEmpleadoAsync(int idEmpleado)
-    {
-        var empleado = await _empleadoData.Obtener(idEmpleado);
-        var persona = empleado?.IdPersona is null ? null : (await _personaData.Listar()).FirstOrDefault(p => p.IdPersona == empleado.IdPersona);
-        return persona is null
-            ? $"(Empleado {idEmpleado})"
-            : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-    }
+        => await _empleados.NombreEmpleadoAsync(idEmpleado);
 }

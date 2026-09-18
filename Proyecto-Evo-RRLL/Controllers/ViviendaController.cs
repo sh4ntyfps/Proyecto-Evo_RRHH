@@ -21,6 +21,7 @@ public class ViviendaController : Controller
     private readonly ExcretasVivData _excretasVivData;
     private readonly MaterialVivData _materialVivData;
     private readonly SecuenciaService _secuencia;
+    private readonly Services.EmpleadoServicio _empleados;
 
     public ViviendaController(
         EmpleadoData empleadoData,
@@ -34,7 +35,8 @@ public class ViviendaController : Controller
         ConservacionVivData conservacionVivData,
         ExcretasVivData excretasVivData,
         MaterialVivData materialVivData,
-        SecuenciaService secuencia)
+        SecuenciaService secuencia,
+        Services.EmpleadoServicio empleados)
     {
         _empleadoData = empleadoData;
         _personaData = personaData;
@@ -48,6 +50,7 @@ public class ViviendaController : Controller
         _excretasVivData = excretasVivData;
         _materialVivData = materialVivData;
         _secuencia = secuencia;
+        _empleados = empleados;
     }
 
     [HttpGet]
@@ -170,29 +173,10 @@ public class ViviendaController : Controller
     // ---------- Utilidades ----------
 
     private async Task<List<(int Id, string Nombre)>> EmpleadosAsync()
-    {
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        return empleados.Select(e =>
-        {
-            var persona = e.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == e.IdPersona);
-            var nombre = persona is null
-                ? $"(Empleado {e.IdEmpleado})"
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-            return (e.IdEmpleado, nombre);
-        }).OrderBy(x => x.nombre).ToList();
-    }
+        => await _empleados.EmpleadosAsync();
 
     private async Task<string?> NombreEmpleadoAsync(int idEmpleado)
-    {
-        var empleado = await _empleadoData.Obtener(idEmpleado);
-        if (empleado?.IdPersona is null)
-            return empleado is null ? null : $"(Empleado {idEmpleado})";
-        var persona = (await _personaData.Listar()).FirstOrDefault(p => p.IdPersona == empleado.IdPersona);
-        return persona is null
-            ? $"(Empleado {idEmpleado})"
-            : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-    }
+        => await _empleados.NombreEmpleadoAsync(idEmpleado);
 
     private static void Copiar(Vivienda destino, Vivienda origen)
     {

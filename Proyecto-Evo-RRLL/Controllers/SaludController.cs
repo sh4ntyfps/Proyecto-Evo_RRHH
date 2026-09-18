@@ -16,6 +16,7 @@ public class SaludController : Controller
     private readonly EstadoCivilData _estadoCivilData;
     private readonly MotivoBajaData _motivoBajaData;
     private readonly SecuenciaService _secuencia;
+    private readonly Services.EmpleadoServicio _empleados;
 
     public SaludController(
         RRHH_SaludData saludData,
@@ -25,7 +26,8 @@ public class SaludController : Controller
         PersonaData personaData,
         EstadoCivilData estadoCivilData,
         MotivoBajaData motivoBajaData,
-        SecuenciaService secuencia)
+        SecuenciaService secuencia,
+        Services.EmpleadoServicio empleados)
     {
         _saludData = saludData;
         _aseguradoData = aseguradoData;
@@ -35,6 +37,7 @@ public class SaludController : Controller
         _estadoCivilData = estadoCivilData;
         _motivoBajaData = motivoBajaData;
         _secuencia = secuencia;
+        _empleados = empleados;
     }
 
     // ---------- Ficha de salud ----------
@@ -338,18 +341,7 @@ public class SaludController : Controller
     // ---------- Utilidades ----------
 
     private async Task<List<(int Id, string Nombre)>> EmpleadosAsync()
-    {
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        return empleados.Select(e =>
-        {
-            var persona = e.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == e.IdPersona);
-            var nombre = persona is null
-                ? $"(Empleado {e.IdEmpleado})"
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-            return (e.IdEmpleado, nombre);
-        }).OrderBy(x => x.nombre).ToList();
-    }
+        => await _empleados.EmpleadosAsync();
 
     private async Task<List<(int Id, string Nombre)>> PersonasAsync()
     {

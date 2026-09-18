@@ -18,6 +18,7 @@ public class SeguridadAdminController : Controller
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
     private readonly SecuenciaService _secuencia;
+    private readonly Services.EmpleadoServicio _empleados;
 
     public SeguridadAdminController(
         UsuarioData usuarioData,
@@ -27,7 +28,8 @@ public class SeguridadAdminController : Controller
         SistemaOpcionData sistemaOpcionData,
         EmpleadoData empleadoData,
         PersonaData personaData,
-        SecuenciaService secuencia)
+        SecuenciaService secuencia,
+        Services.EmpleadoServicio empleados)
     {
         _usuarioData = usuarioData;
         _usuarioRolData = usuarioRolData;
@@ -37,6 +39,7 @@ public class SeguridadAdminController : Controller
         _empleadoData = empleadoData;
         _personaData = personaData;
         _secuencia = secuencia;
+        _empleados = empleados;
     }
 
     // ---------- Usuarios ----------
@@ -364,16 +367,5 @@ public class SeguridadAdminController : Controller
     // ---------- Utilidades ----------
 
     private async Task<List<(int Id, string Nombre)>> EmpleadosAsync()
-    {
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        return empleados.Select(e =>
-        {
-            var persona = e.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == e.IdPersona);
-            var nombre = persona is null
-                ? $"(Empleado {e.IdEmpleado})"
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
-            return (e.IdEmpleado, nombre);
-        }).OrderBy(x => x.nombre).ToList();
-    }
+        => await _empleados.EmpleadosAsync();
 }
