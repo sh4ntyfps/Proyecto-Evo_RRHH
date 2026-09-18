@@ -12,17 +12,20 @@ public class PermisoController : Controller
     private readonly Motivo_PermData _motivoData;
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
+    private readonly SecuenciaService _secuencia;
 
     public PermisoController(
         PermisoData permisoData,
         Motivo_PermData motivoData,
         EmpleadoData empleadoData,
-        PersonaData personaData)
+        PersonaData personaData,
+        SecuenciaService secuencia)
     {
         _permisoData = permisoData;
         _motivoData = motivoData;
         _empleadoData = empleadoData;
         _personaData = personaData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -54,15 +57,31 @@ public class PermisoController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Nuevo(Permiso modelo)
     {
-        var lista = await _permisoData.Listar();
-        var maxN = lista
-            .Where(p => p.IdEmpleado == modelo.IdEmpleado)
-            .Select(p => p.NPermiso)
-            .DefaultIfEmpty(0)
-            .Max();
-        modelo.NPermiso = maxN + 1;
-        await _permisoData.Crear(modelo);
-        return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _permisoData.Listar();
+                return lista
+                    .Where(p => p.IdEmpleado == modelo.IdEmpleado)
+                    .Select(p => p.NPermiso)
+                    .DefaultIfEmpty(0)
+                    .Max() + 1;
+            },
+            async id =>
+            {
+                modelo.NPermiso = id;
+                await _permisoData.Crear(modelo);
+                return true;
+            });
+        if (!guardo)
+            ModelState.AddModelError("", "No se pudo registrar el permiso: intente nuevamente.");
+        else
+            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+
+        ViewBag.IdEmpleado = modelo.IdEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.Motivos = await _motivoData.Listar();
+        return View("Form", modelo);
     }
 
     [HttpGet]

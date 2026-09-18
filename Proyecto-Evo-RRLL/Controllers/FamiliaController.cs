@@ -21,6 +21,7 @@ public class FamiliaController : Controller
     private readonly EstadoCivilData _estadoCivilData;
     private readonly DiscapacidadData _discapacidadData;
     private readonly TipoSangreData _tipoSangreData;
+    private readonly SecuenciaService _secuencia;
 
     public FamiliaController(
         FamiliarData familiarData,
@@ -35,7 +36,8 @@ public class FamiliaController : Controller
         RRHH_RelacHermanoData relacHermanoData,
         EstadoCivilData estadoCivilData,
         DiscapacidadData discapacidadData,
-        TipoSangreData tipoSangreData)
+        TipoSangreData tipoSangreData,
+        SecuenciaService secuencia)
     {
         _familiarData = familiarData;
         _dinamicaData = dinamicaData;
@@ -50,6 +52,7 @@ public class FamiliaController : Controller
         _estadoCivilData = estadoCivilData;
         _discapacidadData = discapacidadData;
         _tipoSangreData = tipoSangreData;
+        _secuencia = secuencia;
     }
 
     // ---------- Familiares ----------
@@ -201,11 +204,24 @@ public class FamiliaController : Controller
     {
         if (ModelState.IsValid)
         {
-            var lista = await _dinamicaData.Listar();
-            modelo.idDinamica = lista.Count == 0 ? 1 : lista.Max(d => d.idDinamica) + 1;
-            await _dinamicaData.Crear(modelo);
-            TempData["MensajeExito"] = "Dinámica familiar guardada.";
-            return RedirectToAction(nameof(Dinamica), new { idEmpleado = modelo.IdEmpleado });
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var lista = await _dinamicaData.Listar();
+                    return lista.Count == 0 ? 1 : lista.Max(d => d.idDinamica) + 1;
+                },
+                async id =>
+                {
+                    modelo.idDinamica = id;
+                    await _dinamicaData.Crear(modelo);
+                    return true;
+                });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Dinámica familiar guardada.";
+                return RedirectToAction(nameof(Dinamica), new { idEmpleado = modelo.IdEmpleado });
+            }
+            ModelState.AddModelError("", "No se pudo guardar la dinámica familiar: intente nuevamente.");
         }
 
         ViewBag.IdEmpleado = modelo.IdEmpleado;
@@ -293,11 +309,24 @@ public class FamiliaController : Controller
     {
         if (ModelState.IsValid)
         {
-            var lista = await _funcFamData.Listar();
-            modelo.idFuncFamiliar = lista.Count == 0 ? 1 : lista.Max(f => f.idFuncFamiliar) + 1;
-            await _funcFamData.Crear(modelo);
-            TempData["MensajeExito"] = "Funcionalidad familiar guardada.";
-            return RedirectToAction(nameof(FuncFam), new { idEmpleado = modelo.IdEmpleado });
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var lista = await _funcFamData.Listar();
+                    return lista.Count == 0 ? 1 : lista.Max(f => f.idFuncFamiliar) + 1;
+                },
+                async id =>
+                {
+                    modelo.idFuncFamiliar = id;
+                    await _funcFamData.Crear(modelo);
+                    return true;
+                });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Funcionalidad familiar guardada.";
+                return RedirectToAction(nameof(FuncFam), new { idEmpleado = modelo.IdEmpleado });
+            }
+            ModelState.AddModelError("", "No se pudo guardar la funcionalidad familiar: intente nuevamente.");
         }
 
         ViewBag.IdEmpleado = modelo.IdEmpleado;

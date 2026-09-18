@@ -17,6 +17,7 @@ public class SeguridadAdminController : Controller
     private readonly SistemaOpcionData _sistemaOpcionData;
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
+    private readonly SecuenciaService _secuencia;
 
     public SeguridadAdminController(
         UsuarioData usuarioData,
@@ -25,7 +26,8 @@ public class SeguridadAdminController : Controller
         Rol_AccesoData rolAccesoData,
         SistemaOpcionData sistemaOpcionData,
         EmpleadoData empleadoData,
-        PersonaData personaData)
+        PersonaData personaData,
+        SecuenciaService secuencia)
     {
         _usuarioData = usuarioData;
         _usuarioRolData = usuarioRolData;
@@ -34,6 +36,7 @@ public class SeguridadAdminController : Controller
         _sistemaOpcionData = sistemaOpcionData;
         _empleadoData = empleadoData;
         _personaData = personaData;
+        _secuencia = secuencia;
     }
 
     // ---------- Usuarios ----------
@@ -97,14 +100,21 @@ public class SeguridadAdminController : Controller
 
         if (ModelState.IsValid)
         {
-            var lista = await _usuarioData.Listar();
-            modelo.IdUsuario = lista.Count == 0 ? 1 : lista.Max(u => u.IdUsuario) + 1;
-            modelo.Login = modelo.Login!.Trim();
-            modelo.PasswordHash = new PasswordHasher<Usuario>().HashPassword(modelo, clave);
-            modelo.Fecha = DateTime.Now;
-            await _usuarioData.Crear(modelo);
-            TempData["MensajeExito"] = "Usuario creado.";
-            return RedirectToAction(nameof(Usuarios));
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                var lista = await _usuarioData.Listar();
+                modelo.IdUsuario = lista.Count == 0 ? 1 : lista.Max(u => u.IdUsuario) + 1;
+                modelo.Login = modelo.Login!.Trim();
+                modelo.PasswordHash = new PasswordHasher<Usuario>().HashPassword(modelo, clave);
+                modelo.Fecha = DateTime.Now;
+                await _usuarioData.Crear(modelo);
+            });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Usuario creado.";
+                return RedirectToAction(nameof(Usuarios));
+            }
+            ModelState.AddModelError("", "No se pudo crear el usuario: intente nuevamente.");
         }
 
         ViewBag.Empleados = await EmpleadosAsync();
@@ -242,11 +252,18 @@ public class SeguridadAdminController : Controller
     {
         if (ModelState.IsValid)
         {
-            var lista = await _rolData.Listar();
-            modelo.IdRol = lista.Count == 0 ? 1 : lista.Max(r => r.IdRol) + 1;
-            await _rolData.Crear(modelo);
-            TempData["MensajeExito"] = "Rol creado.";
-            return RedirectToAction(nameof(Roles));
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                var lista = await _rolData.Listar();
+                modelo.IdRol = lista.Count == 0 ? 1 : lista.Max(r => r.IdRol) + 1;
+                await _rolData.Crear(modelo);
+            });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Rol creado.";
+                return RedirectToAction(nameof(Roles));
+            }
+            ModelState.AddModelError("", "No se pudo crear el rol: intente nuevamente.");
         }
         return View("RolForm", modelo);
     }

@@ -17,6 +17,7 @@ public class CapacitacionController : Controller
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
     private readonly TipoInstitucionData _tipoInstitucionData;
+    private readonly SecuenciaService _secuencia;
 
     public CapacitacionController(
         CapacitacionData capacitacionData,
@@ -27,7 +28,8 @@ public class CapacitacionController : Controller
         EstadoEstudioData estadoEstudioData,
         EmpleadoData empleadoData,
         PersonaData personaData,
-        TipoInstitucionData tipoInstitucionData)
+        TipoInstitucionData tipoInstitucionData,
+        SecuenciaService secuencia)
     {
         _capacitacionData = capacitacionData;
         _estudiosData = estudiosData;
@@ -38,6 +40,7 @@ public class CapacitacionController : Controller
         _empleadoData = empleadoData;
         _personaData = personaData;
         _tipoInstitucionData = tipoInstitucionData;
+        _secuencia = secuencia;
     }
 
     // ---------- Cursos de capacitación ----------
@@ -68,10 +71,25 @@ public class CapacitacionController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Nuevo(Capacitacion modelo)
     {
-        var lista = await _capacitacionData.Listar();
-        modelo.IdCapacitacion = lista.Count > 0 ? lista.Max(x => x.IdCapacitacion) + 1 : 1;
-        await _capacitacionData.Crear(modelo);
-        return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _capacitacionData.Listar();
+                return lista.Count > 0 ? lista.Max(x => x.IdCapacitacion) + 1 : 1;
+            },
+            async id =>
+            {
+                modelo.IdCapacitacion = id;
+                await _capacitacionData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+
+        ViewBag.IdEmpleado = modelo.IdEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ModelState.AddModelError("", "No se pudo registrar la capacitación: intente nuevamente.");
+        return View("Form", modelo);
     }
 
     [HttpGet]
@@ -149,15 +167,32 @@ public class CapacitacionController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EstudioNuevo(EstudiosRealizado modelo)
     {
-        var lista = await _estudiosData.Listar();
-        var maxCorr = lista
-            .Where(e => e.IdTipoEstudios == modelo.IdTipoEstudios && e.IdEmpleado == modelo.IdEmpleado)
-            .Select(e => e.Correlativo)
-            .DefaultIfEmpty(0)
-            .Max();
-        modelo.Correlativo = maxCorr + 1;
-        await _estudiosData.Crear(modelo);
-        return RedirectToAction(nameof(Estudios), new { idEmpleado = modelo.IdEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _estudiosData.Listar();
+                var maxCorr = lista
+                    .Where(e => e.IdTipoEstudios == modelo.IdTipoEstudios && e.IdEmpleado == modelo.IdEmpleado)
+                    .Select(e => e.Correlativo)
+                    .DefaultIfEmpty(0)
+                    .Max();
+                return maxCorr + 1;
+            },
+            async id =>
+            {
+                modelo.Correlativo = id;
+                await _estudiosData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+            return RedirectToAction(nameof(Estudios), new { idEmpleado = modelo.IdEmpleado });
+
+        ViewBag.IdEmpleado = modelo.IdEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.TiposEstudio = await _tipoEstudioData.Listar();
+        ViewBag.EstadosEstudio = await _estadoEstudioData.Listar();
+        ModelState.AddModelError("", "No se pudo registrar el estudio: intente nuevamente.");
+        return View("EstudioForm", modelo);
     }
 
     [HttpGet]
@@ -293,10 +328,24 @@ public class CapacitacionController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> InstitucionNuevo(Institucion modelo)
     {
-        var lista = await _institucionData.Listar();
-        modelo.IdInstitucion = lista.Count > 0 ? lista.Max(x => x.IdInstitucion) + 1 : 1;
-        await _institucionData.Crear(modelo);
-        return RedirectToAction(nameof(Instituciones));
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _institucionData.Listar();
+                return lista.Count > 0 ? lista.Max(x => x.IdInstitucion) + 1 : 1;
+            },
+            async id =>
+            {
+                modelo.IdInstitucion = id;
+                await _institucionData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+            return RedirectToAction(nameof(Instituciones));
+
+        ViewBag.TiposInstitucion = await _tipoInstitucionData.Listar();
+        ModelState.AddModelError("", "No se pudo registrar la institución: intente nuevamente.");
+        return View("InstitucionForm", modelo);
     }
 
     [HttpGet]

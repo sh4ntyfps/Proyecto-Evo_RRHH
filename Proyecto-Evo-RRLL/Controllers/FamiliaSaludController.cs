@@ -27,6 +27,7 @@ public class FamiliaSaludController : Controller
     private readonly EstadoCivilData _estadoCivilData;
     private readonly TipoSangreData _tipoSangreData;
     private readonly DiscapacidadData _discapacidadData;
+    private readonly SecuenciaService _secuencia;
 
     public FamiliaSaludController(
         EmpleadoData empleadoData,
@@ -45,7 +46,8 @@ public class FamiliaSaludController : Controller
         TipoFamiliarData tipoFamiliarData,
         EstadoCivilData estadoCivilData,
         TipoSangreData tipoSangreData,
-        DiscapacidadData discapacidadData)
+        DiscapacidadData discapacidadData,
+        SecuenciaService secuencia)
     {
         _empleadoData = empleadoData;
         _personaData = personaData;
@@ -64,6 +66,7 @@ public class FamiliaSaludController : Controller
         _estadoCivilData = estadoCivilData;
         _tipoSangreData = tipoSangreData;
         _discapacidadData = discapacidadData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -153,9 +156,17 @@ public class FamiliaSaludController : Controller
 
         if (actual is null)
         {
-            var lista = await _saludData.Listar();
-            modelo.idSalud = lista.Count > 0 ? lista.Max(x => x.idSalud) + 1 : 1;
-            await _saludData.Crear(modelo);
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                var lista = await _saludData.Listar();
+                modelo.idSalud = lista.Count > 0 ? lista.Max(x => x.idSalud) + 1 : 1;
+                await _saludData.Crear(modelo);
+            });
+            if (!guardo)
+            {
+                TempData["MensajeError"] = "No se pudo guardar la ficha de salud: intente nuevamente.";
+                return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado ?? 0 });
+            }
         }
         else
         {
@@ -210,47 +221,53 @@ public class FamiliaSaludController : Controller
     {
         var idEmpleado = modelo.IdEmpleado;
 
-        var dinamicaActual = (await _dinamicaData.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
-        if (dinamicaActual is null)
+        var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
         {
-            var lista = await _dinamicaData.Listar();
-            modelo.Dinamica.IdEmpleado = idEmpleado;
-            modelo.Dinamica.idDinamica = lista.Count > 0 ? lista.Max(x => x.idDinamica) + 1 : 1;
-            await _dinamicaData.Crear(modelo.Dinamica);
-        }
-        else
-        {
-            CopiarDinamica(dinamicaActual, modelo.Dinamica);
-            await _dinamicaData.Actualizar(dinamicaActual);
-        }
+            var dinamicaActual = (await _dinamicaData.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
+            if (dinamicaActual is null)
+            {
+                var lista = await _dinamicaData.Listar();
+                modelo.Dinamica.IdEmpleado = idEmpleado;
+                modelo.Dinamica.idDinamica = lista.Count > 0 ? lista.Max(x => x.idDinamica) + 1 : 1;
+                await _dinamicaData.Crear(modelo.Dinamica);
+            }
+            else
+            {
+                CopiarDinamica(dinamicaActual, modelo.Dinamica);
+                await _dinamicaData.Actualizar(dinamicaActual);
+            }
 
-        var aspSocioActual = (await _aspSocioData.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
-        if (aspSocioActual is null)
-        {
-            var lista = await _aspSocioData.Listar();
-            modelo.AspSocio.IdEmpleado = idEmpleado;
-            modelo.AspSocio.idAspSocio = lista.Count > 0 ? lista.Max(x => x.idAspSocio) + 1 : 1;
-            await _aspSocioData.Crear(modelo.AspSocio);
-        }
-        else
-        {
-            CopiarAspSocio(aspSocioActual, modelo.AspSocio);
-            await _aspSocioData.Actualizar(aspSocioActual);
-        }
+            var aspSocioActual = (await _aspSocioData.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
+            if (aspSocioActual is null)
+            {
+                var lista = await _aspSocioData.Listar();
+                modelo.AspSocio.IdEmpleado = idEmpleado;
+                modelo.AspSocio.idAspSocio = lista.Count > 0 ? lista.Max(x => x.idAspSocio) + 1 : 1;
+                await _aspSocioData.Crear(modelo.AspSocio);
+            }
+            else
+            {
+                CopiarAspSocio(aspSocioActual, modelo.AspSocio);
+                await _aspSocioData.Actualizar(aspSocioActual);
+            }
 
-        var funcFamActual = (await _funcFamData.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
-        if (funcFamActual is null)
-        {
-            var lista = await _funcFamData.Listar();
-            modelo.FuncFam.IdEmpleado = idEmpleado;
-            modelo.FuncFam.idFuncFamiliar = lista.Count > 0 ? lista.Max(x => x.idFuncFamiliar) + 1 : 1;
-            await _funcFamData.Crear(modelo.FuncFam);
-        }
-        else
-        {
-            CopiarFuncFam(funcFamActual, modelo.FuncFam);
-            await _funcFamData.Actualizar(funcFamActual);
-        }
+            var funcFamActual = (await _funcFamData.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
+            if (funcFamActual is null)
+            {
+                var lista = await _funcFamData.Listar();
+                modelo.FuncFam.IdEmpleado = idEmpleado;
+                modelo.FuncFam.idFuncFamiliar = lista.Count > 0 ? lista.Max(x => x.idFuncFamiliar) + 1 : 1;
+                await _funcFamData.Crear(modelo.FuncFam);
+            }
+            else
+            {
+                CopiarFuncFam(funcFamActual, modelo.FuncFam);
+                await _funcFamData.Actualizar(funcFamActual);
+            }
+        });
+
+        if (!guardo)
+            TempData["MensajeError"] = "No se pudo guardar la ficha social: intente nuevamente.";
 
         return RedirectToAction(nameof(Index), new { idEmpleado });
     }

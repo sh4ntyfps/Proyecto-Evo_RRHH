@@ -20,6 +20,7 @@ public class ViviendaController : Controller
     private readonly ConservacionVivData _conservacionVivData;
     private readonly ExcretasVivData _excretasVivData;
     private readonly MaterialVivData _materialVivData;
+    private readonly SecuenciaService _secuencia;
 
     public ViviendaController(
         EmpleadoData empleadoData,
@@ -32,7 +33,8 @@ public class ViviendaController : Controller
         AlumbradoVivData alumbradoVivData,
         ConservacionVivData conservacionVivData,
         ExcretasVivData excretasVivData,
-        MaterialVivData materialVivData)
+        MaterialVivData materialVivData,
+        SecuenciaService secuencia)
     {
         _empleadoData = empleadoData;
         _personaData = personaData;
@@ -45,6 +47,7 @@ public class ViviendaController : Controller
         _conservacionVivData = conservacionVivData;
         _excretasVivData = excretasVivData;
         _materialVivData = materialVivData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -117,9 +120,33 @@ public class ViviendaController : Controller
 
         if (actual is null)
         {
-            var lista = await _viviendaData.Listar();
-            modelo.IdVivienda = lista.Count > 0 ? lista.Max(x => x.IdVivienda) + 1 : 1;
-            await _viviendaData.Crear(modelo);
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var lista = await _viviendaData.Listar();
+                    return lista.Count > 0 ? lista.Max(x => x.IdVivienda) + 1 : 1;
+                },
+                async id =>
+                {
+                    modelo.IdVivienda = id;
+                    await _viviendaData.Crear(modelo);
+                    return true;
+                });
+            if (!guardo)
+            {
+                ViewBag.IdEmpleado = modelo.IdEmpleado;
+                ViewBag.NombreEmpleado = await NombreEmpleadoAsync(modelo.IdEmpleado ?? 0);
+                ViewBag.Tipos = await _tipoVivData.Listar();
+                ViewBag.Tenencias = await _tenenciaVivData.Listar();
+                ViewBag.Ubicaciones = await _ubicacionVivData.Listar();
+                ViewBag.Aguas = await _aguaVivData.Listar();
+                ViewBag.Alumbrados = await _alumbradoVivData.Listar();
+                ViewBag.Conservaciones = await _conservacionVivData.Listar();
+                ViewBag.Excretas = await _excretasVivData.Listar();
+                ViewBag.Materiales = await _materialVivData.Listar();
+                ModelState.AddModelError("", "No se pudo guardar la vivienda: intente nuevamente.");
+                return View(modelo);
+            }
         }
         else
         {

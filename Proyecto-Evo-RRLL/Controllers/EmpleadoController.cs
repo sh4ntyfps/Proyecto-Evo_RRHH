@@ -24,6 +24,7 @@ public class EmpleadoController : Controller
     private readonly DiscapacidadData _discapacidadData;
     private readonly ViveConData _viveConData;
     private readonly NacionalidadData _nacionalidadData;
+    private readonly SecuenciaService _secuencia;
 
     public EmpleadoController(
         EmpleadoData empleadoData,
@@ -40,7 +41,8 @@ public class EmpleadoController : Controller
         TipoSangreData tipoSangreData,
         DiscapacidadData discapacidadData,
         ViveConData viveConData,
-        NacionalidadData nacionalidadData)
+        NacionalidadData nacionalidadData,
+        SecuenciaService secuencia)
     {
         _empleadoData = empleadoData;
         _personaData = personaData;
@@ -57,6 +59,7 @@ public class EmpleadoController : Controller
         _discapacidadData = discapacidadData;
         _viveConData = viveConData;
         _nacionalidadData = nacionalidadData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -254,22 +257,29 @@ public class EmpleadoController : Controller
 
         if (ModelState.IsValid)
         {
-            var personas = await _personaData.Listar();
-            persona.IdPersona = personas.Count > 0 ? personas.Max(p => p.IdPersona) + 1 : 1;
-            persona.FechaRegistro = DateTime.Now;
-            await _personaData.Crear(persona);
+            Empleado? empleado = null;
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                var personas = await _personaData.Listar();
+                persona.IdPersona = personas.Count > 0 ? personas.Max(p => p.IdPersona) + 1 : 1;
+                persona.FechaRegistro = DateTime.Now;
+                await _personaData.Crear(persona);
 
-            var empleados = await _empleadoData.Listar();
-            var empleado = modelo.Empleado;
-            empleado.IdEmpleado = empleados.Count > 0 ? empleados.Max(e => e.IdEmpleado) + 1 : 1;
-            empleado.IdPersona = persona.IdPersona;
-            empleado.Foto = foto is not null && foto.Length > 0 ? await LeerArchivo(foto) : null;
-            if (string.IsNullOrWhiteSpace(empleado.Estado))
-                empleado.Estado = "A";
-            await _empleadoData.Crear(empleado);
-
-            TempData["MensajeExito"] = "Empleado registrado.";
-            return RedirectToAction(nameof(Detalles), new { id = empleado.IdEmpleado });
+                var empleados = await _empleadoData.Listar();
+                empleado = modelo.Empleado;
+                empleado.IdEmpleado = empleados.Count > 0 ? empleados.Max(e => e.IdEmpleado) + 1 : 1;
+                empleado.IdPersona = persona.IdPersona;
+                empleado.Foto = foto is not null && foto.Length > 0 ? await LeerArchivo(foto) : null;
+                if (string.IsNullOrWhiteSpace(empleado.Estado))
+                    empleado.Estado = "A";
+                await _empleadoData.Crear(empleado);
+            });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Empleado registrado.";
+                return RedirectToAction(nameof(Detalles), new { id = empleado!.IdEmpleado });
+            }
+            ModelState.AddModelError("", "No se pudo registrar el empleado: intente nuevamente.");
         }
 
         await CargarCatalogosEdicion();

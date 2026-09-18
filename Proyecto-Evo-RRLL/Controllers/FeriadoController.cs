@@ -9,10 +9,12 @@ namespace Proyecto_Evo_RRLL.Controllers;
 public class FeriadoController : Controller
 {
     private readonly RRHH_FeriadoData _feriadoData;
+    private readonly SecuenciaService _secuencia;
 
-    public FeriadoController(RRHH_FeriadoData feriadoData)
+    public FeriadoController(RRHH_FeriadoData feriadoData, SecuenciaService secuencia)
     {
         _feriadoData = feriadoData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -32,11 +34,26 @@ public class FeriadoController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Nuevo(RRHH_Feriado modelo)
     {
-        var lista = await _feriadoData.Listar();
-        modelo.idFeriado = lista.Count > 0 ? lista.Max(f => f.idFeriado) + 1 : 1;
-        await _feriadoData.Crear(modelo);
-        TempData["MensajeExito"] = "Feriado registrado.";
-        return RedirectToAction(nameof(Index));
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _feriadoData.Listar();
+                return lista.Count > 0 ? lista.Max(f => f.idFeriado) + 1 : 1;
+            },
+            async id =>
+            {
+                modelo.idFeriado = id;
+                await _feriadoData.Crear(modelo);
+                return true;
+            });
+        if (!guardo)
+            ModelState.AddModelError("", "No se pudo registrar el feriado: intente nuevamente.");
+        else
+        {
+            TempData["MensajeExito"] = "Feriado registrado.";
+            return RedirectToAction(nameof(Index));
+        }
+        return View("Form", modelo);
     }
 
     [HttpGet]

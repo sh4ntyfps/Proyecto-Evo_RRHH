@@ -9,10 +9,12 @@ namespace Proyecto_Evo_RRLL.Controllers;
 public class InconvenienteController : Controller
 {
     private readonly InconvenienteData _inconvenienteData;
+    private readonly SecuenciaService _secuencia;
 
-    public InconvenienteController(InconvenienteData inconvenienteData)
+    public InconvenienteController(InconvenienteData inconvenienteData, SecuenciaService secuencia)
     {
         _inconvenienteData = inconvenienteData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -57,15 +59,28 @@ public class InconvenienteController : Controller
 
         if (ModelState.IsValid)
         {
-            var lista = await _inconvenienteData.Listar();
-            modelo.IdInconveniente = lista
-                .Where(i => i.IdObjetivo == modelo.IdObjetivo && i.Id_Actividad == modelo.Id_Actividad)
-                .Select(i => i.IdInconveniente)
-                .DefaultIfEmpty(0)
-                .Max() + 1;
-            await _inconvenienteData.Crear(modelo);
-            TempData["MensajeExito"] = "Inconveniente registrado.";
-            return RedirectToAction(nameof(Index), new { idObjetivo = modelo.IdObjetivo, idActividad = modelo.Id_Actividad });
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var lista = await _inconvenienteData.Listar();
+                    return lista
+                        .Where(i => i.IdObjetivo == modelo.IdObjetivo && i.Id_Actividad == modelo.Id_Actividad)
+                        .Select(i => i.IdInconveniente)
+                        .DefaultIfEmpty(0)
+                        .Max() + 1;
+                },
+                async id =>
+                {
+                    modelo.IdInconveniente = id;
+                    await _inconvenienteData.Crear(modelo);
+                    return true;
+                });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Inconveniente registrado.";
+                return RedirectToAction(nameof(Index), new { idObjetivo = modelo.IdObjetivo, idActividad = modelo.Id_Actividad });
+            }
+            ModelState.AddModelError("", "No se pudo registrar el inconveniente: intente nuevamente.");
         }
 
         ViewBag.IdObjetivo = modelo.IdObjetivo;

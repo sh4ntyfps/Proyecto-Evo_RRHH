@@ -16,6 +16,7 @@ public class AsistenciaController : Controller
     private readonly HorarioData _horarioData;
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
+    private readonly SecuenciaService _secuencia;
 
     public AsistenciaController(
         AsistenciaData asistenciaData,
@@ -24,7 +25,8 @@ public class AsistenciaController : Controller
         HorarioTemporalData horarioTemporalData,
         HorarioData horarioData,
         EmpleadoData empleadoData,
-        PersonaData personaData)
+        PersonaData personaData,
+        SecuenciaService secuencia)
     {
         _asistenciaData = asistenciaData;
         _marcacionData = marcacionData;
@@ -33,6 +35,7 @@ public class AsistenciaController : Controller
         _horarioData = horarioData;
         _empleadoData = empleadoData;
         _personaData = personaData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -276,11 +279,26 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> HorarioTemporalNuevo(HorarioTemporal modelo)
     {
-        var lista = await _horarioTemporalData.Listar();
-        var maxN = lista.Where(h => h.idEmpleado == modelo.idEmpleado).Select(h => h.N).DefaultIfEmpty(0).Max();
-        modelo.N = maxN + 1;
-        await _horarioTemporalData.Crear(modelo);
-        return RedirectToAction(nameof(HorariosTemporal), new { idEmpleado = modelo.idEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _horarioTemporalData.Listar();
+                return lista.Where(h => h.idEmpleado == modelo.idEmpleado).Select(h => h.N).DefaultIfEmpty(0).Max() + 1;
+            },
+            async id =>
+            {
+                modelo.N = id;
+                await _horarioTemporalData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+            return RedirectToAction(nameof(HorariosTemporal), new { idEmpleado = modelo.idEmpleado });
+
+        ViewBag.IdEmpleado = modelo.idEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.Horarios = await _horarioData.Listar();
+        ModelState.AddModelError("", "No se pudo registrar el horario temporal: intente nuevamente.");
+        return View("HorarioTemporalForm", modelo);
     }
 
     [HttpGet]

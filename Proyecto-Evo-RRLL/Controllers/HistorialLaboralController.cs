@@ -18,6 +18,7 @@ public class HistorialLaboralController : Controller
     private readonly EstructOrganizData _estructOrganizData;
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
+    private readonly SecuenciaService _secuencia;
 
     public HistorialLaboralController(
         PeriodoLaboralData periodoData,
@@ -28,7 +29,8 @@ public class HistorialLaboralController : Controller
         TipoInstitucionData tipoInstitucionData,
         EstructOrganizData estructuraOrganizData,
         EmpleadoData empleadoData,
-        PersonaData personaData)
+        PersonaData personaData,
+        SecuenciaService secuencia)
     {
         _periodoData = periodoData;
         _expData = expData;
@@ -39,6 +41,7 @@ public class HistorialLaboralController : Controller
         _estructOrganizData = estructuraOrganizData;
         _empleadoData = empleadoData;
         _personaData = personaData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -86,11 +89,25 @@ public class HistorialLaboralController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> PeriodoNuevo(PeriodoLaboral modelo)
     {
-        var lista = await _periodoData.Listar();
-        var maxN = lista.Where(p => p.IdEmpleado == modelo.IdEmpleado).Select(p => p.NroPeriodo).DefaultIfEmpty(0).Max();
-        modelo.NroPeriodo = maxN + 1;
-        await _periodoData.Crear(modelo);
-        return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _periodoData.Listar();
+                return lista.Where(p => p.IdEmpleado == modelo.IdEmpleado).Select(p => p.NroPeriodo).DefaultIfEmpty(0).Max() + 1;
+            },
+            async id =>
+            {
+                modelo.NroPeriodo = id;
+                await _periodoData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+
+        ViewBag.IdEmpleado = modelo.IdEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ModelState.AddModelError("", "No se pudo registrar el período: intente nuevamente.");
+        return View("PeriodoForm", modelo);
     }
 
     [HttpGet]
@@ -149,11 +166,26 @@ public class HistorialLaboralController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ExpNuevo(ExpLaboral modelo)
     {
-        var lista = await _expData.Listar();
-        var maxId = lista.Where(e => e.IdEmpleado == modelo.IdEmpleado).Select(e => e.IdExpLab).DefaultIfEmpty(0).Max();
-        modelo.IdExpLab = maxId + 1;
-        await _expData.Crear(modelo);
-        return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _expData.Listar();
+                return lista.Where(e => e.IdEmpleado == modelo.IdEmpleado).Select(e => e.IdExpLab).DefaultIfEmpty(0).Max() + 1;
+            },
+            async id =>
+            {
+                modelo.IdExpLab = id;
+                await _expData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+
+        ViewBag.IdEmpleado = modelo.IdEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.TiposInstitucion = await _tipoInstitucionData.Listar();
+        ModelState.AddModelError("", "No se pudo registrar la experiencia: intente nuevamente.");
+        return View("ExpForm", modelo);
     }
 
     [HttpGet]
@@ -213,11 +245,26 @@ public class HistorialLaboralController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RotacionNuevo(Rotacion modelo)
     {
-        var lista = await _rotacionData.Listar();
-        var maxId = lista.Where(r => r.idEmpleado == modelo.idEmpleado).Select(r => r.idRotacion).DefaultIfEmpty(0).Max();
-        modelo.idRotacion = maxId + 1;
-        await _rotacionData.Crear(modelo);
-        return RedirectToAction(nameof(Index), new { idEmpleado = modelo.idEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _rotacionData.Listar();
+                return lista.Where(r => r.idEmpleado == modelo.idEmpleado).Select(r => r.idRotacion).DefaultIfEmpty(0).Max() + 1;
+            },
+            async id =>
+            {
+                modelo.idRotacion = id;
+                await _rotacionData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.idEmpleado });
+
+        ViewBag.IdEmpleado = modelo.idEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.Areas = await _estructOrganizData.Listar();
+        ModelState.AddModelError("", "No se pudo registrar la rotación: intente nuevamente.");
+        return View("RotacionForm", modelo);
     }
 
     [HttpGet]
@@ -275,11 +322,26 @@ public class HistorialLaboralController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResolucionNuevo(Resolucion modelo)
     {
-        var lista = await _resolucionData.Listar();
-        var maxId = lista.Where(r => r.idEmpleado == modelo.idEmpleado).Select(r => r.idResolucion).DefaultIfEmpty(0).Max();
-        modelo.idResolucion = maxId + 1;
-        await _resolucionData.Crear(modelo);
-        return RedirectToAction(nameof(Index), new { idEmpleado = modelo.idEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _resolucionData.Listar();
+                return lista.Where(r => r.idEmpleado == modelo.idEmpleado).Select(r => r.idResolucion).DefaultIfEmpty(0).Max() + 1;
+            },
+            async id =>
+            {
+                modelo.idResolucion = id;
+                await _resolucionData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.idEmpleado });
+
+        ViewBag.IdEmpleado = modelo.idEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.TiposResolucion = await _tipoResolucionData.Listar();
+        ModelState.AddModelError("", "No se pudo registrar la resolución: intente nuevamente.");
+        return View("ResolucionForm", modelo);
     }
 
     [HttpGet]

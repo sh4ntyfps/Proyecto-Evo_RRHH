@@ -15,6 +15,7 @@ public class SaludController : Controller
     private readonly PersonaData _personaData;
     private readonly EstadoCivilData _estadoCivilData;
     private readonly MotivoBajaData _motivoBajaData;
+    private readonly SecuenciaService _secuencia;
 
     public SaludController(
         RRHH_SaludData saludData,
@@ -23,7 +24,8 @@ public class SaludController : Controller
         EmpleadoData empleadoData,
         PersonaData personaData,
         EstadoCivilData estadoCivilData,
-        MotivoBajaData motivoBajaData)
+        MotivoBajaData motivoBajaData,
+        SecuenciaService secuencia)
     {
         _saludData = saludData;
         _aseguradoData = aseguradoData;
@@ -32,6 +34,7 @@ public class SaludController : Controller
         _personaData = personaData;
         _estadoCivilData = estadoCivilData;
         _motivoBajaData = motivoBajaData;
+        _secuencia = secuencia;
     }
 
     // ---------- Ficha de salud ----------
@@ -64,11 +67,24 @@ public class SaludController : Controller
     {
         if (ModelState.IsValid)
         {
-            var lista = await _saludData.Listar();
-            modelo.idSalud = lista.Count == 0 ? 1 : lista.Max(s => s.idSalud) + 1;
-            await _saludData.Crear(modelo);
-            TempData["MensajeExito"] = "Ficha de salud guardada.";
-            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var lista = await _saludData.Listar();
+                    return lista.Count == 0 ? 1 : lista.Max(s => s.idSalud) + 1;
+                },
+                async id =>
+                {
+                    modelo.idSalud = id;
+                    await _saludData.Crear(modelo);
+                    return true;
+                });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Ficha de salud guardada.";
+                return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+            }
+            ModelState.AddModelError("", "No se pudo guardar la ficha de salud: intente nuevamente.");
         }
 
         ViewBag.IdEmpleado = modelo.IdEmpleado;
@@ -154,12 +170,32 @@ public class SaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AseguradoNuevo(RRHH_Asegurado modelo)
     {
-        var lista = await _aseguradoData.Listar();
-        var maxN = lista.Where(a => a.idEmpleado == modelo.idEmpleado).Select(a => a.NroBeneficiario).DefaultIfEmpty(0).Max();
-        modelo.NroBeneficiario = maxN + 1;
-        await _aseguradoData.Crear(modelo);
-        TempData["MensajeExito"] = "Beneficiario agregado.";
-        return RedirectToAction(nameof(Asegurados), new { idEmpleado = modelo.idEmpleado });
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _aseguradoData.Listar();
+                return lista.Where(a => a.idEmpleado == modelo.idEmpleado).Select(a => a.NroBeneficiario).DefaultIfEmpty(0).Max() + 1;
+            },
+            async id =>
+            {
+                modelo.NroBeneficiario = id;
+                await _aseguradoData.Crear(modelo);
+                return true;
+            });
+        if (!guardo)
+            ModelState.AddModelError("", "No se pudo agregar el beneficiario: intente nuevamente.");
+        else
+        {
+            TempData["MensajeExito"] = "Beneficiario agregado.";
+            return RedirectToAction(nameof(Asegurados), new { idEmpleado = modelo.idEmpleado });
+        }
+
+        ViewBag.IdEmpleado = modelo.idEmpleado;
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.Personas = await PersonasAsync();
+        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
+        ViewBag.MotivosBaja = await _motivoBajaData.Listar();
+        return View("AseguradoForm", modelo);
     }
 
     [HttpGet]
@@ -235,11 +271,24 @@ public class SaludController : Controller
     {
         if (ModelState.IsValid)
         {
-            var lista = await _acudeEnfermData.Listar();
-            modelo.idAcudeEnferm = lista.Count == 0 ? 1 : lista.Max(a => a.idAcudeEnferm) + 1;
-            await _acudeEnfermData.Crear(modelo);
-            TempData["MensajeExito"] = "Opción agregada.";
-            return RedirectToAction(nameof(AcudeEnferm));
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var lista = await _acudeEnfermData.Listar();
+                    return lista.Count == 0 ? 1 : lista.Max(a => a.idAcudeEnferm) + 1;
+                },
+                async id =>
+                {
+                    modelo.idAcudeEnferm = id;
+                    await _acudeEnfermData.Crear(modelo);
+                    return true;
+                });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Opción agregada.";
+                return RedirectToAction(nameof(AcudeEnferm));
+            }
+            ModelState.AddModelError("", "No se pudo agregar la opción: intente nuevamente.");
         }
         return View("AcudeEnfermForm", modelo);
     }

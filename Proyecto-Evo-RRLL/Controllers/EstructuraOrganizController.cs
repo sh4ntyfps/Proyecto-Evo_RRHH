@@ -15,6 +15,7 @@ public class EstructuraOrganizController : Controller
     private readonly LocalData _localData;
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
+    private readonly SecuenciaService _secuencia;
 
     public EstructuraOrganizController(
         EstructOrganizData areaData,
@@ -22,7 +23,8 @@ public class EstructuraOrganizController : Controller
         Empleado_AreaData empleadoAreaData,
         LocalData localData,
         EmpleadoData empleadoData,
-        PersonaData personaData)
+        PersonaData personaData,
+        SecuenciaService secuencia)
     {
         _areaData = areaData;
         _responsableData = responsableData;
@@ -30,6 +32,7 @@ public class EstructuraOrganizController : Controller
         _localData = localData;
         _empleadoData = empleadoData;
         _personaData = personaData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -78,11 +81,24 @@ public class EstructuraOrganizController : Controller
 
         if (ModelState.IsValid)
         {
-            var porAnio = (await _areaData.Listar()).Where(a => a.Year == modelo.Year).ToList();
-            modelo.idAreaOrganiz = porAnio.Count > 0 ? porAnio.Max(a => a.idAreaOrganiz) + 1 : 1;
-            await _areaData.Crear(modelo);
-            TempData["MensajeExito"] = "Unidad orgánica registrada.";
-            return RedirectToAction(nameof(Index), new { year = modelo.Year });
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var porAnio = (await _areaData.Listar()).Where(a => a.Year == modelo.Year).ToList();
+                    return porAnio.Count > 0 ? porAnio.Max(a => a.idAreaOrganiz) + 1 : 1;
+                },
+                async id =>
+                {
+                    modelo.idAreaOrganiz = id;
+                    await _areaData.Crear(modelo);
+                    return true;
+                });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Unidad orgánica registrada.";
+                return RedirectToAction(nameof(Index), new { year = modelo.Year });
+            }
+            ModelState.AddModelError("", "No se pudo registrar la unidad orgánica: intente nuevamente.");
         }
 
         await CargarCatalogos(modelo.Year);
@@ -195,11 +211,24 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResponsableNuevo(ResponsableXUO modelo)
     {
-        var lista = await _responsableData.Listar();
-        modelo.IdResponsable = lista.Count > 0 ? lista.Max(r => r.IdResponsable) + 1 : 1;
-        modelo.AreaOrganizacional = (await _areaData.Obtener(modelo.Year ?? 0, modelo.idAreaOrganiz ?? 0))?.AreaOrganizacional;
-        await _responsableData.Crear(modelo);
-        TempData["MensajeExito"] = "Responsable asignado.";
+        var guardo = await _secuencia.EjecutarConBloqueoAsync(
+            async () =>
+            {
+                var lista = await _responsableData.Listar();
+                return lista.Count > 0 ? lista.Max(r => r.IdResponsable) + 1 : 1;
+            },
+            async id =>
+            {
+                modelo.IdResponsable = id;
+                modelo.AreaOrganizacional = (await _areaData.Obtener(modelo.Year ?? 0, modelo.idAreaOrganiz ?? 0))?.AreaOrganizacional;
+                await _responsableData.Crear(modelo);
+                return true;
+            });
+        if (guardo)
+        {
+            TempData["MensajeExito"] = "Responsable asignado.";
+            return RedirectToAction(nameof(Detalles), new { year = modelo.Year, idAreaOrganiz = modelo.idAreaOrganiz });
+        }
         return RedirectToAction(nameof(Detalles), new { year = modelo.Year, idAreaOrganiz = modelo.idAreaOrganiz });
     }
 
@@ -228,9 +257,20 @@ public class EstructuraOrganizController : Controller
 
         if (ModelState.IsValid)
         {
-            var lista = await _localData.Listar();
-            modelo.idLocal = lista.Count > 0 ? lista.Max(l => l.idLocal) + 1 : 1;
-            await _localData.Crear(modelo);
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var lista = await _localData.Listar();
+                    return lista.Count > 0 ? lista.Max(l => l.idLocal) + 1 : 1;
+                },
+                async id =>
+                {
+                    modelo.idLocal = id;
+                    await _localData.Crear(modelo);
+                    return true;
+                });
+            if (!guardo)
+                ModelState.AddModelError(nameof(modelo.NombreLocal), "No se pudo registrar el local: intente nuevamente.");
         }
         return RedirectToAction(nameof(Locales));
     }

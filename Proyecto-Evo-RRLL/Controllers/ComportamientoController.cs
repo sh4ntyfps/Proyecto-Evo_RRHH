@@ -12,17 +12,20 @@ public class ComportamientoController : Controller
     private readonly TipoComportamientoData _tipoData;
     private readonly EmpleadoData _empleadoData;
     private readonly PersonaData _personaData;
+    private readonly SecuenciaService _secuencia;
 
     public ComportamientoController(
         ComportamientoData comportamientoData,
         TipoComportamientoData tipoData,
         EmpleadoData empleadoData,
-        PersonaData personaData)
+        PersonaData personaData,
+        SecuenciaService secuencia)
     {
         _comportamientoData = comportamientoData;
         _tipoData = tipoData;
         _empleadoData = empleadoData;
         _personaData = personaData;
+        _secuencia = secuencia;
     }
 
     [HttpGet]
@@ -57,11 +60,24 @@ public class ComportamientoController : Controller
 
         if (ModelState.IsValid)
         {
-            var lista = await _comportamientoData.Listar();
-            modelo.idComportamiento = lista.Count > 0 ? lista.Max(c => c.idComportamiento) + 1 : 1;
-            await _comportamientoData.Crear(modelo);
-            TempData["MensajeExito"] = "Comportamiento registrado.";
-            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+            var guardo = await _secuencia.EjecutarConBloqueoAsync(
+                async () =>
+                {
+                    var lista = await _comportamientoData.Listar();
+                    return lista.Count > 0 ? lista.Max(c => c.idComportamiento) + 1 : 1;
+                },
+                async id =>
+                {
+                    modelo.idComportamiento = id;
+                    await _comportamientoData.Crear(modelo);
+                    return true;
+                });
+            if (guardo)
+            {
+                TempData["MensajeExito"] = "Comportamiento registrado.";
+                return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
+            }
+            ModelState.AddModelError("", "No se pudo registrar el comportamiento: intente nuevamente.");
         }
 
         ViewBag.IdEmpleado = modelo.IdEmpleado;
