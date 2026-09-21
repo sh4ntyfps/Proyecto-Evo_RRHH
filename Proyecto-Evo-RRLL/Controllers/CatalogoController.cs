@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +10,9 @@ namespace Proyecto_Evo_RRLL.Controllers;
 public class CatalogoController : Controller
 {
     private readonly CatalogoRepositorio _repositorio;
-    private readonly BitacoraData _bitacora;
+    private readonly BitacoraLogica _bitacora;
 
-    public CatalogoController(CatalogoRepositorio repositorio, BitacoraData bitacora)
+    public CatalogoController(CatalogoRepositorio repositorio, BitacoraLogica bitacora)
     {
         _repositorio = repositorio;
         _bitacora = bitacora;

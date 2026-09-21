@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -8,10 +9,10 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class InconvenienteController : Controller
 {
-    private readonly InconvenienteData _inconvenienteData;
+    private readonly InconvenienteLogica _inconvenienteData;
     private readonly SecuenciaService _secuencia;
 
-    public InconvenienteController(InconvenienteData inconvenienteData, SecuenciaService secuencia)
+    public InconvenienteController(InconvenienteLogica inconvenienteData, SecuenciaService secuencia)
     {
         _inconvenienteData = inconvenienteData;
         _secuencia = secuencia;

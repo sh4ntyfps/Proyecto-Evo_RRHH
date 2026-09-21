@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -8,24 +9,24 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class SaludController : Controller
 {
-    private readonly RRHH_SaludData _saludData;
-    private readonly RRHH_AseguradoData _aseguradoData;
-    private readonly RRHH_AcudeEnfermData _acudeEnfermData;
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
-    private readonly EstadoCivilData _estadoCivilData;
-    private readonly MotivoBajaData _motivoBajaData;
+    private readonly RRHH_SaludLogica _saludData;
+    private readonly RRHH_AseguradoLogica _aseguradoData;
+    private readonly RRHH_AcudeEnfermLogica _acudeEnfermData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
+    private readonly EstadoCivilLogica _estadoCivilData;
+    private readonly MotivoBajaLogica _motivoBajaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public SaludController(
-        RRHH_SaludData saludData,
-        RRHH_AseguradoData aseguradoData,
-        RRHH_AcudeEnfermData acudeEnfermData,
-        EmpleadoData empleadoData,
-        PersonaData personaData,
-        EstadoCivilData estadoCivilData,
-        MotivoBajaData motivoBajaData,
+        RRHH_SaludLogica saludData,
+        RRHH_AseguradoLogica aseguradoData,
+        RRHH_AcudeEnfermLogica acudeEnfermData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
+        EstadoCivilLogica estadoCivilData,
+        MotivoBajaLogica motivoBajaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {

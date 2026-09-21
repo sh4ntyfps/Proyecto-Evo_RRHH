@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -9,39 +10,39 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class EmpleadoController : Controller
 {
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
-    private readonly CargoData _cargoData;
-    private readonly EstructOrganizData _estructOrganizData;
-    private readonly LocalData _localData;
-    private readonly HorarioData _horarioData;
-    private readonly TipoTrabajadorData _tipoTrabajadorData;
-    private readonly RegimenPensionData _regimenPensionData;
-    private readonly TipoDocIDData _tipoDocData;
-    private readonly AFPData _afpData;
-    private readonly EstadoCivilData _estadoCivilData;
-    private readonly TipoSangreData _tipoSangreData;
-    private readonly DiscapacidadData _discapacidadData;
-    private readonly ViveConData _viveConData;
-    private readonly NacionalidadData _nacionalidadData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
+    private readonly CargoLogica _cargoData;
+    private readonly EstructOrganizLogica _estructOrganizData;
+    private readonly LocalLogica _localData;
+    private readonly HorarioLogica _horarioData;
+    private readonly TipoTrabajadorLogica _tipoTrabajadorData;
+    private readonly RegimenPensionLogica _regimenPensionData;
+    private readonly TipoDocIDLogica _tipoDocData;
+    private readonly AFPLogica _afpData;
+    private readonly EstadoCivilLogica _estadoCivilData;
+    private readonly TipoSangreLogica _tipoSangreData;
+    private readonly DiscapacidadLogica _discapacidadData;
+    private readonly ViveConLogica _viveConData;
+    private readonly NacionalidadLogica _nacionalidadData;
     private readonly SecuenciaService _secuencia;
 
     public EmpleadoController(
-        EmpleadoData empleadoData,
-        PersonaData personaData,
-        CargoData cargoData,
-        EstructOrganizData estructuraOrganizData,
-        LocalData localData,
-        HorarioData horarioData,
-        TipoTrabajadorData tipoTrabajadorData,
-        RegimenPensionData regimenPensionData,
-        TipoDocIDData tipoDocData,
-        AFPData afpData,
-        EstadoCivilData estadoCivilData,
-        TipoSangreData tipoSangreData,
-        DiscapacidadData discapacidadData,
-        ViveConData viveConData,
-        NacionalidadData nacionalidadData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
+        CargoLogica cargoData,
+        EstructOrganizLogica estructuraOrganizData,
+        LocalLogica localData,
+        HorarioLogica horarioData,
+        TipoTrabajadorLogica tipoTrabajadorData,
+        RegimenPensionLogica regimenPensionData,
+        TipoDocIDLogica tipoDocData,
+        AFPLogica afpData,
+        EstadoCivilLogica estadoCivilData,
+        TipoSangreLogica tipoSangreData,
+        DiscapacidadLogica discapacidadData,
+        ViveConLogica viveConData,
+        NacionalidadLogica nacionalidadData,
         SecuenciaService secuencia)
     {
         _empleadoData = empleadoData;

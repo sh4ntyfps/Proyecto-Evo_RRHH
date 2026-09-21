@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -9,28 +10,28 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class HistorialLaboralController : Controller
 {
-    private readonly PeriodoLaboralData _periodoData;
-    private readonly ExpLaboralData _expData;
-    private readonly RotacionData _rotacionData;
-    private readonly ResolucionData _resolucionData;
-    private readonly TipoResolucionData _tipoResolucionData;
-    private readonly TipoInstitucionData _tipoInstitucionData;
-    private readonly EstructOrganizData _estructOrganizData;
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
+    private readonly PeriodoLaboralLogica _periodoData;
+    private readonly ExpLaboralLogica _expData;
+    private readonly RotacionLogica _rotacionData;
+    private readonly ResolucionLogica _resolucionData;
+    private readonly TipoResolucionLogica _tipoResolucionData;
+    private readonly TipoInstitucionLogica _tipoInstitucionData;
+    private readonly EstructOrganizLogica _estructOrganizData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public HistorialLaboralController(
-        PeriodoLaboralData periodoData,
-        ExpLaboralData expData,
-        RotacionData rotacionData,
-        ResolucionData resolucionData,
-        TipoResolucionData tipoResolucionData,
-        TipoInstitucionData tipoInstitucionData,
-        EstructOrganizData estructuraOrganizData,
-        EmpleadoData empleadoData,
-        PersonaData personaData,
+        PeriodoLaboralLogica periodoData,
+        ExpLaboralLogica expData,
+        RotacionLogica rotacionData,
+        ResolucionLogica resolucionData,
+        TipoResolucionLogica tipoResolucionData,
+        TipoInstitucionLogica tipoInstitucionData,
+        EstructOrganizLogica estructuraOrganizData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {

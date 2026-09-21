@@ -1,4 +1,4 @@
-using Capa_Datos;
+using Capa_Logica;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Proyecto_Evo_RRLL.Models;
@@ -10,20 +10,20 @@ namespace Proyecto_Evo_RRLL.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly EmpleadoData _empleadoData;
-        private readonly PersonaData _personaData;
-        private readonly AsistenciaData _asistenciaData;
-        private readonly EstructOrganizData _estructOrganizData;
-private readonly CargoData _cargoData;
-    private readonly RRHH_FeriadoData _feriadoData;
+        private readonly EmpleadoLogica _empleadoData;
+        private readonly PersonaLogica _personaData;
+        private readonly AsistenciaLogica _asistenciaData;
+        private readonly EstructOrganizLogica _estructOrganizData;
+private readonly CargoLogica _cargoData;
+    private readonly RRHH_FeriadoLogica _feriadoData;
 
     public HomeController(
-        EmpleadoData empleadoData,
-        PersonaData personaData,
-        AsistenciaData asistenciaData,
-        EstructOrganizData estructuraOrganizData,
-        CargoData cargoData,
-        RRHH_FeriadoData feriadoData)
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
+        AsistenciaLogica asistenciaData,
+        EstructOrganizLogica estructuraOrganizData,
+        CargoLogica cargoData,
+        RRHH_FeriadoLogica feriadoData)
     {
         _empleadoData = empleadoData;
         _personaData = personaData;
