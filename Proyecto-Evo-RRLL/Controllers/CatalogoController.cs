@@ -1,4 +1,5 @@
 using Capa_Logica;
+using Proyecto_Evo_RRLL.Utilidades;
 using Capa_Datos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -189,15 +190,9 @@ public class CatalogoController : Controller
             filas.Add(columnas.Select(c => entidad.GetType().GetProperty(c.Nombre)?.GetValue(entidad)?.ToString() ?? string.Empty).ToArray());
         }
 
-        var contenido = string.Join("\r\n", filas.Select(f => string.Join(";", f.Select(EscaparCsv))));
+        var contenido = string.Join("\r\n", filas.Select(f => string.Join(";", f.Select(CsvUtilidad.EscaparCsv))));
         var nombre = $"{tabla}_{DateTime.Now:yyyyMMdd_HHmm}.csv";
         return File(new System.Text.UTF8Encoding(true).GetBytes(contenido), "text/csv; charset=utf-8", nombre);
     }
 
-    private static string EscaparCsv(string valor)
-    {
-        if (valor.Contains(';') || valor.Contains('"') || valor.Contains('\n') || valor.Contains('\r'))
-            return $"\"{valor.Replace("\"", "\"\"")}\"";
-        return valor;
-    }
 }
