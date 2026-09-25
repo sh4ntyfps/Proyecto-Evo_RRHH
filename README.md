@@ -22,7 +22,7 @@ Sistema de Recursos Humanos (RR.HH.) en ASP.NET Core MVC (net10.0), arquitectura
 
 ## Conexión a la base de datos
 
-El único archivo que hay que editar es `Proyecto-Evo-RRLL/appsettings.json`:
+El archivo que hay que editar es `Proyecto-Evo-RRLL/appsettings.json`:
 
 ```json
 "ConnectionStrings": {
