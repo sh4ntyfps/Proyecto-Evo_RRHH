@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Capa_Datos;
+using Capa_Logica;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,10 +12,10 @@ namespace Proyecto_Evo_RRLL.Controllers;
 
 public class SeguridadController : Controller
 {
-    private readonly UsuarioData _usuarioData;
-    private readonly BitacoraData _bitacora;
+    private readonly UsuarioLogica _usuarioData;
+    private readonly BitacoraLogica _bitacora;
 
-    public SeguridadController(UsuarioData usuarioData, BitacoraData bitacora)
+    public SeguridadController(UsuarioLogica usuarioData, BitacoraLogica bitacora)
     {
         _usuarioData = usuarioData;
         _bitacora = bitacora;

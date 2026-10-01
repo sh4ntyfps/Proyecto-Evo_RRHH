@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -9,24 +10,24 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class AsistenciaController : Controller
 {
-    private readonly AsistenciaData _asistenciaData;
-    private readonly MarcacionData _marcacionData;
-    private readonly RegAsisDiarioData _regAsisData;
-    private readonly HorarioTemporalData _horarioTemporalData;
-    private readonly HorarioData _horarioData;
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
+    private readonly AsistenciaLogica _asistenciaData;
+    private readonly MarcacionLogica _marcacionData;
+    private readonly RegAsisDiarioLogica _regAsisData;
+    private readonly HorarioTemporalLogica _horarioTemporalData;
+    private readonly HorarioLogica _horarioData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public AsistenciaController(
-        AsistenciaData asistenciaData,
-        MarcacionData marcacionData,
-        RegAsisDiarioData regAsisData,
-        HorarioTemporalData horarioTemporalData,
-        HorarioData horarioData,
-        EmpleadoData empleadoData,
-        PersonaData personaData,
+        AsistenciaLogica asistenciaData,
+        MarcacionLogica marcacionData,
+        RegAsisDiarioLogica regAsisData,
+        HorarioTemporalLogica horarioTemporalData,
+        HorarioLogica horarioData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {

@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -8,18 +9,18 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class ComportamientoController : Controller
 {
-    private readonly ComportamientoData _comportamientoData;
-    private readonly TipoComportamientoData _tipoData;
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
+    private readonly ComportamientoLogica _comportamientoData;
+    private readonly TipoComportamientoLogica _tipoData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public ComportamientoController(
-        ComportamientoData comportamientoData,
-        TipoComportamientoData tipoData,
-        EmpleadoData empleadoData,
-        PersonaData personaData,
+        ComportamientoLogica comportamientoData,
+        TipoComportamientoLogica tipoData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {

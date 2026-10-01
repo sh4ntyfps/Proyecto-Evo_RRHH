@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -8,28 +9,28 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class CapacitacionController : Controller
 {
-    private readonly CapacitacionData _capacitacionData;
-    private readonly EstudiosRealizadoData _estudiosData;
-    private readonly TitulosEmpleadoData _titulosData;
-    private readonly InstitucionData _institucionData;
-    private readonly TipoEstudioData _tipoEstudioData;
-    private readonly EstadoEstudioData _estadoEstudioData;
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
-    private readonly TipoInstitucionData _tipoInstitucionData;
+    private readonly CapacitacionLogica _capacitacionData;
+    private readonly EstudiosRealizadoLogica _estudiosData;
+    private readonly TitulosEmpleadoLogica _titulosData;
+    private readonly InstitucionLogica _institucionData;
+    private readonly TipoEstudioLogica _tipoEstudioData;
+    private readonly EstadoEstudioLogica _estadoEstudioData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
+    private readonly TipoInstitucionLogica _tipoInstitucionData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public CapacitacionController(
-        CapacitacionData capacitacionData,
-        EstudiosRealizadoData estudiosData,
-        TitulosEmpleadoData titulosData,
-        InstitucionData institucionData,
-        TipoEstudioData tipoEstudioData,
-        EstadoEstudioData estadoEstudioData,
-        EmpleadoData empleadoData,
-        PersonaData personaData,
-        TipoInstitucionData tipoInstitucionData,
+        CapacitacionLogica capacitacionData,
+        EstudiosRealizadoLogica estudiosData,
+        TitulosEmpleadoLogica titulosData,
+        InstitucionLogica institucionData,
+        TipoEstudioLogica tipoEstudioData,
+        EstadoEstudioLogica estadoEstudioData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
+        TipoInstitucionLogica tipoInstitucionData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {

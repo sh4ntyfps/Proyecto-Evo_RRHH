@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -9,32 +10,32 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class ViviendaController : Controller
 {
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
-    private readonly ViviendaData _viviendaData;
-    private readonly TipoVivData _tipoVivData;
-    private readonly TenenciaVivData _tenenciaVivData;
-    private readonly UbicacionVivData _ubicacionVivData;
-    private readonly AguaVivData _aguaVivData;
-    private readonly AlumbradoVivData _alumbradoVivData;
-    private readonly ConservacionVivData _conservacionVivData;
-    private readonly ExcretasVivData _excretasVivData;
-    private readonly MaterialVivData _materialVivData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
+    private readonly ViviendaLogica _viviendaData;
+    private readonly TipoVivLogica _tipoVivData;
+    private readonly TenenciaVivLogica _tenenciaVivData;
+    private readonly UbicacionVivLogica _ubicacionVivData;
+    private readonly AguaVivLogica _aguaVivData;
+    private readonly AlumbradoVivLogica _alumbradoVivData;
+    private readonly ConservacionVivLogica _conservacionVivData;
+    private readonly ExcretasVivLogica _excretasVivData;
+    private readonly MaterialVivLogica _materialVivData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public ViviendaController(
-        EmpleadoData empleadoData,
-        PersonaData personaData,
-        ViviendaData viviendaData,
-        TipoVivData tipoVivData,
-        TenenciaVivData tenenciaVivData,
-        UbicacionVivData ubicacionVivData,
-        AguaVivData aguaVivData,
-        AlumbradoVivData alumbradoVivData,
-        ConservacionVivData conservacionVivData,
-        ExcretasVivData excretasVivData,
-        MaterialVivData materialVivData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
+        ViviendaLogica viviendaData,
+        TipoVivLogica tipoVivData,
+        TenenciaVivLogica tenenciaVivData,
+        UbicacionVivLogica ubicacionVivData,
+        AguaVivLogica aguaVivData,
+        AlumbradoVivLogica alumbradoVivData,
+        ConservacionVivLogica conservacionVivData,
+        ExcretasVivLogica excretasVivData,
+        MaterialVivLogica materialVivData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {

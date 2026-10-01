@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -9,22 +10,22 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class EstructuraOrganizController : Controller
 {
-    private readonly EstructOrganizData _areaData;
-    private readonly ResponsableXUOData _responsableData;
-    private readonly Empleado_AreaData _empleadoAreaData;
-    private readonly LocalData _localData;
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
+    private readonly EstructOrganizLogica _areaData;
+    private readonly ResponsableXUOLogica _responsableData;
+    private readonly Empleado_AreaLogica _empleadoAreaData;
+    private readonly LocalLogica _localData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public EstructuraOrganizController(
-        EstructOrganizData areaData,
-        ResponsableXUOData responsableData,
-        Empleado_AreaData empleadoAreaData,
-        LocalData localData,
-        EmpleadoData empleadoData,
-        PersonaData personaData,
+        EstructOrganizLogica areaData,
+        ResponsableXUOLogica responsableData,
+        Empleado_AreaLogica empleadoAreaData,
+        LocalLogica localData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {
