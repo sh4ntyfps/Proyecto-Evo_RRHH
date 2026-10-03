@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class TitulosEmpleadoLogica
+public class TitulosEmpleadoLogica : LogicaBase<TitulosEmpleado, TitulosEmpleadoData>
 {
-    private readonly TitulosEmpleadoData _data;
-
-    public TitulosEmpleadoLogica(TitulosEmpleadoData data) => _data = data;
-
-    public async Task<List<TitulosEmpleado>> Listar() => await _data.Listar();
-    public async Task<TitulosEmpleado?> Obtener(string NumColegiaturaParam) => await _data.Obtener(NumColegiaturaParam);
-    public async Task Crear(TitulosEmpleado registro) => await _data.Crear(registro);
-    public async Task Actualizar(TitulosEmpleado registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(TitulosEmpleado registro) => await _data.Eliminar(registro);
+    public TitulosEmpleadoLogica(TitulosEmpleadoData datos) : base(datos) { }
 }
-

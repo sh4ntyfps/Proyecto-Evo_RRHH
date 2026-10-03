@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class Usuario_RolLogica
+public class Usuario_RolLogica : LogicaBase<Usuario_Rol, Usuario_RolData>
 {
-    private readonly Usuario_RolData _data;
-
-    public Usuario_RolLogica(Usuario_RolData data) => _data = data;
-
-    public async Task<List<Usuario_Rol>> Listar() => await _data.Listar();
-    public async Task<Usuario_Rol?> Obtener(int IdUsuarioParam, int IdRolParam) => await _data.Obtener(IdUsuarioParam, IdRolParam);
-    public async Task Crear(Usuario_Rol registro) => await _data.Crear(registro);
-    public async Task Actualizar(Usuario_Rol registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Usuario_Rol registro) => await _data.Eliminar(registro);
+    public Usuario_RolLogica(Usuario_RolData datos) : base(datos) { }
 }
-

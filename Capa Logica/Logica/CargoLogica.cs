@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class CargoLogica
+public class CargoLogica : LogicaBase<Cargo, CargoData>
 {
-    private readonly CargoData _data;
-
-    public CargoLogica(CargoData data) => _data = data;
-
-    public async Task<List<Cargo>> Listar() => await _data.Listar();
-    public async Task<Cargo?> Obtener(int IdCargoParam) => await _data.Obtener(IdCargoParam);
-    public async Task Crear(Cargo registro) => await _data.Crear(registro);
-    public async Task Actualizar(Cargo registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Cargo registro) => await _data.Eliminar(registro);
+    public CargoLogica(CargoData datos) : base(datos) { }
 }
-

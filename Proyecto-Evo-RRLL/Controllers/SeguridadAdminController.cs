@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Proyecto_Evo_RRLL.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Capa_Logica;
 using Capa_Datos;
@@ -21,6 +21,7 @@ public class SeguridadAdminController : Controller
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
     private readonly BitacoraLogica _bitacora;
+    private readonly ServicioClaves _claves;
 
     public SeguridadAdminController(
         UsuarioLogica usuarioData,
@@ -32,7 +33,8 @@ public class SeguridadAdminController : Controller
         PersonaLogica personaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados,
-        BitacoraLogica bitacora)
+        BitacoraLogica bitacora,
+        ServicioClaves claves)
     {
         _usuarioData = usuarioData;
         _usuarioRolData = usuarioRolData;
@@ -44,6 +46,7 @@ public class SeguridadAdminController : Controller
         _secuencia = secuencia;
         _empleados = empleados;
         _bitacora = bitacora;
+        _claves = claves;
     }
 
     // ---------- Usuarios ----------
@@ -112,7 +115,7 @@ public class SeguridadAdminController : Controller
                 var lista = await _usuarioData.Listar();
                 modelo.IdUsuario = lista.Count == 0 ? 1 : lista.Max(u => u.IdUsuario) + 1;
                 modelo.Login = modelo.Login!.Trim();
-                modelo.PasswordHash = new PasswordHasher<Usuario>().HashPassword(modelo, clave);
+                modelo.PasswordHash = _claves.Generar(clave);
                 modelo.Fecha = DateTime.Now;
                 await _usuarioData.Crear(modelo);
             });
@@ -160,7 +163,7 @@ public class SeguridadAdminController : Controller
             actual.Estado = modelo.Estado;
             actual.IdEmpleado = modelo.IdEmpleado;
             if (!string.IsNullOrWhiteSpace(clave))
-                actual.PasswordHash = new PasswordHasher<Usuario>().HashPassword(actual, clave);
+                actual.PasswordHash = _claves.Generar(clave);
             await _usuarioData.Actualizar(actual);
             TempData["MensajeExito"] = "Usuario actualizado.";
             await _bitacora.Registrar(User.Identity?.Name ?? "?", "Editar", "Usuario", $"id={actual.IdUsuario}, login={actual.Login}");

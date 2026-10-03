@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class ComportamientoLogica
+public class ComportamientoLogica : LogicaBase<Comportamiento, ComportamientoData>
 {
-    private readonly ComportamientoData _data;
-
-    public ComportamientoLogica(ComportamientoData data) => _data = data;
-
-    public async Task<List<Comportamiento>> Listar() => await _data.Listar();
-    public async Task<Comportamiento?> Obtener(int idComportamientoParam) => await _data.Obtener(idComportamientoParam);
-    public async Task Crear(Comportamiento registro) => await _data.Crear(registro);
-    public async Task Actualizar(Comportamiento registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Comportamiento registro) => await _data.Eliminar(registro);
+    public ComportamientoLogica(ComportamientoData datos) : base(datos) { }
 }
-

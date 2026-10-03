@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class TipoVivLogica
+public class TipoVivLogica : LogicaBase<TipoViv, TipoVivData>
 {
-    private readonly TipoVivData _data;
-
-    public TipoVivLogica(TipoVivData data) => _data = data;
-
-    public async Task<List<TipoViv>> Listar() => await _data.Listar();
-    public async Task<TipoViv?> Obtener(int IdTipoParam) => await _data.Obtener(IdTipoParam);
-    public async Task Crear(TipoViv registro) => await _data.Crear(registro);
-    public async Task Actualizar(TipoViv registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(TipoViv registro) => await _data.Eliminar(registro);
+    public TipoVivLogica(TipoVivData datos) : base(datos) { }
 }
-

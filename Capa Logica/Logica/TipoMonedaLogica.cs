@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class TipoMonedaLogica
+public class TipoMonedaLogica : LogicaBase<TipoMoneda, TipoMonedaData>
 {
-    private readonly TipoMonedaData _data;
-
-    public TipoMonedaLogica(TipoMonedaData data) => _data = data;
-
-    public async Task<List<TipoMoneda>> Listar() => await _data.Listar();
-    public async Task<TipoMoneda?> Obtener(int IdTipoMonedaParam) => await _data.Obtener(IdTipoMonedaParam);
-    public async Task Crear(TipoMoneda registro) => await _data.Crear(registro);
-    public async Task Actualizar(TipoMoneda registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(TipoMoneda registro) => await _data.Eliminar(registro);
+    public TipoMonedaLogica(TipoMonedaData datos) : base(datos) { }
 }
-

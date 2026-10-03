@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class InstitucionLogica
+public class InstitucionLogica : LogicaBase<Institucion, InstitucionData>
 {
-    private readonly InstitucionData _data;
-
-    public InstitucionLogica(InstitucionData data) => _data = data;
-
-    public async Task<List<Institucion>> Listar() => await _data.Listar();
-    public async Task<Institucion?> Obtener(int IdInstitucionParam) => await _data.Obtener(IdInstitucionParam);
-    public async Task Crear(Institucion registro) => await _data.Crear(registro);
-    public async Task Actualizar(Institucion registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Institucion registro) => await _data.Eliminar(registro);
+    public InstitucionLogica(InstitucionData datos) : base(datos) { }
 }
-

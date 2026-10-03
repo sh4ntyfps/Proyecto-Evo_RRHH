@@ -4,7 +4,7 @@ using Capa_Entidades;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Proyecto_Evo_RRLL.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Proyecto_Evo_RRLL.Models.ViewModels;
 
@@ -14,11 +14,13 @@ public class SeguridadController : Controller
 {
     private readonly UsuarioLogica _usuarioData;
     private readonly BitacoraLogica _bitacora;
+    private readonly ServicioClaves _claves;
 
-    public SeguridadController(UsuarioLogica usuarioData, BitacoraLogica bitacora)
+    public SeguridadController(UsuarioLogica usuarioData, BitacoraLogica bitacora, ServicioClaves claves)
     {
         _usuarioData = usuarioData;
         _bitacora = bitacora;
+        _claves = claves;
     }
 
     [HttpGet]
@@ -44,9 +46,7 @@ public class SeguridadController : Controller
             return View(modelo);
         }
 
-        var verificador = new PasswordHasher<Usuario>();
-        var resultado = verificador.VerifyHashedPassword(new Usuario(), usuario.PasswordHash, modelo.Clave);
-        if (resultado == PasswordVerificationResult.Failed)
+        if (!_claves.EsValida(usuario.PasswordHash, modelo.Clave))
         {
             modelo.Error = "Usuario o clave incorrectos.";
             return View(modelo);

@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class ViviendaLogica
+public class ViviendaLogica : LogicaBase<Vivienda, ViviendaData>
 {
-    private readonly ViviendaData _data;
-
-    public ViviendaLogica(ViviendaData data) => _data = data;
-
-    public async Task<List<Vivienda>> Listar() => await _data.Listar();
-    public async Task<Vivienda?> Obtener(int IdViviendaParam) => await _data.Obtener(IdViviendaParam);
-    public async Task Crear(Vivienda registro) => await _data.Crear(registro);
-    public async Task Actualizar(Vivienda registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Vivienda registro) => await _data.Eliminar(registro);
+    public ViviendaLogica(ViviendaData datos) : base(datos) { }
 }
-

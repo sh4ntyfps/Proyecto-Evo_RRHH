@@ -1,18 +1,9 @@
-﻿using Capa_Entidades;
 using Capa_Datos;
+using Capa_Entidades;
 
 namespace Capa_Logica;
 
-public class UnidadMedidaLogica
+public class UnidadMedidaLogica : LogicaBase<UnidadMedida, UnidadMedidaData>
 {
-    private readonly UnidadMedidaData _data;
-
-    public UnidadMedidaLogica(UnidadMedidaData data) => _data = data;
-
-    public async Task<List<UnidadMedida>> Listar() => await _data.Listar();
-    public async Task<UnidadMedida?> Obtener(string IdUnidadMedidaParam) => await _data.Obtener(IdUnidadMedidaParam);
-    public async Task Crear(UnidadMedida registro) => await _data.Crear(registro);
-    public async Task Actualizar(UnidadMedida registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(UnidadMedida registro) => await _data.Eliminar(registro);
+    public UnidadMedidaLogica(UnidadMedidaData datos) : base(datos) { }
 }
-
