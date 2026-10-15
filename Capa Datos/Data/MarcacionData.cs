@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class MarcacionData : RepositorioBase<Marcacion>
 {
     public MarcacionData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<Marcacion?> Obtener(DateTime FechaParam, int IdEmpleadoParam) => ObtenerPorClave(FechaParam, IdEmpleadoParam);
 }

@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class TenenciaVivLogica : LogicaBase<TenenciaViv>
 {
-    private readonly TenenciaVivData _data;
+    private readonly IRepositorio<TenenciaViv> _data;
 
-    public TenenciaVivLogica(TenenciaVivData data) : base(data) => _data = data;
+    public TenenciaVivLogica(IRepositorio<TenenciaViv> data) : base(data) => _data = data;
 
-    public async Task<TenenciaViv?> Obtener(int IdTenenciaParam) => await _data.Obtener(IdTenenciaParam);
+    public async Task<TenenciaViv?> Obtener(int idTenencia) => await _data.Obtener(idTenencia);
 }

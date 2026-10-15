@@ -71,7 +71,7 @@
                             <td>@emp.Nombre</td>
                             <td>
                                 <form asp-action="QuitarEmpleado" asp-route-year="@area?.Year" asp-route-idAreaOrganiz="@area?.idAreaOrganiz" asp-route-idEmpleado="@a.IdEmpleado" method="post"
-                                      onsubmit="return confirm('¿Quitar este empleado de la unidad?');">
+                                      data-confirmar="¿Quitar este empleado de la unidad?" data-confirmar-accion="Quitar">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Quitar"><i class="bi bi-person-dash"></i></button>
                                 </form>
                             </td>
@@ -134,7 +134,7 @@
                             <td>@r.F_Termino?.ToString("dd/MM/yyyy")</td>
                             <td>
                                 <form asp-action="ResponsableEliminar" asp-route-idResponsable="@r.IdResponsable" method="post"
-                                      onsubmit="return confirm('¿Quitar este responsable?');">
+                                      data-confirmar="¿Quitar este responsable?" data-confirmar-accion="Quitar">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Quitar"><i class="bi bi-trash"></i></button>
                                 </form>
                             </td>

@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class ViveConData : RepositorioBase<ViveCon>
 {
     public ViveConData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<ViveCon?> Obtener(int IdViveConParam) => ObtenerPorClave(IdViveConParam);
 }

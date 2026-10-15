@@ -49,7 +49,7 @@ else
                             <div class="d-flex gap-2">
                                 <a asp-action="AseguradoEditar" asp-route-idEmpleado="@((int)ViewBag.IdEmpleado)" asp-route-nro="@a.NroBeneficiario" class="btn btn-sm btn-outline-primary">Editar</a>
                                 <form asp-action="AseguradoEliminar" asp-route-idEmpleado="@((int)ViewBag.IdEmpleado)" asp-route-nro="@a.NroBeneficiario" method="post"
-                                      onsubmit="return confirm('¿Eliminar el asegurado N° @a.NroBeneficiario?');">
+                                      data-confirmar="¿Eliminar el asegurado N° @a.NroBeneficiario?">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                 </form>

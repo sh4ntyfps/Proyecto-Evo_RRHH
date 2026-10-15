@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class AlumbradoVivData : RepositorioBase<AlumbradoViv>
 {
     public AlumbradoVivData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<AlumbradoViv?> Obtener(int IdAlumbradoParam) => ObtenerPorClave(IdAlumbradoParam);
 }

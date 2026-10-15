@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class TipoPermisoLogica : LogicaBase<TipoPermiso>
 {
-    private readonly TipoPermisoData _data;
+    private readonly IRepositorio<TipoPermiso> _data;
 
-    public TipoPermisoLogica(TipoPermisoData data) : base(data) => _data = data;
+    public TipoPermisoLogica(IRepositorio<TipoPermiso> data) : base(data) => _data = data;
 
-    public async Task<TipoPermiso?> Obtener(int idTipoPermisoParam) => await _data.Obtener(idTipoPermisoParam);
+    public async Task<TipoPermiso?> Obtener(int idTipoPermiso) => await _data.Obtener(idTipoPermiso);
 }

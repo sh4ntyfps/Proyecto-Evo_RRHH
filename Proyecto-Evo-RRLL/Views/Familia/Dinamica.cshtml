@@ -53,7 +53,7 @@
                     <td>@d.Observacion</td>
                     <td>
                         <a asp-action="DinamicaEditar" asp-route-id="@d.idDinamica" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                        <form asp-action="DinamicaEliminar" asp-route-id="@d.idDinamica" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este registro?');">
+                        <form asp-action="DinamicaEliminar" asp-route-id="@d.idDinamica" method="post" class="d-inline" data-confirmar="¿Eliminar este registro?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

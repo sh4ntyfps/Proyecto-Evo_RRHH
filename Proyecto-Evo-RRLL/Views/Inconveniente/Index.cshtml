@@ -60,7 +60,7 @@
                     <td>
                         <a asp-action="Editar" asp-route-idObjetivo="@i.IdObjetivo" asp-route-idActividad="@i.Id_Actividad" asp-route-idInconveniente="@i.IdInconveniente" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
                         <form asp-action="Eliminar" asp-route-idObjetivo="@i.IdObjetivo" asp-route-idActividad="@i.Id_Actividad" asp-route-idInconveniente="@i.IdInconveniente" method="post" class="d-inline"
-                              onsubmit="return confirm('¿Eliminar este inconveniente?');">
+                              data-confirmar="¿Eliminar este inconveniente?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

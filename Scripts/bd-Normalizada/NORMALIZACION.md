@@ -22,6 +22,8 @@ Este documento explica **qué se normalizó, por qué y hasta qué forma normal 
 2. Scripts/bd-Normalizada/03-datos-RRHH_Normalizado.sql     -> carga los datos ya normalizados (~156 MB, ~100 s)
 ```
 
+En el repositorio se versiona `03-datos-RRHH_Normalizado.zip` (5.5 MB): el `.sql` supera el límite de 100 MB de GitHub, así que primero hay que descomprimirlo.
+
 `03-datos-RRHH_Normalizado.sql` es el equivalente normalizado de `bd-Datos.sql`: tiene los mismos INSERT ya en el formato nuevo (714,771 filas en 77 tablas). Mantiene los Id originales con `IDENTITY_INSERT`, carga con las FKs deshabilitadas y al final las vuelve a habilitar `WITH CHECK`, así que quedan confiables. Termina verificando los conteos. Se genera con `generar-03-datos.ps1` a partir de una `RRHH_Normalizado` cargada por la ruta 1–4. Hay que regenerarlo si cambian el esquema o la migración.
 
 - **Los scripts de datos originales no se tocan.** Toda la transformación se hace con SQL (`INSERT … SELECT`) de una BD a la otra.
@@ -288,10 +290,13 @@ SELECT * FROM RRHH_Normalizado.mig.Incidencia ORDER BY Tabla, Accion;
 
 ## 9. Impacto en la aplicación (para cuando se migre)
 
-La aplicación **sigue apuntando a `RRHH_Nuevo`** y no se rompe nada. Para pasarla a `RRHH_Normalizado` habrá que ajustar:
+La aplicación **sigue apuntando a `RRHH_Nuevo`**. Con la arquitectura actual, pasarla a `RRHH_Normalizado` **solo cambia la Capa Datos** y la cadena de conexión. Las entidades, la lógica, los controllers y las vistas no se tocan; las pruebas `ArquitecturaTests` vigilan que siga así.
 
-1. **Entidades EF** (`Capa Entidades`): `Empleado`, `Persona`, `Familiar`, `RRHH_Asegurado`, `ResponsableXUO`, `EstructOrganiz`, `Marcacion`, `RegAsisDiario`, `EstudiosRealizado`, `TitulosEmpleado`, `Rol_Acceso`, `SistemaOpcion`. Reemplazar `Ubigeo` por `Distrito`/`vw_Ubigeo` y `RRHH_FuncFam` por `RRHH_FuncFamRespuesta`. Agregar `Departamento`, `Provincia`, `VinculoAsegurado`, `ServicioViv`, `ViviendaServicio`, `EstadoAsistencia`, `TipoMarcacion` y `DispositivoMarcacion`.
-2. **Quitar del `DbContext`** las 10 entidades excluidas (`Familia`, `UnidadMedida`, `Inconveniente`, `Limitacion`, `Institucion`, `TipoDoc`, …).
-3. **Generación de Id:** 14 controladores calculan el Id con `Max()+1`. Con `IDENTITY` hay que dejar que la BD lo asigne (en EF: `[DatabaseGenerated(DatabaseGeneratedOption.Identity)]`).
-4. **Formularios de Empleado y Familiar:** los datos personales ahora se guardan en `Persona`.
-5. **Cadena de conexión:** `Database=RRHH_Normalizado` en `appsettings.json`.
+Cambios dentro de `Capa Datos`:
+
+1. **`EvoRRLDbContext`**: mapear las tablas nuevas con Fluent API. Donde la tabla coincide con la entidad (la mayoría de catálogos) basta con `ToTable`/`HasKey`.
+2. **Repositorios que traducen**: donde la tabla ya no coincide con la entidad, se crean clases de tabla internas en `Capa Datos` y el repositorio convierte entre la tabla y la entidad. Por ejemplo, `EmpleadoData` lee `Empleado` + `Persona` y entrega el mismo `Empleado` de siempre. Aplica a `Empleado`, `Familiar` y `RRHH_Asegurado` (datos personales en `Persona`), `Marcacion` (`Estado` → `NroMarcacion` + `TipoMarcacion`), `Ubigeo` (→ `Distrito`/`vw_Ubigeo`) y `RRHH_FuncFam` (→ `RRHH_FuncFamRespuesta`).
+3. **`Numeracion.cs`**: quitar las claves que ahora genera `IDENTITY`. Los correlativos por grupo (ej. `NPermiso` por empleado) se mantienen.
+4. **Cadena de conexión**: `Database=RRHH_Normalizado` en `appsettings.json`.
+
+**Excepción (decisión funcional, no técnica):** las 10 tablas excluidas (sección 6) no existen en la BD nueva. `Institucion` e `Inconveniente` tienen pantallas, así que antes de migrar hay que decidir una de dos: agregarlas al esquema normalizado o retirar esas pantallas.

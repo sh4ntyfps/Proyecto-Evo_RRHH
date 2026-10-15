@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class AFPLogica : LogicaBase<AFP>
 {
-    private readonly AFPData _data;
+    private readonly IRepositorio<AFP> _data;
 
-    public AFPLogica(AFPData data) : base(data) => _data = data;
+    public AFPLogica(IRepositorio<AFP> data) : base(data) => _data = data;
 
-    public async Task<AFP?> Obtener(int IdAFPParam) => await _data.Obtener(IdAFPParam);
+    public async Task<AFP?> Obtener(int idAFP) => await _data.Obtener(idAFP);
 }

@@ -1,5 +1,5 @@
-using Capa_Datos;
 using Capa_Entidades;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 

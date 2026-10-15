@@ -1,19 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class ExpLaboralLogica : LogicaBase<ExpLaboral>
 {
-    private readonly ExpLaboralData _data;
+    private readonly IRepositorio<ExpLaboral> _data;
 
-    public ExpLaboralLogica(ExpLaboralData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public ExpLaboralLogica(IRepositorio<ExpLaboral> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<ExpLaboral?> Obtener(int IdEmpleadoParam, int IdExpLabParam) => await _data.Obtener(IdEmpleadoParam, IdExpLabParam);
-
-    // Numero de experiencia correlativo por empleado.
-    public Task CrearConNuevoId(ExpLaboral registro) =>
-        CrearNumerado(registro, x => x.IdExpLab, id => registro.IdExpLab = id, x => x.IdEmpleado == registro.IdEmpleado);
-
-    public Task<bool> Registrar(ExpLaboral registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<ExpLaboral?> Obtener(int idEmpleado, int idExpLab) => await _data.Obtener(idEmpleado, idExpLab);
 }

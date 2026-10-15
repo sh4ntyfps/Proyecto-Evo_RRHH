@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Capa Datos\Capa Datos.csproj" />
+    <!-- Solo Entidades (modelo + contratos): la logica no conoce la Capa Datos ni la BD. -->
     <ProjectReference Include="..\Capa Entidades\Capa Entidad.csproj" />
   </ItemGroup>
 

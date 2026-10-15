@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class RRHH_RelacPHLogica : LogicaBase<RRHH_RelacPH>
 {
-    private readonly RRHH_RelacPHData _data;
+    private readonly IRepositorio<RRHH_RelacPH> _data;
 
-    public RRHH_RelacPHLogica(RRHH_RelacPHData data) : base(data) => _data = data;
+    public RRHH_RelacPHLogica(IRepositorio<RRHH_RelacPH> data) : base(data) => _data = data;
 
-    public async Task<RRHH_RelacPH?> Obtener(int idRelacPHParam) => await _data.Obtener(idRelacPHParam);
+    public async Task<RRHH_RelacPH?> Obtener(int idRelacPH) => await _data.Obtener(idRelacPH);
 }

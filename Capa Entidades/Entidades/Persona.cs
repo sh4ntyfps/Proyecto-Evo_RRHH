@@ -1,12 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("Persona")]
     public class Persona
     {
-    [Key]
     public int IdPersona { get; set; }
     public string? Nombres { get; set; }
     public string? Apellido_Paterno { get; set; }

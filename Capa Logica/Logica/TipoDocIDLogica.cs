@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class TipoDocIDLogica : LogicaBase<TipoDocID>
 {
-    private readonly TipoDocIDData _data;
+    private readonly IRepositorio<TipoDocID> _data;
 
-    public TipoDocIDLogica(TipoDocIDData data) : base(data) => _data = data;
+    public TipoDocIDLogica(IRepositorio<TipoDocID> data) : base(data) => _data = data;
 
-    public async Task<TipoDocID?> Obtener(int TipoDocIDParam) => await _data.Obtener(TipoDocIDParam);
+    public async Task<TipoDocID?> Obtener(int tipoDocID) => await _data.Obtener(tipoDocID);
 }

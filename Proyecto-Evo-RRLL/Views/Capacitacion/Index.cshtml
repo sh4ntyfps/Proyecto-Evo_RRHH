@@ -51,7 +51,7 @@
                     <td>
                         <a asp-action="Editar" asp-route-id="@c.IdCapacitacion" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
                         <form asp-action="Eliminar" asp-route-id="@c.IdCapacitacion" asp-route-idEmpleado="@idEmpleado" method="post" class="d-inline"
-                              onsubmit="return confirm('¿Eliminar este curso?');">
+                              data-confirmar="¿Eliminar este curso?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

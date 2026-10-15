@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class AlumbradoVivLogica : LogicaBase<AlumbradoViv>
 {
-    private readonly AlumbradoVivData _data;
+    private readonly IRepositorio<AlumbradoViv> _data;
 
-    public AlumbradoVivLogica(AlumbradoVivData data) : base(data) => _data = data;
+    public AlumbradoVivLogica(IRepositorio<AlumbradoViv> data) : base(data) => _data = data;
 
-    public async Task<AlumbradoViv?> Obtener(int IdAlumbradoParam) => await _data.Obtener(IdAlumbradoParam);
+    public async Task<AlumbradoViv?> Obtener(int idAlumbrado) => await _data.Obtener(idAlumbrado);
 }

@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class SistemaOpcionData : RepositorioBase<SistemaOpcion>
 {
     public SistemaOpcionData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<SistemaOpcion?> Obtener(string IdSistemaOpcionParam) => ObtenerPorClave(IdSistemaOpcionParam);
 }

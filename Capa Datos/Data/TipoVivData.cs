@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class TipoVivData : RepositorioBase<TipoViv>
 {
     public TipoVivData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<TipoViv?> Obtener(int IdTipoParam) => ObtenerPorClave(IdTipoParam);
 }

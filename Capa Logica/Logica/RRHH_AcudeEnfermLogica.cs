@@ -1,18 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class RRHH_AcudeEnfermLogica : LogicaBase<RRHH_AcudeEnferm>
 {
-    private readonly RRHH_AcudeEnfermData _data;
+    private readonly IRepositorio<RRHH_AcudeEnferm> _data;
 
-    public RRHH_AcudeEnfermLogica(RRHH_AcudeEnfermData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public RRHH_AcudeEnfermLogica(IRepositorio<RRHH_AcudeEnferm> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<RRHH_AcudeEnferm?> Obtener(int idAcudeEnfermParam) => await _data.Obtener(idAcudeEnfermParam);
-
-    public Task CrearConNuevoId(RRHH_AcudeEnferm registro) =>
-        CrearNumerado(registro, x => x.idAcudeEnferm, id => registro.idAcudeEnferm = id);
-
-    public Task<bool> Registrar(RRHH_AcudeEnferm registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<RRHH_AcudeEnferm?> Obtener(int idAcudeEnferm) => await _data.Obtener(idAcudeEnferm);
 }

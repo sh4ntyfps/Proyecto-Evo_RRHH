@@ -63,7 +63,7 @@
                     <td>
                         <a asp-action="UsuarioRoles" asp-route-id="@f.Usuario.IdUsuario" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Roles"><i class="bi bi-shield"></i></a>
                         <a asp-action="UsuarioEditar" asp-route-id="@f.Usuario.IdUsuario" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                        <form asp-action="UsuarioEliminar" asp-route-id="@f.Usuario.IdUsuario" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar el usuario @(f.Usuario.Login)?');">
+                        <form asp-action="UsuarioEliminar" asp-route-id="@f.Usuario.IdUsuario" method="post" class="d-inline" data-confirmar="¿Eliminar el usuario @(f.Usuario.Login)?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

@@ -38,7 +38,7 @@
                     <td>
                         <a asp-action="RolAccesos" asp-route-id="@f.Rol.IdRol" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Permisos"><i class="bi bi-key"></i></a>
                         <a asp-action="RolEditar" asp-route-id="@f.Rol.IdRol" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                        <form asp-action="RolEliminar" asp-route-id="@f.Rol.IdRol" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar el rol @(f.Rol.Descripcion)?');">
+                        <form asp-action="RolEliminar" asp-route-id="@f.Rol.IdRol" method="post" class="d-inline" data-confirmar="¿Eliminar el rol @(f.Rol.Descripcion)?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

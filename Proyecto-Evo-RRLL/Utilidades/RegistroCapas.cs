@@ -1,5 +1,4 @@
 using System.Reflection;
-using Capa_Datos;
 using Capa_Logica;
 using Capa_Logica.Exportacion;
 
@@ -7,17 +6,13 @@ namespace Proyecto_Evo_RRLL.Utilidades;
 
 internal static class RegistroCapas
 {
-    // Unico punto de composicion de dependencias (IoC): Program.cs y las pruebas usan este mismo registro.
+    // Composicion de la logica y de los servicios web (IoC). La Capa Datos se registra aparte,
+    // en Program.cs con AgregarCapaDatos: es la unica pieza que cambia si cambia la base de datos.
     internal static IServiceCollection AgregarServiciosDeAplicacion(this IServiceCollection servicios)
     {
-        // Toda clase *Data y *Logica se registra sola: una tabla nueva no obliga a editar este archivo.
-        servicios.AgregarClasesDeCapa(typeof(RepositorioBase<>).Assembly, "Data");
+        // Toda clase *Logica se registra sola: una tabla nueva no obliga a editar este archivo.
         servicios.AgregarClasesDeCapa(typeof(LogicaBase<>).Assembly, "Logica");
 
-        servicios.AddScoped<CatalogoRepositorio>();
-        servicios.AddScoped<SecuenciaService>();
-        servicios.AddScoped<IEmpleadoData>(sp => sp.GetRequiredService<EmpleadoData>());
-        servicios.AddScoped<IPersonaData>(sp => sp.GetRequiredService<PersonaData>());
         servicios.AddScoped<EmpleadoServicio>();
 
         // Formatos de exportacion: un formato nuevo solo agrega su clase y su registro aqui (OCP).

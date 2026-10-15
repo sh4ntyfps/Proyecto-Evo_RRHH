@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class RolData : RepositorioBase<Rol>
 {
     public RolData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<Rol?> Obtener(int IdRolParam) => ObtenerPorClave(IdRolParam);
 }

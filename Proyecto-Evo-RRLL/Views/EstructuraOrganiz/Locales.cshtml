@@ -61,7 +61,7 @@
                     </td>
                     <td>
                         <form asp-action="LocalEliminar" asp-route-idLocal="@l.idLocal" method="post"
-                              onsubmit="return confirm('¿Eliminar este local?');">
+                              data-confirmar="¿Eliminar este local?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

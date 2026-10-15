@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class ExcretasVivLogica : LogicaBase<ExcretasViv>
 {
-    private readonly ExcretasVivData _data;
+    private readonly IRepositorio<ExcretasViv> _data;
 
-    public ExcretasVivLogica(ExcretasVivData data) : base(data) => _data = data;
+    public ExcretasVivLogica(IRepositorio<ExcretasViv> data) : base(data) => _data = data;
 
-    public async Task<ExcretasViv?> Obtener(int IdExcretasParam) => await _data.Obtener(IdExcretasParam);
+    public async Task<ExcretasViv?> Obtener(int idExcretas) => await _data.Obtener(idExcretas);
 }

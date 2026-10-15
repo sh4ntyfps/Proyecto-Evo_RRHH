@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class ExcretasVivData : RepositorioBase<ExcretasViv>
 {
     public ExcretasVivData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<ExcretasViv?> Obtener(int IdExcretasParam) => ObtenerPorClave(IdExcretasParam);
 }

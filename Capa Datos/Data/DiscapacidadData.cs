@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class DiscapacidadData : RepositorioBase<Discapacidad>
 {
     public DiscapacidadData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<Discapacidad?> Obtener(int IdDiscapacidadParam) => ObtenerPorClave(IdDiscapacidadParam);
 }

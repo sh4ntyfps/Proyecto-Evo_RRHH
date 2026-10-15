@@ -1,13 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Capa_Entidades;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Datos;
 
-public class UsuarioData : RepositorioBase<Usuario>
+public class UsuarioData : RepositorioBase<Usuario>, IUsuarioRepositorio
 {
     public UsuarioData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<Usuario?> Obtener(int IdUsuarioParam) => ObtenerPorClave(IdUsuarioParam);
 
     public async Task<Usuario?> ObtenerPorLogin(string login) =>
         await Tabla.FirstOrDefaultAsync(u => u.Login != null && u.Login.Trim() == login);

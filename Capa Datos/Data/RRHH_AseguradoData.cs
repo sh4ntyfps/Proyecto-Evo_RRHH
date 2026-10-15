@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class RRHH_AseguradoData : RepositorioBase<RRHH_Asegurado>
 {
     public RRHH_AseguradoData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<RRHH_Asegurado?> Obtener(int idEmpleadoParam, int NroBeneficiarioParam) => ObtenerPorClave(idEmpleadoParam, NroBeneficiarioParam);
 }

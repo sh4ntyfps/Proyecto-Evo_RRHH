@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class MotivoBajaLogica : LogicaBase<MotivoBaja>
 {
-    private readonly MotivoBajaData _data;
+    private readonly IRepositorio<MotivoBaja> _data;
 
-    public MotivoBajaLogica(MotivoBajaData data) : base(data) => _data = data;
+    public MotivoBajaLogica(IRepositorio<MotivoBaja> data) : base(data) => _data = data;
 
-    public async Task<MotivoBaja?> Obtener(int idMotivoBajaParam) => await _data.Obtener(idMotivoBajaParam);
+    public async Task<MotivoBaja?> Obtener(int idMotivoBaja) => await _data.Obtener(idMotivoBaja);
 }

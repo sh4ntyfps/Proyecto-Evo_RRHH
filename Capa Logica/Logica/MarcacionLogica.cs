@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class MarcacionLogica : LogicaBase<Marcacion>
 {
-    private readonly MarcacionData _data;
+    private readonly IRepositorio<Marcacion> _data;
 
-    public MarcacionLogica(MarcacionData data) : base(data) => _data = data;
+    public MarcacionLogica(IRepositorio<Marcacion> data) : base(data) => _data = data;
 
-    public async Task<Marcacion?> Obtener(DateTime FechaParam, int IdEmpleadoParam) => await _data.Obtener(FechaParam, IdEmpleadoParam);
+    public async Task<Marcacion?> Obtener(DateTime fecha, int idEmpleado) => await _data.Obtener(fecha, idEmpleado);
 }

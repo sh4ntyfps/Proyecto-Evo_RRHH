@@ -57,7 +57,7 @@
                     <td>@f.Soc3</td>
                     <td>
                         <a asp-action="FuncFamEditar" asp-route-id="@f.idFuncFamiliar" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                        <form asp-action="FuncFamEliminar" asp-route-id="@f.idFuncFamiliar" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta evaluación?');">
+                        <form asp-action="FuncFamEliminar" asp-route-id="@f.idFuncFamiliar" method="post" class="d-inline" data-confirmar="¿Eliminar esta evaluación?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

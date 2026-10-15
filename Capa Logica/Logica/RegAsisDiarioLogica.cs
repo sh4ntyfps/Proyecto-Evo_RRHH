@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class RegAsisDiarioLogica : LogicaBase<RegAsisDiario>
 {
-    private readonly RegAsisDiarioData _data;
+    private readonly IRepositorio<RegAsisDiario> _data;
 
-    public RegAsisDiarioLogica(RegAsisDiarioData data) : base(data) => _data = data;
+    public RegAsisDiarioLogica(IRepositorio<RegAsisDiario> data) : base(data) => _data = data;
 
-    public async Task<RegAsisDiario?> Obtener(DateTime FechaParam, int IdEmpleadoParam) => await _data.Obtener(FechaParam, IdEmpleadoParam);
+    public async Task<RegAsisDiario?> Obtener(DateTime fecha, int idEmpleado) => await _data.Obtener(fecha, idEmpleado);
 }

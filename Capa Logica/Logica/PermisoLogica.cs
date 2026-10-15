@@ -1,19 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class PermisoLogica : LogicaBase<Permiso>
 {
-    private readonly PermisoData _data;
+    private readonly IRepositorio<Permiso> _data;
 
-    public PermisoLogica(PermisoData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public PermisoLogica(IRepositorio<Permiso> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<Permiso?> Obtener(int IdEmpleadoParam, int NPermisoParam) => await _data.Obtener(IdEmpleadoParam, NPermisoParam);
-
-    // Numero de permiso correlativo por empleado.
-    public Task CrearConNuevoId(Permiso registro) =>
-        CrearNumerado(registro, x => x.NPermiso, id => registro.NPermiso = id, x => x.IdEmpleado == registro.IdEmpleado);
-
-    public Task<bool> Registrar(Permiso registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<Permiso?> Obtener(int idEmpleado, int nPermiso) => await _data.Obtener(idEmpleado, nPermiso);
 }

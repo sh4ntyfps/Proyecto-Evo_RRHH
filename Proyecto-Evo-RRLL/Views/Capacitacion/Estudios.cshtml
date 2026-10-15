@@ -54,7 +54,7 @@
                         <a asp-action="EstudioEditar" asp-route-idTipo="@e.IdTipoEstudios" asp-route-idEmpleado="@e.IdEmpleado" asp-route-correlativo="@e.Correlativo"
                            class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
                         <form asp-action="EstudioEliminar" asp-route-idTipo="@e.IdTipoEstudios" asp-route-idEmpleado="@e.IdEmpleado" asp-route-correlativo="@e.Correlativo"
-                              method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este estudio?');">
+                              method="post" class="d-inline" data-confirmar="¿Eliminar este estudio?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

@@ -1,5 +1,6 @@
 using Capa_Datos;
 using Capa_Entidades;
+using Capa_Entidades.Contratos;
 using Capa_Logica.Tests.Soporte;
 
 namespace Capa_Logica.Tests;

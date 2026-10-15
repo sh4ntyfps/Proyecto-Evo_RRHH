@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class Motivo_PermLogica : LogicaBase<Motivo_Perm>
 {
-    private readonly Motivo_PermData _data;
+    private readonly IRepositorio<Motivo_Perm> _data;
 
-    public Motivo_PermLogica(Motivo_PermData data) : base(data) => _data = data;
+    public Motivo_PermLogica(IRepositorio<Motivo_Perm> data) : base(data) => _data = data;
 
-    public async Task<Motivo_Perm?> Obtener(int idMotivoParam) => await _data.Obtener(idMotivoParam);
+    public async Task<Motivo_Perm?> Obtener(int idMotivo) => await _data.Obtener(idMotivo);
 }

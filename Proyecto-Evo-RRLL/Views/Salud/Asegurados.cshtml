@@ -53,7 +53,7 @@
                     <td>@a.FechaFinVinculo?.ToString("dd/MM/yyyy")</td>
                     <td>
                         <a asp-action="AseguradoEditar" asp-route-idEmpleado="@a.idEmpleado" asp-route-nroBeneficiario="@a.NroBeneficiario" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                        <form asp-action="AseguradoEliminar" asp-route-idEmpleado="@a.idEmpleado" asp-route-nroBeneficiario="@a.NroBeneficiario" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este beneficiario?');">
+                        <form asp-action="AseguradoEliminar" asp-route-idEmpleado="@a.idEmpleado" asp-route-nroBeneficiario="@a.NroBeneficiario" method="post" class="d-inline" data-confirmar="¿Eliminar este beneficiario?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

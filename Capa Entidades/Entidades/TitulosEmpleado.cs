@@ -1,12 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("TitulosEmpleado")]
     public class TitulosEmpleado
     {
-    [Key]
     public string? NumColegiatura { get; set; }
     public string? DenominacionGrado { get; set; }
     public string? Institucion { get; set; }

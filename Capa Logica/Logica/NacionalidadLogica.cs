@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class NacionalidadLogica : LogicaBase<Nacionalidad>
 {
-    private readonly NacionalidadData _data;
+    private readonly IRepositorio<Nacionalidad> _data;
 
-    public NacionalidadLogica(NacionalidadData data) : base(data) => _data = data;
+    public NacionalidadLogica(IRepositorio<Nacionalidad> data) : base(data) => _data = data;
 
-    public async Task<Nacionalidad?> Obtener(int IdNacionalidadParam) => await _data.Obtener(IdNacionalidadParam);
+    public async Task<Nacionalidad?> Obtener(int idNacionalidad) => await _data.Obtener(idNacionalidad);
 }

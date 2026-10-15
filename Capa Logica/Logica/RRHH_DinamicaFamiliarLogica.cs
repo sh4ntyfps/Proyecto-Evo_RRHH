@@ -1,18 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class RRHH_DinamicaFamiliarLogica : LogicaBase<RRHH_DinamicaFamiliar>
 {
-    private readonly RRHH_DinamicaFamiliarData _data;
+    private readonly IRepositorio<RRHH_DinamicaFamiliar> _data;
 
-    public RRHH_DinamicaFamiliarLogica(RRHH_DinamicaFamiliarData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public RRHH_DinamicaFamiliarLogica(IRepositorio<RRHH_DinamicaFamiliar> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<RRHH_DinamicaFamiliar?> Obtener(int idDinamicaParam) => await _data.Obtener(idDinamicaParam);
-
-    public Task CrearConNuevoId(RRHH_DinamicaFamiliar registro) =>
-        CrearNumerado(registro, x => x.idDinamica, id => registro.idDinamica = id);
-
-    public Task<bool> Registrar(RRHH_DinamicaFamiliar registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<RRHH_DinamicaFamiliar?> Obtener(int idDinamica) => await _data.Obtener(idDinamica);
 }

@@ -1,14 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("PeriodoLaboral")]
     public class PeriodoLaboral
     {
-    [Key]
     public int IdEmpleado { get; set; }
-    [Key]
     public int NroPeriodo { get; set; }
     public string? NumResoIngreInstitu { get; set; }
     public DateTime? FechaSalida { get; set; }

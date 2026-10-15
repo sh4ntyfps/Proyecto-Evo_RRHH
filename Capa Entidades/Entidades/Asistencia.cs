@@ -1,14 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("Asistencia")]
     public class Asistencia
     {
-    [Key]
     public DateTime Fecha { get; set; }
-    [Key]
     public int IdEmpleado { get; set; }
     public string? Hor_Ent { get; set; }
     public string? Hor_Sal { get; set; }

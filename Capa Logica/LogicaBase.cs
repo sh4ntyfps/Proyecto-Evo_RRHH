@@ -1,37 +1,33 @@
-using System.Linq.Expressions;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 // Operaciones comunes de la capa de logica; cada clase *Logica agrega solo sus reglas propias (DRY).
+// Solo conoce contratos: la Capa Datos puede cambiar de base de datos sin tocar esta capa.
 public abstract class LogicaBase<T> where T : class
 {
-    private readonly RepositorioBase<T> _repositorio;
-    private readonly SecuenciaService? _secuencia;
+    private readonly IRepositorio<T> _repositorio;
+    private readonly IUnidadDeTrabajo? _unidad;
 
-    // La secuencia solo la pasan las clases que numeran sus registros.
-    protected LogicaBase(RepositorioBase<T> repositorio, SecuenciaService? secuencia = null)
+    // La unidad de trabajo solo la pasan las clases que registran con Registrar o EnTransaccion.
+    protected LogicaBase(IRepositorio<T> repositorio, IUnidadDeTrabajo? unidad = null)
     {
         _repositorio = repositorio;
-        _secuencia = secuencia;
+        _unidad = unidad;
     }
 
     public Task<List<T>> Listar() => _repositorio.Listar();
+
+    // Si la entidad tiene clave generada, la Capa Datos la asigna y la deja en el registro.
     public Task Crear(T registro) => _repositorio.Crear(registro);
     public Task Actualizar(T registro) => _repositorio.Actualizar(registro);
     public Task Eliminar(T registro) => _repositorio.Eliminar(registro);
 
-    // Numeracion "maximo + 1" del sistema legado: asigna el siguiente numero y guarda.
-    // "grupo" limita el maximo a un conjunto (ej. permisos del mismo empleado).
-    protected async Task CrearNumerado(T registro, Expression<Func<T, int>> campo, Action<int> asignar,
-        Expression<Func<T, bool>>? grupo = null)
-    {
-        asignar(await _repositorio.SiguienteId(campo, grupo));
-        await _repositorio.Crear(registro);
-    }
+    // Alta con reintentos si otro usuario guarda al mismo tiempo: false si no se pudo guardar.
+    public Task<bool> Registrar(T registro) => EnTransaccion(() => _repositorio.Crear(registro));
 
-    // Transaccion serializable con reintentos: evita que dos usuarios obtengan el mismo numero.
+    // Varias operaciones en una sola transaccion: se guardan todas o ninguna.
     protected Task<bool> EnTransaccion(Func<Task> trabajo)
-        => (_secuencia ?? throw new InvalidOperationException($"{GetType().Name} no recibio SecuenciaService."))
-            .EjecutarTransaccionalAsync(trabajo);
+        => (_unidad ?? throw new InvalidOperationException($"{GetType().Name} no recibio IUnidadDeTrabajo."))
+            .EjecutarAsync(trabajo);
 }

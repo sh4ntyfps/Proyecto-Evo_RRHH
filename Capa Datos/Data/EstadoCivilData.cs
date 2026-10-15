@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class EstadoCivilData : RepositorioBase<EstadoCivil>
 {
     public EstadoCivilData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<EstadoCivil?> Obtener(int IdEstadoCivilParam) => ObtenerPorClave(IdEstadoCivilParam);
 }

@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class ConservacionVivData : RepositorioBase<ConservacionViv>
 {
     public ConservacionVivData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<ConservacionViv?> Obtener(int IdConservacionParam) => ObtenerPorClave(IdConservacionParam);
 }

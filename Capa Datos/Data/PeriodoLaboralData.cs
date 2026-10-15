@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class PeriodoLaboralData : RepositorioBase<PeriodoLaboral>
 {
     public PeriodoLaboralData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<PeriodoLaboral?> Obtener(int IdEmpleadoParam, int NroPeriodoParam) => ObtenerPorClave(IdEmpleadoParam, NroPeriodoParam);
 }

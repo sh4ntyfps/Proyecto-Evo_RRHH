@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class CargoLogica : LogicaBase<Cargo>
 {
-    private readonly CargoData _data;
+    private readonly IRepositorio<Cargo> _data;
 
-    public CargoLogica(CargoData data) : base(data) => _data = data;
+    public CargoLogica(IRepositorio<Cargo> data) : base(data) => _data = data;
 
-    public async Task<Cargo?> Obtener(int IdCargoParam) => await _data.Obtener(IdCargoParam);
+    public async Task<Cargo?> Obtener(int idCargo) => await _data.Obtener(idCargo);
 }

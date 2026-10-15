@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class NacionalidadData : RepositorioBase<Nacionalidad>
 {
     public NacionalidadData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<Nacionalidad?> Obtener(int IdNacionalidadParam) => ObtenerPorClave(IdNacionalidadParam);
 }

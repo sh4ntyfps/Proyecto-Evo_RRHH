@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class TipoVivLogica : LogicaBase<TipoViv>
 {
-    private readonly TipoVivData _data;
+    private readonly IRepositorio<TipoViv> _data;
 
-    public TipoVivLogica(TipoVivData data) : base(data) => _data = data;
+    public TipoVivLogica(IRepositorio<TipoViv> data) : base(data) => _data = data;
 
-    public async Task<TipoViv?> Obtener(int IdTipoParam) => await _data.Obtener(IdTipoParam);
+    public async Task<TipoViv?> Obtener(int idTipo) => await _data.Obtener(idTipo);
 }

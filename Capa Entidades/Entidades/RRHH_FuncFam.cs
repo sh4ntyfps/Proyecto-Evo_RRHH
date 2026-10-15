@@ -1,12 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("RRHH_FuncFam")]
     public class RRHH_FuncFam
     {
-    [Key]
     public int idFuncFamiliar { get; set; }
     public int? IdEmpleado { get; set; }
     public string? Com1 { get; set; }

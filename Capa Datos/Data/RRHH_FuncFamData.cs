@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class RRHH_FuncFamData : RepositorioBase<RRHH_FuncFam>
 {
     public RRHH_FuncFamData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<RRHH_FuncFam?> Obtener(int idFuncFamiliarParam) => ObtenerPorClave(idFuncFamiliarParam);
 }

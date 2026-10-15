@@ -3,142 +3,102 @@
     ViewData["Title"] = "Inicio";
     var hora = DateTime.Now.Hour;
     var saludo = hora < 12 ? "Buenos días" : hora < 19 ? "Buenas tardes" : "Buenas noches";
-    var esCultura = new System.Globalization.CultureInfo("es-ES");
-    var fechaHoy = DateTime.Now.ToString("dddd, dd 'de' MMMM 'de' yyyy", esCultura);
-    fechaHoy = esCultura.TextInfo.ToTitleCase(fechaHoy);
+    var esCultura = new System.Globalization.CultureInfo("es-PE");
+    var fechaHoy = DateTime.Now.ToString("dddd d 'de' MMMM 'de' yyyy", esCultura);
+    fechaHoy = char.ToUpper(fechaHoy[0]) + fechaHoy[1..];
+    var inactivos = Model.Empleados - Model.EmpleadosActivos;
 }
 
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+<div class="inicio-cabecera d-flex flex-wrap align-items-end justify-content-between gap-3">
     <div>
-        <h3 class="mb-1">@saludo, @User.Identity?.Name</h3>
-        <p class="text-secondary small mb-0"><i class="bi bi-calendar3 me-1"></i>@fechaHoy</p>
+        <h1>@saludo, @User.Identity?.Name</h1>
+        <p class="inicio-fecha">@fechaHoy</p>
     </div>
-    <a asp-controller="Empleado" asp-action="Nuevo" class="btn btn-primary">
-        <i class="bi bi-person-plus me-1"></i>Nuevo empleado
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="Permiso" asp-action="Nuevo" class="btn btn-outline-secondary">
+            <i class="bi bi-calendar-plus me-1"></i>Registrar permiso
+        </a>
+        <a asp-controller="Empleado" asp-action="Nuevo" class="btn btn-primary">
+            <i class="bi bi-person-plus me-1"></i>Nuevo empleado
+        </a>
+    </div>
+</div>
+
+@* El estado del personal en una sola linea de registro: la cifra que importa primero *@
+<section class="registro-dia" aria-label="Resumen del personal">
+    <a asp-controller="Empleado" asp-action="Index" class="registro-cifra registro-principal">
+        <span class="registro-valor">@Model.EmpleadosActivos.ToString("N0", esCultura)</span>
+        <span class="registro-etiqueta">Empleados activos</span>
+        <span class="registro-detalle">de @Model.Empleados.ToString("N0", esCultura) registrados@(inactivos > 0 ? $", {inactivos.ToString("N0", esCultura)} inactivos" : "")</span>
     </a>
-</div>
+    <a asp-controller="Asistencia" asp-action="Index" class="registro-cifra">
+        <span class="registro-valor">@Model.asistenciasHoy.ToString("N0", esCultura)</span>
+        <span class="registro-etiqueta">Asistencias registradas hoy</span>
+    </a>
+    <a asp-controller="EstructuraOrganiz" asp-action="Index" class="registro-cifra">
+        <span class="registro-valor">@Model.Areas.ToString("N0", esCultura)</span>
+        <span class="registro-etiqueta">Unidades orgánicas</span>
+    </a>
+    <a asp-controller="Feriado" asp-action="Index" class="registro-cifra">
+        <span class="registro-valor">@Model.FeriadosMes.Count</span>
+        <span class="registro-etiqueta">Feriados este mes</span>
+    </a>
+</section>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-4 col-sm-6">
-        <a asp-controller="Empleado" asp-action="Index" class="card stat-card h-100">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-primary"><i class="bi bi-people"></i></div>
-                <div>
-                    <div class="text-secondary small text-uppercase">Empleados</div>
-                    <div class="fs-3 fw-bold">@Model.Empleados</div>
-                </div>
-                <i class="bi bi-arrow-right stat-arrow"></i>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-4 col-sm-6">
-        <div class="card stat-card h-100">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-success"><i class="bi bi-person-vcard"></i></div>
-                <div>
-                    <div class="text-secondary small text-uppercase">Personas</div>
-                    <div class="fs-3 fw-bold">@Model.Personas</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 col-sm-6">
-        <a asp-controller="Asistencia" asp-action="Index" class="card stat-card h-100">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-info"><i class="bi bi-clock-history"></i></div>
-                <div>
-                    <div class="text-secondary small text-uppercase">Asistencias hoy</div>
-                    <div class="fs-3 fw-bold">@Model.asistenciasHoy</div>
-                </div>
-                <i class="bi bi-arrow-right stat-arrow"></i>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-4 col-sm-6">
-        <div class="card stat-card h-100">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-violet"><i class="bi bi-diagram-3"></i></div>
-                <div>
-                    <div class="text-secondary small text-uppercase">Áreas</div>
-                    <div class="fs-3 fw-bold">@Model.Areas</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 col-sm-6">
-        <a asp-controller="Catalogo" asp-action="Index" asp-route-tabla="Cargo" class="card stat-card h-100">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-danger"><i class="bi bi-briefcase"></i></div>
-                <div>
-                    <div class="text-secondary small text-uppercase">Cargos</div>
-                    <div class="fs-3 fw-bold">@Model.Cargos</div>
-                </div>
-                <i class="bi bi-arrow-right stat-arrow"></i>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-4 col-sm-6">
-        <a asp-controller="Empleado" asp-action="Index" class="card stat-card h-100">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-success"><i class="bi bi-person-check"></i></div>
-                <div>
-                    <div class="text-secondary small text-uppercase">Empleados activos</div>
-                    <div class="fs-3 fw-bold">@Model.EmpleadosActivos</div>
-                </div>
-                <i class="bi bi-arrow-right stat-arrow"></i>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-4 col-sm-6">
-        <div class="card stat-card h-100">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-warning"><i class="bi bi-calendar-heart"></i></div>
-                <div>
-                    <div class="text-secondary small text-uppercase">Feriados del mes</div>
-                    <div class="fs-3 fw-bold">@Model.FeriadosDelMes</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@if (Model.FeriadosMes.Count > 0)
-{
-    <div class="card mb-3">
-        <div class="card-body py-2 d-flex flex-wrap gap-2 align-items-center">
-            <span class="text-secondary small text-uppercase me-1">Próximos feriados:</span>
-            @foreach (var f in Model.FeriadosMes)
-            {
-                <span class="badge text-bg-danger-subtle border border-danger-subtle">@f</span>
-            }
-        </div>
-    </div>
-}
+<ul class="registro-secundario">
+    <li><b>@Model.Personas.ToString("N0", esCultura)</b>personas en el registro, entre empleados y familiares</li>
+    <li><a asp-controller="Catalogo" asp-action="Index" asp-route-tabla="Cargo"><b>@Model.Cargos.ToString("N0", esCultura)</b>cargos definidos</a></li>
+</ul>
 
 <div class="row g-3 mb-3">
-    <div class="col-lg-8">
-        <div class="card h-100">
+    <div class="col-xl-8">
+        <section class="card h-100">
             <div class="card-body">
-                <h6 class="fw-semibold mb-3"><i class="bi bi-diagram-3 me-2 text-primary"></i>Empleados por área</h6>
-                <div class="chart-box"><canvas id="chartAreas"></canvas></div>
+                <h2 class="panel-titulo">Empleados por área</h2>
+                <div class="chart-box"><canvas id="chartAreas" aria-label="Gráfico de empleados por área" role="img"></canvas></div>
             </div>
-        </div>
+        </section>
     </div>
-    <div class="col-lg-4">
-        <div class="card h-100">
+    <div class="col-xl-4">
+        <section class="card h-100">
             <div class="card-body">
-                <h6 class="fw-semibold mb-3"><i class="bi bi-person-badge me-2 text-warning"></i>Empleados por estado</h6>
-                <div class="chart-box"><canvas id="chartEstados"></canvas></div>
+                <h2 class="panel-titulo">Feriados del mes</h2>
+                @if (Model.FeriadosMes.Count == 0)
+                {
+                    <p class="text-secondary mb-2">No hay feriados registrados este mes.</p>
+                    <a asp-controller="Feriado" asp-action="Nuevo" class="small">Registrar un feriado</a>
+                }
+                else
+                {
+                    <ul class="feriados-lista">
+                        @foreach (var f in Model.FeriadosMes)
+                        {
+                            var partes = f.Split(" - ", 2);
+                            <li>
+                                <span class="feriado-fecha">@partes[0]</span>
+                                <span>@(partes.Length > 1 ? partes[1] : "Feriado")</span>
+                            </li>
+                        }
+                    </ul>
+                }
             </div>
-        </div>
+        </section>
     </div>
-    <div class="col-12">
-        <div class="card h-100">
+    <div class="col-xl-8">
+        <section class="card h-100">
             <div class="card-body">
-                <h6 class="fw-semibold mb-3"><i class="bi bi-clock-history me-2 text-success"></i>Asistencias últimos 7 días</h6>
-                <div class="chart-box"><canvas id="chartAsistencia"></canvas></div>
+                <h2 class="panel-titulo">Asistencias de los últimos 7 días</h2>
+                <div class="chart-box"><canvas id="chartAsistencia" aria-label="Gráfico de asistencias de los últimos 7 días" role="img"></canvas></div>
             </div>
-        </div>
+        </section>
+    </div>
+    <div class="col-xl-4">
+        <section class="card h-100">
+            <div class="card-body">
+                <h2 class="panel-titulo">Empleados por estado</h2>
+                <div class="chart-box"><canvas id="chartEstados" aria-label="Gráfico de empleados por estado" role="img"></canvas></div>
+            </div>
+        </section>
     </div>
 </div>
 
@@ -146,11 +106,6 @@
     <script src="~/lib/chart.js/chart.umd.min.js"></script>
     <script>
         (function () {
-            var azul = '#4f46e5';   // = --evo-primary (índigo de toda la app)
-            var azulSuave = '#6366f1';
-            var verde = '#10b981';
-            var paleta = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#64748b'];
-
             var areasNombres = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AreasNombres));
             var areasData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmpleadosPorArea));
             var diasAsis = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DiasAsistencia));
@@ -158,116 +113,74 @@
             var estadosNombres = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EstadosNombres));
             var estadosData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmpleadosPorEstado));
 
-            function tema() {
-                var oscuro = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            // Los colores salen de la hoja de estilos: un solo lugar define la paleta, en claro y en oscuro
+            function paleta() {
+                var css = getComputedStyle(document.documentElement);
+                var v = function (n) { return css.getPropertyValue(n).trim(); };
                 return {
-                    etiqueta: oscuro ? '#e2e8f0' : '#475569',
-                    grilla: oscuro ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)',
-                    tooltip: oscuro ? '#1e293b' : 'rgba(0,0,0,.8)'
+                    registro: v('--registro'), manila: v('--manila'), tinta: v('--tinta'),
+                    suave: v('--tinta-suave'), regla: v('--regla'), hoja: v('--hoja'),
+                    estados: [v('--registro'), v('--manila'), v('--regla-fuerte'), v('--alerta')]
                 };
             }
 
-            var t = tema();
+            Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+            Chart.defaults.font.size = 13;
 
-            // Empleados por área (barra horizontal)
+            // Nombres de area largos se acortan en pantallas angostas; el nombre completo queda en el tooltip
+            function etiquetaCorta(valor) {
+                var texto = this.getLabelForValue(valor);
+                var max = window.innerWidth < 576 ? 18 : 34;
+                return texto.length > max ? texto.slice(0, max - 1) + '…' : texto;
+            }
+
+            function opcionesEjes(p, horizontal) {
+                var valor = { beginAtZero: true, ticks: { precision: 0, color: p.suave }, grid: { color: p.regla }, border: { display: false } };
+                var categoria = { ticks: { color: p.tinta, autoSkip: false, callback: etiquetaCorta }, grid: { display: false }, border: { color: p.regla } };
+                return horizontal ? { x: valor, y: categoria } : { x: categoria, y: valor };
+            }
+
+            function tooltip(p) {
+                return { backgroundColor: p.tinta, titleColor: p.hoja, bodyColor: p.hoja, padding: 10, cornerRadius: 4, displayColors: false };
+            }
+
+            var p = paleta();
+
             var chartAreas = new Chart(document.getElementById('chartAreas'), {
                 type: 'bar',
-                data: {
-                    labels: areasNombres,
-                    datasets: [{
-                        label: 'Empleados',
-                        data: areasData,
-                        backgroundColor: azulSuave + 'cc',
-                        borderColor: azul,
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { backgroundColor: t.tooltip }
-                    },
-                    scales: {
-                        x: { beginAtZero: true, ticks: { precision: 0, color: t.etiqueta }, grid: { color: t.grilla } },
-                        y: { ticks: { color: t.etiqueta, autoSkip: false }, grid: { display: false } }
-                    }
-                }
+                data: { labels: areasNombres, datasets: [{ label: 'Empleados', data: areasData, backgroundColor: p.registro, borderRadius: 2, maxBarThickness: 22 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: tooltip(p) }, scales: opcionesEjes(p, true) }
             });
 
-            // Empleados por estado (dona)
+            var chartAsistencia = new Chart(document.getElementById('chartAsistencia'), {
+                type: 'bar',
+                data: { labels: diasAsis, datasets: [{ label: 'Asistencias', data: asisData, backgroundColor: p.manila, borderRadius: 2, maxBarThickness: 48 }] },
+                options: { responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: tooltip(p) }, scales: opcionesEjes(p, false) }
+            });
+
             var chartEstados = new Chart(document.getElementById('chartEstados'), {
                 type: 'doughnut',
-                data: {
-                    labels: estadosNombres,
-                    datasets: [{
-                        data: estadosData,
-                        backgroundColor: estadosData.map(function (_, i) { return paleta[i % paleta.length]; }),
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '62%',
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: t.etiqueta, padding: 12 } },
-                        tooltip: { backgroundColor: t.tooltip }
-                    }
-                }
+                data: { labels: estadosNombres, datasets: [{ data: estadosData, backgroundColor: p.estados, borderColor: p.hoja, borderWidth: 3 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '64%',
+                    plugins: { legend: { position: 'bottom', labels: { color: p.tinta, padding: 14, boxWidth: 12, boxHeight: 12 } }, tooltip: tooltip(p) } }
             });
 
-            // Asistencias últimos 7 días (línea)
-            var chartAsistencia = new Chart(document.getElementById('chartAsistencia'), {
-                type: 'line',
-                data: {
-                    labels: diasAsis,
-                    datasets: [{
-                        label: 'Asistencias',
-                        data: asisData,
-                        borderColor: verde,
-                        backgroundColor: verde + '22',
-                        fill: true,
-                        tension: .35,
-                        pointBackgroundColor: verde
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { backgroundColor: t.tooltip }
-                    },
-                    scales: {
-                        x: { ticks: { color: t.etiqueta }, grid: { display: false } },
-                        y: { beginAtZero: true, ticks: { precision: 0, color: t.etiqueta }, grid: { color: t.grilla } }
-                    }
-                }
-            });
-
-            // Recolorear los gráficos al cambiar de tema, sin recargar la página
+            // Al cambiar de tema se vuelven a leer los colores, sin recargar la pagina
             document.addEventListener('evo:theme', function () {
-                var t = tema();
-
-                chartAreas.options.plugins.tooltip.backgroundColor = t.tooltip;
-                chartAreas.options.scales.x.ticks.color = t.etiqueta;
-                chartAreas.options.scales.x.grid.color = t.grilla;
-                chartAreas.options.scales.y.ticks.color = t.etiqueta;
-                chartAreas.update();
-
-                chartEstados.options.plugins.tooltip.backgroundColor = t.tooltip;
-                chartEstados.options.plugins.legend.labels.color = t.etiqueta;
-                chartEstados.update();
-
-                chartAsistencia.options.plugins.tooltip.backgroundColor = t.tooltip;
-                chartAsistencia.options.scales.x.ticks.color = t.etiqueta;
-                chartAsistencia.options.scales.y.ticks.color = t.etiqueta;
-                chartAsistencia.options.scales.y.grid.color = t.grilla;
-                chartAsistencia.update();
+                var p = paleta();
+                chartAreas.data.datasets[0].backgroundColor = p.registro;
+                chartAreas.options.scales = opcionesEjes(p, true);
+                chartAreas.options.plugins.tooltip = tooltip(p);
+                chartAsistencia.data.datasets[0].backgroundColor = p.manila;
+                chartAsistencia.options.scales = opcionesEjes(p, false);
+                chartAsistencia.options.plugins.tooltip = tooltip(p);
+                chartEstados.data.datasets[0].backgroundColor = p.estados;
+                chartEstados.data.datasets[0].borderColor = p.hoja;
+                chartEstados.options.plugins.legend.labels.color = p.tinta;
+                chartEstados.options.plugins.tooltip = tooltip(p);
+                [chartAreas, chartAsistencia, chartEstados].forEach(function (c) { c.update(); });
             });
         })();
     </script>

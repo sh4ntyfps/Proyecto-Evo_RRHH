@@ -1,18 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class PersonaLogica : LogicaBase<Persona>
 {
-    private readonly PersonaData _data;
+    private readonly IRepositorio<Persona> _data;
 
-    public PersonaLogica(PersonaData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public PersonaLogica(IRepositorio<Persona> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<Persona?> Obtener(int IdPersonaParam) => await _data.Obtener(IdPersonaParam);
-
-    public Task CrearConNuevoId(Persona registro) =>
-        CrearNumerado(registro, x => x.IdPersona, id => registro.IdPersona = id);
-
-    public Task<bool> Registrar(Persona registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<Persona?> Obtener(int idPersona) => await _data.Obtener(idPersona);
 }

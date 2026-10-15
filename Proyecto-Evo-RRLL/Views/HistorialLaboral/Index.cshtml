@@ -62,7 +62,7 @@
                             <td>@emp.Nombre</td>
                             <td>
                                 <a asp-action="PeriodoEditar" asp-route-idEmpleado="@p.IdEmpleado" asp-route-nroPeriodo="@p.NroPeriodo" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                                <form asp-action="PeriodoEliminar" asp-route-idEmpleado="@p.IdEmpleado" asp-route-nroPeriodo="@p.NroPeriodo" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este período?');">
+                                <form asp-action="PeriodoEliminar" asp-route-idEmpleado="@p.IdEmpleado" asp-route-nroPeriodo="@p.NroPeriodo" method="post" class="d-inline" data-confirmar="¿Eliminar este período?">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                                 </form>
                             </td>
@@ -107,7 +107,7 @@
                             <td>@e.FechaEgreso?.ToString("dd/MM/yyyy")</td>
                             <td>
                                 <a asp-action="ExpEditar" asp-route-idEmpleado="@e.IdEmpleado" asp-route-idExpLab="@e.IdExpLab" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                                <form asp-action="ExpEliminar" asp-route-idEmpleado="@e.IdEmpleado" asp-route-idExpLab="@e.IdExpLab" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta experiencia?');">
+                                <form asp-action="ExpEliminar" asp-route-idEmpleado="@e.IdEmpleado" asp-route-idExpLab="@e.IdExpLab" method="post" class="d-inline" data-confirmar="¿Eliminar esta experiencia?">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                                 </form>
                             </td>
@@ -148,7 +148,7 @@
                             <td>@r.Year</td>
                             <td>
                                 <a asp-action="RotacionEditar" asp-route-idEmpleado="@r.idEmpleado" asp-route-idRotacion="@r.idRotacion" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                                <form asp-action="RotacionEliminar" asp-route-idEmpleado="@r.idEmpleado" asp-route-idRotacion="@r.idRotacion" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta rotación?');">
+                                <form asp-action="RotacionEliminar" asp-route-idEmpleado="@r.idEmpleado" asp-route-idRotacion="@r.idRotacion" method="post" class="d-inline" data-confirmar="¿Eliminar esta rotación?">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                                 </form>
                             </td>
@@ -187,7 +187,7 @@
                             <td>@r.FechaResolucion?.ToString("dd/MM/yyyy")</td>
                             <td>
                                 <a asp-action="ResolucionEditar" asp-route-idEmpleado="@r.idEmpleado" asp-route-idResolucion="@r.idResolucion" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                                <form asp-action="ResolucionEliminar" asp-route-idEmpleado="@r.idEmpleado" asp-route-idResolucion="@r.idResolucion" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta resolución?');">
+                                <form asp-action="ResolucionEliminar" asp-route-idEmpleado="@r.idEmpleado" asp-route-idResolucion="@r.idResolucion" method="post" class="d-inline" data-confirmar="¿Eliminar esta resolución?">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                                 </form>
                             </td>

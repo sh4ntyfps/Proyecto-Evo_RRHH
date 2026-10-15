@@ -4,9 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - RRHH</title>
+    <script>
+        // Aplica el tema guardado antes de pintar, para que no parpadee al cargar
+        try {
+            var t = localStorage.getItem('evo-theme') ||
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', t);
+        } catch (e) { }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -14,17 +22,10 @@
 <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-    <div id="splashLoader" class="splash-loader">
-        <div class="splash-box">
-            <span class="brand-logo splash-logo"><i class="bi bi-person-badge-fill"></i></span>
-            <div class="splash-title">RRHH</div>
-            <div class="splash-bar"><span></span></div>
-        </div>
-    </div>
-
     @if (User.Identity?.IsAuthenticated == true)
     {
         var controlador = ViewContext.RouteData.Values["controller"]?.ToString();
+        var accion = ViewContext.RouteData.Values["action"]?.ToString();
         var nombreUsuario = User.Identity?.Name ?? "";
         var partesNombre = nombreUsuario.Split(new[] { ' ', '.', '_', '-' }, StringSplitOptions.RemoveEmptyEntries);
         string inicialesUsuario;
@@ -35,122 +36,123 @@
         else
             inicialesUsuario = "?";
 
-        <aside class="sidebar" id="sidebar">
-            <a class="sidebar-brand d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
-                <span class="brand-logo"><i class="bi bi-person-badge-fill"></i></span>
-                <span class="fw-bold">RRHH</span>
+        string Activo(string c) => controlador == c ? "active" : "";
+        string? Actual(string c) => controlador == c ? "page" : null;
+
+        <aside class="sidebar" id="sidebar" aria-label="Menú principal">
+            <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+                <span class="brand-logo" aria-hidden="true"></span>
+                <span>
+                    <span class="sidebar-brand-nombre">RRHH</span>
+                    <span class="sidebar-brand-detalle">Legajo de personal</span>
+                </span>
             </a>
-            <div class="sidebar-section">PRINCIPAL</div>
             <nav class="sidebar-nav">
-                <a class="sidebar-link @(controlador == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-speedometer2"></i><span>Inicio</span>
+                <div class="sidebar-section">Personal</div>
+                <a class="sidebar-link @Activo("Home")" aria-current="@Actual("Home")" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-house-door"></i><span>Inicio</span>
                 </a>
-                <a class="sidebar-link @(controlador == "Empleado" ? "active" : "")" asp-controller="Empleado" asp-action="Index">
-                    <i class="bi bi-people"></i><span>Personal</span>
+                <a class="sidebar-link @Activo("Empleado")" aria-current="@Actual("Empleado")" asp-controller="Empleado" asp-action="Index">
+                    <i class="bi bi-people"></i><span>Empleados</span>
                 </a>
-                <a class="sidebar-link @(controlador == "Salud" ? "active" : "")" asp-controller="Salud" asp-action="Index">
-                    <i class="bi bi-heart-pulse"></i><span>Salud</span>
+                <a class="sidebar-link @Activo("HistorialLaboral")" aria-current="@Actual("HistorialLaboral")" asp-controller="HistorialLaboral" asp-action="Index">
+                    <i class="bi bi-briefcase"></i><span>Historial laboral</span>
                 </a>
-                <a class="sidebar-link @(controlador == "Familia" ? "active" : "")" asp-controller="Familia" asp-action="Index">
-                    <i class="bi bi-people-fill"></i><span>Familia</span>
-                </a>
-                <a class="sidebar-link @(controlador == "Asistencia" ? "active" : "")" asp-controller="Asistencia" asp-action="Index">
+                <a class="sidebar-link @Activo("Asistencia")" aria-current="@Actual("Asistencia")" asp-controller="Asistencia" asp-action="Index">
                     <i class="bi bi-clock-history"></i><span>Asistencia</span>
                 </a>
-                <a class="sidebar-link @(controlador == "Feriado" ? "active" : "")" asp-controller="Feriado" asp-action="Index">
-                    <i class="bi bi-calendar-event"></i><span>Feriados</span>
-                </a>
-                <a class="sidebar-link @(controlador == "Capacitacion" ? "active" : "")" asp-controller="Capacitacion" asp-action="Index">
-                    <i class="bi bi-mortarboard"></i><span>Capacitación</span>
-                </a>
-                <a class="sidebar-link @(controlador == "Permiso" ? "active" : "")" asp-controller="Permiso" asp-action="Index">
+                <a class="sidebar-link @Activo("Permiso")" aria-current="@Actual("Permiso")" asp-controller="Permiso" asp-action="Index">
                     <i class="bi bi-calendar-check"></i><span>Permisos</span>
                 </a>
-                <a class="sidebar-link @(controlador == "HistorialLaboral" ? "active" : "")" asp-controller="HistorialLaboral" asp-action="Index">
-                    <i class="bi bi-briefcase"></i><span>Historial Laboral</span>
+                <a class="sidebar-link @Activo("Feriado")" aria-current="@Actual("Feriado")" asp-controller="Feriado" asp-action="Index">
+                    <i class="bi bi-calendar-event"></i><span>Feriados</span>
                 </a>
-                <a class="sidebar-link @(controlador == "Comportamiento" ? "active" : "")" asp-controller="Comportamiento" asp-action="Index">
-                    <i class="bi bi-clipboard-data"></i><span>Comportamiento</span>
+
+                <div class="sidebar-section">Bienestar</div>
+                <a class="sidebar-link @Activo("Salud")" aria-current="@Actual("Salud")" asp-controller="Salud" asp-action="Index">
+                    <i class="bi bi-heart-pulse"></i><span>Salud</span>
                 </a>
-                <a class="sidebar-link @(controlador == "Inconveniente" ? "active" : "")" asp-controller="Inconveniente" asp-action="Index">
-                    <i class="bi bi-exclamation-octagon"></i><span>Inconvenientes</span>
+                <a class="sidebar-link @Activo("Familia")" aria-current="@Actual("Familia")" asp-controller="Familia" asp-action="Index">
+                    <i class="bi bi-people-fill"></i><span>Familia</span>
                 </a>
-                <a class="sidebar-link @(controlador == "Vivienda" ? "active" : "")" asp-controller="Vivienda" asp-action="Index">
+                <a class="sidebar-link @Activo("Vivienda")" aria-current="@Actual("Vivienda")" asp-controller="Vivienda" asp-action="Index">
                     <i class="bi bi-house"></i><span>Vivienda</span>
                 </a>
-                <a class="sidebar-link @(controlador == "EstructuraOrganiz" ? "active" : "")" asp-controller="EstructuraOrganiz" asp-action="Index">
+
+                <div class="sidebar-section">Desempeño</div>
+                <a class="sidebar-link @Activo("Capacitacion")" aria-current="@Actual("Capacitacion")" asp-controller="Capacitacion" asp-action="Index">
+                    <i class="bi bi-mortarboard"></i><span>Capacitación</span>
+                </a>
+                <a class="sidebar-link @Activo("Comportamiento")" aria-current="@Actual("Comportamiento")" asp-controller="Comportamiento" asp-action="Index">
+                    <i class="bi bi-clipboard-check"></i><span>Comportamiento</span>
+                </a>
+                <a class="sidebar-link @Activo("Inconveniente")" aria-current="@Actual("Inconveniente")" asp-controller="Inconveniente" asp-action="Index">
+                    <i class="bi bi-exclamation-octagon"></i><span>Inconvenientes</span>
+                </a>
+
+                <div class="sidebar-section">Institución</div>
+                <a class="sidebar-link @Activo("EstructuraOrganiz")" aria-current="@Actual("EstructuraOrganiz")" asp-controller="EstructuraOrganiz" asp-action="Index">
                     <i class="bi bi-diagram-3"></i><span>Estructura orgánica</span>
                 </a>
+                <a class="sidebar-link @Activo("Catalogo")" data-bs-toggle="collapse" href="#menuCatalogo" role="button"
+                   aria-expanded="@(controlador == "Catalogo" ? "true" : "false")" aria-controls="menuCatalogo">
+                    <i class="bi bi-journal-text"></i><span>Tablas maestras</span><i class="bi bi-chevron-down submenu-caret"></i>
+                </a>
+                <div class="collapse @(controlador == "Catalogo" ? "show" : "")" id="menuCatalogo">
+                    <div class="submenu-list" data-filtro-menu>
+                        <input type="search" class="submenu-filtro" placeholder="Filtrar tablas" aria-label="Filtrar tablas maestras" />
+                        @foreach (var catalogo in Proyecto_Evo_RRLL.Models.ViewModels.CatalogoNavegacion.Items)
+                        {
+                            var esActual = controlador == "Catalogo" && (Context.Request.Query["tabla"].ToString() == catalogo.Key);
+                            <a class="sidebar-sublink @(esActual ? "active" : "")" aria-current="@(esActual ? "page" : null)"
+                               asp-controller="Catalogo" asp-action="Index" asp-route-tabla="@catalogo.Key">@catalogo.Value</a>
+                        }
+                        <div class="submenu-vacio" hidden>Ninguna tabla coincide.</div>
+                    </div>
+                </div>
 
                 @if (User.IsInRole("Administrador"))
                 {
-                    <div class="sidebar-section">SEGURIDAD</div>
-                    <div class="sidebar-submenu">
-                        <a class="sidebar-link @(controlador == "SeguridadAdmin" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Usuarios">
-                            <i class="bi bi-person-gear"></i><span>Usuarios y roles</span>
-                        </a>
-                        <a class="sidebar-link" asp-controller="SeguridadAdmin" asp-action="Actividad">
-                            <i class="bi bi-clock-history"></i><span>Bitácora de actividad</span>
-                        </a>
-                    </div>
-                }
-
-                <div class="sidebar-section">ADMINISTRACIÓN</div>
-                <div class="sidebar-submenu">
-                    <a class="sidebar-link @(controlador == "Catalogo" ? "active" : "")" data-bs-toggle="collapse" href="#menuCatalogo" role="button" aria-expanded="false" aria-controls="menuCatalogo">
-                        <i class="bi bi-grid-1x2"></i><span>Mantenimiento</span><i class="bi bi-chevron-down ms-auto submenu-caret"></i>
+                    <div class="sidebar-section">Seguridad</div>
+                    <a class="sidebar-link @(controlador == "SeguridadAdmin" && accion != "Actividad" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Usuarios">
+                        <i class="bi bi-person-gear"></i><span>Usuarios y roles</span>
                     </a>
-                    <div class="collapse @(controlador == "Catalogo" ? "show" : "")" id="menuCatalogo">
-                        <div class="submenu-list">
-                            @foreach (var catalogo in Proyecto_Evo_RRLL.Models.ViewModels.CatalogoNavegacion.Items)
-                            {
-                                <a class="sidebar-sublink @(controlador == "Catalogo" && (ViewContext.RouteData.Values["tabla"]?.ToString() ?? "") == catalogo.Key ? "active" : "")"
-                                   asp-controller="Catalogo" asp-action="Index" asp-route-tabla="@catalogo.Key">
-                                    <span>@catalogo.Value</span>
-                                </a>
-                            }
-                        </div>
-                    </div>
-                </div>
+                    <a class="sidebar-link @(controlador == "SeguridadAdmin" && accion == "Actividad" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Actividad">
+                        <i class="bi bi-journal-check"></i><span>Bitácora de actividad</span>
+                    </a>
+                }
             </nav>
-            <div class="sidebar-footer">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="brand-logo small"><i class="bi bi-shield-check"></i></div>
-                    <div class="small lh-sm">
-                        <div class="fw-semibold">RRHH</div>
-                        <div class="text-secondary">Sistema de RR.HH.</div>
-                    </div>
-                </div>
-            </div>
+            <div class="sidebar-footer">Sesión de @nombreUsuario</div>
         </aside>
         <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
         <header class="topbar">
             <div class="d-flex align-items-center gap-3 w-100">
-                <button class="btn btn-link d-lg-none p-0 text-body" type="button" id="btnMenu" aria-label="Abrir menú">
-                    <i class="bi bi-list fs-2"></i>
+                <button class="icon-btn d-lg-none" type="button" id="btnMenu" aria-label="Abrir menú" aria-controls="sidebar">
+                    <i class="bi bi-list fs-5"></i>
                 </button>
-                <div class="flex-grow-1 d-none d-md-block page-title">@ViewData["Title"]</div>
+                <h1 class="page-title flex-grow-1 text-truncate">@ViewData["Title"]</h1>
                 <div class="d-flex align-items-center gap-2 ms-auto">
-                    <form class="d-flex me-2 d-none d-lg-inline-flex" role="search" onsubmit="return false;">
-                        <div class="input-group search-box">
-                            <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input id="siteSearch" type="search" class="form-control" placeholder="Buscar en esta página..." aria-label="Buscar en esta página" />
+                    <form class="d-none d-lg-block" role="search" onsubmit="return false;">
+                        <div class="search-box">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            <input id="siteSearch" type="search" class="form-control" placeholder="Filtrar esta página" aria-label="Filtrar esta página" aria-keyshortcuts="/" />
+                            <kbd aria-hidden="true">/</kbd>
                         </div>
                     </form>
-                    <button id="themeToggle" class="icon-btn" type="button" aria-label="Cambiar tema" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cambiar tema">
-                        <i id="themeIcon" class="bi bi-moon-stars"></i>
+                    <button id="themeToggle" class="icon-btn" type="button" aria-label="Cambiar a tema oscuro" title="Cambiar tema">
+                        <i id="themeIcon" class="bi bi-moon"></i>
                     </button>
                     <div class="dropdown">
-                        <button class="user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Mi cuenta">
+                        <button class="user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Mi cuenta">
                             <span class="user-avatar">@inicialesUsuario</span>
-                            <span class="d-none d-sm-inline">@User.Identity?.Name</span>
+                            <span class="d-none d-sm-inline">@nombreUsuario</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <ul class="dropdown-menu dropdown-menu-end">
                             <li>
                                 <form asp-controller="Seguridad" asp-action="CerrarSesion" method="post">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</button>
+                                    <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</button>
                                 </form>
                             </li>
                         </ul>
@@ -159,77 +161,81 @@
             </div>
         </header>
     }
-    else
-    {
-        <nav class="navbar navbar-dark bg-primary shadow-sm auth-navbar">
-            <div class="container">
-                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
-                    <span class="brand-logo"><i class="bi bi-person-badge-fill"></i></span>
-                    RRHH
-                </a>
-                <button id="themeToggle" class="btn btn-outline-light btn-sm" type="button" aria-label="Cambiar tema">
-                    <i id="themeIcon" class="bi bi-moon-stars"></i>
-                </button>
-            </div>
-        </nav>
-    }
 
     <main id="contenido" role="main" class="main-content @(User.Identity?.IsAuthenticated == true ? "" : "no-topbar")">
-        <div class="container-fluid py-4 px-3 px-md-4">
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <nav aria-label="breadcrumb" class="breadcrumb-bar">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
-                    </ol>
-                </nav>
-            }
-            @if (TempData["MensajeExito"] is string exito)
-            {
-                <div class="alert alert-success alert-dismissible fade show alert-auto shadow-sm" role="alert">
-                    <i class="bi bi-check-circle me-2"></i>@exito
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>
-            }
-            @if (TempData["MensajeError"] is string error)
-            {
-                <div class="alert alert-danger alert-dismissible fade show alert-auto shadow-sm" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>@error
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>
-            }
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="container-fluid py-4 px-3 px-md-4">
+                @if (ViewData["Title"]?.ToString() != "Inicio")
+                {
+                    <nav aria-label="Ruta" class="breadcrumb-bar">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+                        </ol>
+                    </nav>
+                }
+                @await Html.PartialAsync("_Avisos")
+                @RenderBody()
+            </div>
+        }
+        else if (ViewData["PantallaCompleta"] is true)
+        {
             @RenderBody()
-        </div>
+        }
+        else
+        {
+            <div class="container py-5">
+                @await Html.PartialAsync("_Avisos")
+                @RenderBody()
+            </div>
+        }
     </main>
 
-    <footer class="footer">
-        <div class="container d-flex justify-content-between flex-wrap gap-2">
-            <span class="small">RRHH &copy; @DateTime.Now.Year</span>
-            <span class="d-flex gap-3 small">
-                <a asp-controller="Home" asp-action="Ayuda" class="link-body-emphasis text-decoration-none">
-                    <i class="bi bi-question-circle me-1"></i>Ayuda
-                </a>
-                <a asp-controller="Home" asp-action="Privacidad" class="link-body-emphasis text-decoration-none">
-                    <i class="bi bi-shield-lock me-1"></i>Política de privacidad
-                </a>
-            </span>
-            <span class="small">Última actualización: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
-        </div>
-    </footer>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <footer class="footer">
+            <div class="container-fluid px-3 px-md-4 d-flex justify-content-between flex-wrap gap-2">
+                <span>RRHH &copy; @DateTime.Now.Year</span>
+                <span class="d-flex gap-3">
+                    <a asp-controller="Home" asp-action="Ayuda"><i class="bi bi-question-circle me-1"></i>Ayuda</a>
+                    <a asp-controller="Home" asp-action="Privacidad"><i class="bi bi-shield-lock me-1"></i>Privacidad</a>
+                </span>
+            </div>
+        </footer>
+
+        <button id="backToTop" type="button" class="btn btn-primary back-to-top" aria-label="Volver arriba">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+    }
 
     <div class="toast-container position-fixed bottom-0 end-0 p-3 evo-toasts" id="toastHost" aria-live="polite" aria-atomic="true"></div>
 
-    <div id="cookieBanner" class="cookie-banner bg-body-tertiary shadow-lg" role="region" aria-label="Aviso de cookies">
+    <div id="cookieBanner" class="cookie-banner" role="region" aria-label="Aviso de cookies">
         <div class="container py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <p class="mb-0 small"><i class="bi bi-cookie me-1"></i>Este sitio utiliza cookies para recordar tus preferencias (tema oscuro) y sesión. Al continuar navegando aceptas su uso.</p>
-            <button id="cookieAccept" type="button" class="btn btn-primary btn-sm">Aceptar</button>
+            <p class="mb-0 small">Usamos cookies para mantener tu sesión y recordar si prefieres el tema claro u oscuro.</p>
+            <button id="cookieAccept" type="button" class="btn btn-primary btn-sm">Entendido</button>
         </div>
     </div>
 
-    <button id="backToTop" type="button" class="btn btn-primary back-to-top" aria-label="Volver arriba">
-        <i class="bi bi-arrow-up"></i>
-    </button>
+    @* Confirmacion de acciones destructivas: los formularios con data-confirmar la usan en lugar de confirm() *@
+    <div class="modal fade modal-confirmar" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:420px">
+            <div class="modal-content">
+                <div class="modal-body d-flex gap-3">
+                    <span class="icono-alerta" aria-hidden="true"><i class="bi bi-trash3"></i></span>
+                    <div>
+                        <h2 class="modal-title mb-1" id="modalConfirmarTitulo">¿Eliminar el registro?</h2>
+                        <p class="mb-0 text-secondary small">Esta acción no se puede deshacer.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="modalConfirmarAceptar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="loadingSpinner" class="loading-spinner" aria-hidden="true">
         <div class="spinner-border text-light" role="status">

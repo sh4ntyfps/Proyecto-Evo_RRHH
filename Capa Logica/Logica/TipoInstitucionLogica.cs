@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class TipoInstitucionLogica : LogicaBase<TipoInstitucion>
 {
-    private readonly TipoInstitucionData _data;
+    private readonly IRepositorio<TipoInstitucion> _data;
 
-    public TipoInstitucionLogica(TipoInstitucionData data) : base(data) => _data = data;
+    public TipoInstitucionLogica(IRepositorio<TipoInstitucion> data) : base(data) => _data = data;
 
-    public async Task<TipoInstitucion?> Obtener(int IdTipoInstitucionParam) => await _data.Obtener(IdTipoInstitucionParam);
+    public async Task<TipoInstitucion?> Obtener(int idTipoInstitucion) => await _data.Obtener(idTipoInstitucion);
 }

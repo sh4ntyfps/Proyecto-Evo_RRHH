@@ -52,7 +52,7 @@
                     <td>@h.FechaRegistro?.ToString("dd/MM/yyyy")</td>
                     <td>
                         <a asp-action="HorarioTemporalEditar" asp-route-idEmpleado="@h.idEmpleado" asp-route-n="@h.N" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                        <form asp-action="HorarioTemporalEliminar" asp-route-idEmpleado="@h.idEmpleado" asp-route-n="@h.N" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este horario?');">
+                        <form asp-action="HorarioTemporalEliminar" asp-route-idEmpleado="@h.idEmpleado" asp-route-n="@h.N" method="post" class="d-inline" data-confirmar="¿Eliminar este horario?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

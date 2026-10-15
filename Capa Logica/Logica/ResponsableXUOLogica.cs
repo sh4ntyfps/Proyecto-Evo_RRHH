@@ -1,18 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class ResponsableXUOLogica : LogicaBase<ResponsableXUO>
 {
-    private readonly ResponsableXUOData _data;
+    private readonly IRepositorio<ResponsableXUO> _data;
 
-    public ResponsableXUOLogica(ResponsableXUOData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public ResponsableXUOLogica(IRepositorio<ResponsableXUO> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<ResponsableXUO?> Obtener(int IdResponsableParam) => await _data.Obtener(IdResponsableParam);
-
-    public Task CrearConNuevoId(ResponsableXUO registro) =>
-        CrearNumerado(registro, x => x.IdResponsable, id => registro.IdResponsable = id);
-
-    public Task<bool> Registrar(ResponsableXUO registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<ResponsableXUO?> Obtener(int idResponsable) => await _data.Obtener(idResponsable);
 }

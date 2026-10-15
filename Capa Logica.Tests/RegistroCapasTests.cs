@@ -1,4 +1,5 @@
 using Capa_Datos;
+using Capa_Entidades.Contratos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,14 +15,19 @@ public class RegistroCapasTests
             .Where(t => typeof(Controller).IsAssignableFrom(t) && !t.IsAbstract)
             .Select(t => new object[] { t.Name });
 
+    private static ServiceCollection ServiciosCompletos()
+    {
+        var servicios = new ServiceCollection();
+        servicios.AgregarCapaDatos(o => o.UseSqlite("DataSource=:memory:"));
+        servicios.AgregarServiciosDeAplicacion();
+        return servicios;
+    }
+
     [Theory]
     [MemberData(nameof(Controladores))]
     public void Todas_las_dependencias_del_controlador_estan_registradas(string controlador)
     {
-        var servicios = new ServiceCollection();
-        servicios.AddDbContext<EvoRRLDbContext>(o => o.UseSqlite("DataSource=:memory:"));
-        servicios.AgregarServiciosDeAplicacion();
-        using var proveedor = servicios.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true });
+        using var proveedor = ServiciosCompletos().BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true });
         using var alcance = proveedor.CreateScope();
 
         var tipo = typeof(RegistroCapas).Assembly.GetTypes().Single(t => t.Name == controlador);
@@ -32,9 +38,11 @@ public class RegistroCapasTests
     [Fact]
     public void Registra_todas_las_clases_de_datos_y_de_logica()
     {
-        var servicios = new ServiceCollection().AgregarServiciosDeAplicacion();
+        var servicios = ServiciosCompletos();
 
-        Assert.Equal(77, servicios.Count(s => s.ImplementationType?.Name.EndsWith("Data") == true));
-        Assert.Equal(77, servicios.Count(s => s.ImplementationType?.Name.EndsWith("Logica") == true));
+        // 76 repositorios genericos + bitacora + catalogo, cada uno por los contratos que implementa.
+        Assert.Equal(78, servicios.Where(s => s.ServiceType.Namespace == typeof(IRepositorio<>).Namespace
+            && s.ServiceType != typeof(IUnidadDeTrabajo)).Select(s => s.ImplementationType).Distinct().Count());
+        Assert.Equal(79, servicios.Count(s => s.ImplementationType?.Name.EndsWith("Logica") == true));
     }
 }

@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class FamiliaLogica : LogicaBase<Familia>
 {
-    private readonly FamiliaData _data;
+    private readonly IRepositorio<Familia> _data;
 
-    public FamiliaLogica(FamiliaData data) : base(data) => _data = data;
+    public FamiliaLogica(IRepositorio<Familia> data) : base(data) => _data = data;
 
-    public async Task<Familia?> Obtener(string IdFamiliaParam, string IdClaseParam, string IdGrupoParam) => await _data.Obtener(IdFamiliaParam, IdClaseParam, IdGrupoParam);
+    public async Task<Familia?> Obtener(string idFamilia, string idClase, string idGrupo) => await _data.Obtener(idFamilia, idClase, idGrupo);
 }

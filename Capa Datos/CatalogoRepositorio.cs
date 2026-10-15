@@ -1,36 +1,21 @@
 using System.Globalization;
 using System.Reflection;
 using Capa_Entidades;
+using Capa_Entidades.Contratos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Capa_Datos;
 
-public record CatalogoColumna(string Nombre, string Tipo, bool EsClave, bool EsArchivo);
-
-public class CatalogoRepositorio
+// Implementa el mantenimiento generico de catalogos sobre el modelo de EF.
+// Que catalogos se pueden editar lo decide la Capa Logica (CatalogoLogica).
+public class CatalogoRepositorio : ICatalogoRepositorio
 {
-    private static readonly string[] Editable =
-    {
-        "Cargo", "MotivoBaja", "EstadoCivil", "TipoDocID", "TipoTrabajador",
-        "TipoSangre", "Nacionalidad", "RegimenPension", "ViveCon", "TipoPermiso",
-        "Motivo_Perm", "TipoEstudio", "TipoInstitucion", "Discapacidad",
-        "Limitacion", "TipoComportamiento", "TipoResolucion", "Familia",
-        "TipoFamiliar", "RRHH_TipoFamilia", "RRHH_RelacPareja", "RRHH_RelacPH",
-        "RRHH_RelacHermano", "AFP", "AguaViv", "AlumbradoViv", "ConservacionViv",
-        "ExcretasViv", "MaterialViv", "TenenciaViv", "TipoViv", "UbicacionViv",
-        "RRHH_AcudeEnferm", "TipoMoneda", "TipoRecurso", "UnidadMedida", "Horario"
-    };
-
     private readonly EvoRRLDbContext _contexto;
 
     public CatalogoRepositorio(EvoRRLDbContext contexto) => _contexto = contexto;
 
-    public static bool EsEditable(string tabla) => Editable.Contains(tabla);
-
-    public static IEnumerable<string> CatalogoEditable() => Editable;
-
-    public Type ObtenerTipo(string tabla)
+    private Type ObtenerTipo(string tabla)
     {
         var tipo = typeof(Empleado).Assembly.GetType($"Capa_Entidades.{tabla}")
             ?? throw new InvalidOperationException($"No existe la entidad {tabla}");
@@ -73,9 +58,6 @@ public class CatalogoRepositorio
 
     public async Task Crear(string tabla, IReadOnlyDictionary<string, string> datos)
     {
-        if (!EsEditable(tabla))
-            throw new InvalidOperationException($"El catálogo {tabla} no es editable.");
-
         var tipo = ObtenerTipo(tabla);
         var entidad = Activator.CreateInstance(tipo)!;
         AplicarValores(tipo, entidad, datos);
@@ -85,9 +67,6 @@ public class CatalogoRepositorio
 
     public async Task Actualizar(string tabla, string[] ids, IReadOnlyDictionary<string, string> datos)
     {
-        if (!EsEditable(tabla))
-            throw new InvalidOperationException($"El catálogo {tabla} no es editable.");
-
         var tipo = ObtenerTipo(tabla);
         var actual = await ObtenerEntidadAsync(tipo, ConvertirClaves(tipo, ids))
             ?? throw new InvalidOperationException("Registro no encontrado");
@@ -97,9 +76,6 @@ public class CatalogoRepositorio
 
     public async Task Eliminar(string tabla, string[] ids)
     {
-        if (!EsEditable(tabla))
-            throw new InvalidOperationException($"El catálogo {tabla} no es editable.");
-
         var tipo = ObtenerTipo(tabla);
         var actual = await ObtenerEntidadAsync(tipo, ConvertirClaves(tipo, ids))
             ?? throw new InvalidOperationException("Registro no encontrado");

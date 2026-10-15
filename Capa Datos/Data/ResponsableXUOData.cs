@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class ResponsableXUOData : RepositorioBase<ResponsableXUO>
 {
     public ResponsableXUOData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<ResponsableXUO?> Obtener(int IdResponsableParam) => ObtenerPorClave(IdResponsableParam);
 }

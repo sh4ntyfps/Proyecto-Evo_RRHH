@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class Rol_AccesoLogica : LogicaBase<Rol_Acceso>
 {
-    private readonly Rol_AccesoData _data;
+    private readonly IRepositorio<Rol_Acceso> _data;
 
-    public Rol_AccesoLogica(Rol_AccesoData data) : base(data) => _data = data;
+    public Rol_AccesoLogica(IRepositorio<Rol_Acceso> data) : base(data) => _data = data;
 
-    public async Task<Rol_Acceso?> Obtener(int IdRolParam, string IdSistemaOpcionParam) => await _data.Obtener(IdRolParam, IdSistemaOpcionParam);
+    public async Task<Rol_Acceso?> Obtener(int idRol, string idSistemaOpcion) => await _data.Obtener(idRol, idSistemaOpcion);
 }

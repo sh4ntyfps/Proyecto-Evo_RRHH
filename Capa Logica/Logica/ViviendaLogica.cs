@@ -1,18 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class ViviendaLogica : LogicaBase<Vivienda>
 {
-    private readonly ViviendaData _data;
+    private readonly IRepositorio<Vivienda> _data;
 
-    public ViviendaLogica(ViviendaData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public ViviendaLogica(IRepositorio<Vivienda> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<Vivienda?> Obtener(int IdViviendaParam) => await _data.Obtener(IdViviendaParam);
-
-    public Task CrearConNuevoId(Vivienda registro) =>
-        CrearNumerado(registro, x => x.IdVivienda, id => registro.IdVivienda = id);
-
-    public Task<bool> Registrar(Vivienda registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<Vivienda?> Obtener(int idVivienda) => await _data.Obtener(idVivienda);
 }

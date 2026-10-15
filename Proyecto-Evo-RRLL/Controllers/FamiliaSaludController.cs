@@ -1,5 +1,4 @@
 using Capa_Logica;
-using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +27,7 @@ public class FamiliaSaludController : Controller
     private readonly EstadoCivilLogica _estadoCivilLogica;
     private readonly TipoSangreLogica _tipoSangreLogica;
     private readonly DiscapacidadLogica _discapacidadLogica;
-    private readonly SecuenciaService _secuencia;
+    private readonly FichaSocialLogica _fichaSocialLogica;
     private readonly EmpleadoServicio _empleados;
 
     public FamiliaSaludController(
@@ -49,7 +48,7 @@ public class FamiliaSaludController : Controller
         EstadoCivilLogica estadoCivilLogica,
         TipoSangreLogica tipoSangreLogica,
         DiscapacidadLogica discapacidadLogica,
-        SecuenciaService secuencia,
+        FichaSocialLogica fichaSocialLogica,
         EmpleadoServicio empleados)
     {
         _empleadoLogica = empleadoLogica;
@@ -69,7 +68,7 @@ public class FamiliaSaludController : Controller
         _estadoCivilLogica = estadoCivilLogica;
         _tipoSangreLogica = tipoSangreLogica;
         _discapacidadLogica = discapacidadLogica;
-        _secuencia = secuencia;
+        _fichaSocialLogica = fichaSocialLogica;
         _empleados = empleados;
     }
 
@@ -220,44 +219,7 @@ public class FamiliaSaludController : Controller
     {
         var idEmpleado = modelo.IdEmpleado;
 
-        var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
-        {
-            var dinamicaActual = (await _dinamicaLogica.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
-            if (dinamicaActual is null)
-            {
-                modelo.Dinamica.IdEmpleado = idEmpleado;
-                await _dinamicaLogica.CrearConNuevoId(modelo.Dinamica);
-            }
-            else
-            {
-                CopiarDinamica(dinamicaActual, modelo.Dinamica);
-                await _dinamicaLogica.Actualizar(dinamicaActual);
-            }
-
-            var aspSocioActual = (await _aspSocioLogica.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
-            if (aspSocioActual is null)
-            {
-                modelo.AspSocio.IdEmpleado = idEmpleado;
-                await _aspSocioLogica.CrearConNuevoId(modelo.AspSocio);
-            }
-            else
-            {
-                CopiarAspSocio(aspSocioActual, modelo.AspSocio);
-                await _aspSocioLogica.Actualizar(aspSocioActual);
-            }
-
-            var funcFamActual = (await _funcFamLogica.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
-            if (funcFamActual is null)
-            {
-                modelo.FuncFam.IdEmpleado = idEmpleado;
-                await _funcFamLogica.CrearConNuevoId(modelo.FuncFam);
-            }
-            else
-            {
-                CopiarFuncFam(funcFamActual, modelo.FuncFam);
-                await _funcFamLogica.Actualizar(funcFamActual);
-            }
-        });
+        var guardo = await _fichaSocialLogica.Guardar(idEmpleado, modelo.Dinamica, modelo.AspSocio, modelo.FuncFam);
 
         if (!guardo)
             TempData["MensajeError"] = "No se pudo guardar la ficha social: intente nuevamente.";
@@ -366,37 +328,4 @@ public class FamiliaSaludController : Controller
 
     private async Task<string?> NombreEmpleadoAsync(int idEmpleado)
         => await _empleados.NombreEmpleadoAsync(idEmpleado);
-
-    private static void CopiarDinamica(RRHH_DinamicaFamiliar destino, RRHH_DinamicaFamiliar origen)
-    {
-        destino.idTipoFam = origen.idTipoFam;
-        destino.idRelaPareja = origen.idRelaPareja;
-        destino.idRelaPH = origen.idRelaPH;
-        destino.idRelacHermano = origen.idRelacHermano;
-        destino.Observacion = origen.Observacion;
-    }
-
-    private static void CopiarAspSocio(RRHH_AspSocio destino, RRHH_AspSocio origen)
-    {
-        destino.idPregunta1 = origen.idPregunta1;
-        destino.idPregunta2 = origen.idPregunta2;
-        destino.idPregunta3 = origen.idPregunta3;
-        destino.PrincipProblemas = origen.PrincipProblemas;
-        destino.PropMejoraInstitu = origen.PropMejoraInstitu;
-        destino.hobby = origen.hobby;
-        destino.ActRecreaInstitu = origen.ActRecreaInstitu;
-    }
-
-    private static void CopiarFuncFam(RRHH_FuncFam destino, RRHH_FuncFam origen)
-    {
-        destino.Com1 = origen.Com1;
-        destino.Com2 = origen.Com2;
-        destino.Afec1 = origen.Afec1;
-        destino.Afec2 = origen.Afec2;
-        destino.Decis1 = origen.Decis1;
-        destino.Decis2 = origen.Decis2;
-        destino.Soc1 = origen.Soc1;
-        destino.Soc2 = origen.Soc2;
-        destino.Soc3 = origen.Soc3;
-    }
 }

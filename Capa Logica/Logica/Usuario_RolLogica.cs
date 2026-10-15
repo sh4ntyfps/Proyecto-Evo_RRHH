@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class Usuario_RolLogica : LogicaBase<Usuario_Rol>
 {
-    private readonly Usuario_RolData _data;
+    private readonly IRepositorio<Usuario_Rol> _data;
 
-    public Usuario_RolLogica(Usuario_RolData data) : base(data) => _data = data;
+    public Usuario_RolLogica(IRepositorio<Usuario_Rol> data) : base(data) => _data = data;
 
-    public async Task<Usuario_Rol?> Obtener(int IdUsuarioParam, int IdRolParam) => await _data.Obtener(IdUsuarioParam, IdRolParam);
+    public async Task<Usuario_Rol?> Obtener(int idUsuario, int idRol) => await _data.Obtener(idUsuario, idRol);
 }

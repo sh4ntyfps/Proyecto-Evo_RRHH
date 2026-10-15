@@ -31,7 +31,7 @@
                     <td>
                         <a asp-action="InstitucionEditar" asp-route-id="@i.IdInstitucion" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
                         <form asp-action="InstitucionEliminar" asp-route-id="@i.IdInstitucion" method="post" class="d-inline"
-                              onsubmit="return confirm('¿Eliminar esta institución?');">
+                              data-confirmar="¿Eliminar esta institución?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

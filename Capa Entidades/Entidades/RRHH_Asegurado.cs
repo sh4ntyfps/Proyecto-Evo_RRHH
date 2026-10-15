@@ -1,14 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("RRHH_Asegurado")]
     public class RRHH_Asegurado
     {
-    [Key]
     public int idEmpleado { get; set; }
-    [Key]
     public int NroBeneficiario { get; set; }
     public int? idPersona { get; set; }
     public int? idEstadoCivil { get; set; }

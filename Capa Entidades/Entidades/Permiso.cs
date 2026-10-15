@@ -1,14 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("Permiso")]
     public class Permiso
     {
-    [Key]
     public int IdEmpleado { get; set; }
-    [Key]
     public int NPermiso { get; set; }
     public DateTime? FechaInicio { get; set; }
     public DateTime? FechaFin { get; set; }

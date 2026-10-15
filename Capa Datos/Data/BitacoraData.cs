@@ -1,27 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Capa_Entidades;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Datos;
 
-public class BitacoraData
+public class BitacoraData : IBitacoraRepositorio
 {
     private readonly EvoRRLDbContext _contexto;
 
     public BitacoraData(EvoRRLDbContext contexto) => _contexto = contexto;
 
     // Registro tolerante: si la tabla aun no existe en la BD, no se rompe la operacion principal.
-    public async Task Registrar(string usuario, string accion, string entidad, string? detalle = null)
+    public async Task Registrar(Bitacora registro)
     {
         try
         {
-            _contexto.Set<Bitacora>().Add(new Bitacora
-            {
-                Fecha = DateTime.Now,
-                Usuario = usuario,
-                Accion = accion,
-                Entidad = entidad,
-                Detalle = detalle
-            });
+            _contexto.Set<Bitacora>().Add(registro);
             await _contexto.SaveChangesAsync();
         }
         catch

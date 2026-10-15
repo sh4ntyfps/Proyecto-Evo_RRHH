@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class TipoSangreLogica : LogicaBase<TipoSangre>
 {
-    private readonly TipoSangreData _data;
+    private readonly IRepositorio<TipoSangre> _data;
 
-    public TipoSangreLogica(TipoSangreData data) : base(data) => _data = data;
+    public TipoSangreLogica(IRepositorio<TipoSangre> data) : base(data) => _data = data;
 
-    public async Task<TipoSangre?> Obtener(int IdTipoSangreParam) => await _data.Obtener(IdTipoSangreParam);
+    public async Task<TipoSangre?> Obtener(int idTipoSangre) => await _data.Obtener(idTipoSangre);
 }

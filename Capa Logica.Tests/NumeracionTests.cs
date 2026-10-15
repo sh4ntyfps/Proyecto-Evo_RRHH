@@ -11,7 +11,7 @@ public class NumeracionTests
     public async Task Tabla_vacia_empieza_en_1()
     {
         using var bd = new BaseDatosPrueba();
-        var logica = new RRHH_FeriadoLogica(new RRHH_FeriadoData(bd.Contexto), new SecuenciaService(bd.Contexto));
+        var logica = new RRHH_FeriadoLogica(new RRHH_FeriadoData(bd.Contexto), new UnidadDeTrabajo(bd.Contexto));
 
         var feriado = new RRHH_Feriado { Motivo = "Año nuevo" };
         Assert.True(await logica.Registrar(feriado));
@@ -24,7 +24,7 @@ public class NumeracionTests
     {
         using var bd = new BaseDatosPrueba();
         await bd.SembrarAsync(new RRHH_Feriado { idFeriado = 3 }, new RRHH_Feriado { idFeriado = 8 });
-        var logica = new RRHH_FeriadoLogica(new RRHH_FeriadoData(bd.Contexto), new SecuenciaService(bd.Contexto));
+        var logica = new RRHH_FeriadoLogica(new RRHH_FeriadoData(bd.Contexto), new UnidadDeTrabajo(bd.Contexto));
 
         var feriado = new RRHH_Feriado();
         await logica.Registrar(feriado);
@@ -40,7 +40,7 @@ public class NumeracionTests
             new Permiso { IdEmpleado = 1, NPermiso = 1 },
             new Permiso { IdEmpleado = 1, NPermiso = 2 },
             new Permiso { IdEmpleado = 2, NPermiso = 15 });
-        var logica = new PermisoLogica(new PermisoData(bd.Contexto), new SecuenciaService(bd.Contexto));
+        var logica = new PermisoLogica(new PermisoData(bd.Contexto), new UnidadDeTrabajo(bd.Contexto));
 
         var delEmpleado1 = new Permiso { IdEmpleado = 1 };
         var delEmpleado3 = new Permiso { IdEmpleado = 3 };
@@ -58,7 +58,7 @@ public class NumeracionTests
         await bd.SembrarAsync(
             new EstructOrganiz { Year = 2024, idAreaOrganiz = 40, AreaOrganizacional = "A", Abrev = "A", Sigla = "A" },
             new EstructOrganiz { Year = 2025, idAreaOrganiz = 5, AreaOrganizacional = "B", Abrev = "B", Sigla = "B" });
-        var logica = new EstructOrganizLogica(new EstructOrganizData(bd.Contexto), new SecuenciaService(bd.Contexto));
+        var logica = new EstructOrganizLogica(new EstructOrganizData(bd.Contexto), new UnidadDeTrabajo(bd.Contexto));
 
         var area = new EstructOrganiz { Year = 2025, AreaOrganizacional = "C", Abrev = "C", Sigla = "C" };
         await logica.Registrar(area);
@@ -70,11 +70,24 @@ public class NumeracionTests
     public async Task El_registro_numerado_queda_guardado()
     {
         using var bd = new BaseDatosPrueba();
-        var logica = new PermisoLogica(new PermisoData(bd.Contexto), new SecuenciaService(bd.Contexto));
+        var logica = new PermisoLogica(new PermisoData(bd.Contexto), new UnidadDeTrabajo(bd.Contexto));
 
         await logica.Registrar(new Permiso { IdEmpleado = 4, Obs = "cita medica" });
 
         Assert.Equal("cita medica", (await logica.Obtener(4, 1))?.Obs);
+    }
+
+    [Fact]
+    public async Task Crear_tambien_numera_porque_la_clave_la_genera_la_capa_de_datos()
+    {
+        using var bd = new BaseDatosPrueba();
+        await bd.SembrarAsync(new RRHH_Asegurado { idEmpleado = 7, NroBeneficiario = 2 });
+        var logica = new RRHH_AseguradoLogica(new RRHH_AseguradoData(bd.Contexto), new UnidadDeTrabajo(bd.Contexto));
+
+        var asegurado = new RRHH_Asegurado { idEmpleado = 7 };
+        await logica.Crear(asegurado);
+
+        Assert.Equal(3, asegurado.NroBeneficiario);
     }
 }
 
@@ -85,9 +98,9 @@ public class AltaEmpleadoTests
     {
         using var bd = new BaseDatosPrueba();
         await bd.SembrarAsync(new Persona { IdPersona = 50 }, new Empleado { IdEmpleado = 300, IdPersona = 50 });
-        var secuencia = new SecuenciaService(bd.Contexto);
-        var personaLogica = new PersonaLogica(new PersonaData(bd.Contexto), secuencia);
-        var logica = new EmpleadoLogica(new EmpleadoData(bd.Contexto), personaLogica, secuencia);
+        var unidad = new UnidadDeTrabajo(bd.Contexto);
+        var personaLogica = new PersonaLogica(new PersonaData(bd.Contexto), unidad);
+        var logica = new EmpleadoLogica(new EmpleadoData(bd.Contexto), personaLogica, unidad);
 
         var persona = new Persona { Nombres = "Luis" };
         var empleado = new Empleado { Estado = " " };
@@ -98,5 +111,24 @@ public class AltaEmpleadoTests
         Assert.Equal(301, empleado.IdEmpleado);
         Assert.Equal(51, empleado.IdPersona);
         Assert.Equal("A", empleado.Estado);
+    }
+}
+
+public class FichaSocialTests
+{
+    [Fact]
+    public async Task Guardar_crea_las_tres_partes_y_luego_las_actualiza()
+    {
+        using var bd = new BaseDatosPrueba();
+        var logica = new FichaSocialLogica(new RRHH_DinamicaFamiliarData(bd.Contexto), new RRHH_AspSocioData(bd.Contexto),
+            new RRHH_FuncFamData(bd.Contexto), new UnidadDeTrabajo(bd.Contexto));
+
+        Assert.True(await logica.Guardar(5, new RRHH_DinamicaFamiliar { Observacion = "primera" }, new RRHH_AspSocio { hobby = "futbol" }, new RRHH_FuncFam()));
+        Assert.True(await logica.Guardar(5, new RRHH_DinamicaFamiliar { Observacion = "segunda" }, new RRHH_AspSocio { hobby = "ajedrez" }, new RRHH_FuncFam()));
+
+        var dinamica = Assert.Single(await new RRHH_DinamicaFamiliarData(bd.Contexto).Listar());
+        Assert.Equal((5, 1, "segunda"), (dinamica.IdEmpleado ?? 0, dinamica.idDinamica, dinamica.Observacion));
+        Assert.Equal("ajedrez", Assert.Single(await new RRHH_AspSocioData(bd.Contexto).Listar()).hobby);
+        Assert.Single(await new RRHH_FuncFamData(bd.Contexto).Listar());
     }
 }

@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class TipoFamiliarLogica : LogicaBase<TipoFamiliar>
 {
-    private readonly TipoFamiliarData _data;
+    private readonly IRepositorio<TipoFamiliar> _data;
 
-    public TipoFamiliarLogica(TipoFamiliarData data) : base(data) => _data = data;
+    public TipoFamiliarLogica(IRepositorio<TipoFamiliar> data) : base(data) => _data = data;
 
-    public async Task<TipoFamiliar?> Obtener(int IdTipoFamParam) => await _data.Obtener(IdTipoFamParam);
+    public async Task<TipoFamiliar?> Obtener(int idTipoFam) => await _data.Obtener(idTipoFam);
 }

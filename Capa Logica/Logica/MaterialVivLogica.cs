@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class MaterialVivLogica : LogicaBase<MaterialViv>
 {
-    private readonly MaterialVivData _data;
+    private readonly IRepositorio<MaterialViv> _data;
 
-    public MaterialVivLogica(MaterialVivData data) : base(data) => _data = data;
+    public MaterialVivLogica(IRepositorio<MaterialViv> data) : base(data) => _data = data;
 
-    public async Task<MaterialViv?> Obtener(int IdMaterialParam) => await _data.Obtener(IdMaterialParam);
+    public async Task<MaterialViv?> Obtener(int idMaterial) => await _data.Obtener(idMaterial);
 }

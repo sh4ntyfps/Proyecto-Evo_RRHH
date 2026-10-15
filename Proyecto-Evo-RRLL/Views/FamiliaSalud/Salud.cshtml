@@ -69,7 +69,7 @@
 @if (!esNuevo)
 {
     <form id="formEliminarSalud" asp-action="EliminarSalud" method="post"
-          onsubmit="return confirm('¿Eliminar el registro de salud?');">
+          data-confirmar="¿Eliminar el registro de salud?">
         @Html.AntiForgeryToken()
         <input type="hidden" name="idEmpleado" value="@ViewBag.IdEmpleado" />
     </form>

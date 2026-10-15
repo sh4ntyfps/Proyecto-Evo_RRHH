@@ -4,7 +4,6 @@
     'use strict';
 
     document.addEventListener('DOMContentLoaded', function () {
-        initSplash();
         initTheme();
         initSearch();
         initDataTables();
@@ -15,18 +14,11 @@
         initToasts();
         initSidebar();
         initTooltips();
+        initAtajos();
+        initFiltroMenu();
+        initConfirmar();
+        initEnvio();
     });
-
-    /* ---------- Splash de carga ---------- */
-    function initSplash() {
-        var splash = document.getElementById('splashLoader');
-        if (!splash) return;
-        var ocultar = function () { splash.classList.add('hidden'); };
-        if (document.readyState === 'complete') setTimeout(ocultar, 600);
-        else window.addEventListener('load', function () { setTimeout(ocultar, 600); });
-        // Respaldo por si 'load' tarda demasiado
-        setTimeout(ocultar, 3000);
-    }
 
     /* ---------- Modo oscuro ---------- */
     function initTheme() {
@@ -48,7 +40,8 @@
             root.setAttribute('data-bs-theme', t);
             try { localStorage.setItem(STORE, t); } catch (e) { }
             var icono = document.getElementById('themeIcon');
-            if (icono) icono.className = t === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+            if (icono) icono.className = t === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
+            toggle.setAttribute('aria-label', t === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
             // Avisa a quien lo necesite (p. ej. los gráficos del dashboard) para recolorear sin recargar
             document.dispatchEvent(new CustomEvent('evo:theme', { detail: { tema: t } }));
         }
@@ -356,13 +349,14 @@
         var delay = delayPersonalizado || (tipo === 'danger' ? 6000 : 3500);
 
         var el = document.createElement('div');
-        el.className = 'toast';
+        el.className = 'toast toast-' + tipo;
         el.setAttribute('role', 'status');
         el.innerHTML =
             '<div class="d-flex">' +
-            '  <div class="toast-body"><i class="bi ' + (iconos[tipo] || iconos.info) + ' me-2 ' + (tintas[tipo] || tintas.info) + '"></i>' + mensaje + '</div>' +
+            '  <div class="toast-body"><i class="bi ' + (iconos[tipo] || iconos.info) + ' me-2 ' + (tintas[tipo] || tintas.info) + '"></i><span></span></div>' +
             '  <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>' +
             '</div>';
+        el.querySelector('.toast-body span').textContent = mensaje;   // texto plano, nunca HTML
         host.appendChild(el);
         if (window.bootstrap && window.bootstrap.Toast) {
             var t = new window.bootstrap.Toast(el, { delay: delay });
@@ -390,6 +384,9 @@
         }
         btn.addEventListener('click', abrir);
         backdrop.addEventListener('click', cerrar);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) { cerrar(); btn.focus(); }
+        });
         // Cierra al navegar (click en enlace del sidebar) en móvil
         sidebar.querySelectorAll('a.sidebar-link, a.sidebar-sublink').forEach(function (enlace) {
             enlace.addEventListener('click', function () {
@@ -402,6 +399,117 @@
     function initTooltips() {
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
             bootstrap.Tooltip.getOrCreateInstance(el);
+        });
+    }
+
+    /* ---------- Atajos de teclado: "/" busca en la pagina, Esc limpia ---------- */
+    function initAtajos() {
+        var input = document.getElementById('siteSearch');
+        if (!input) return;
+        document.addEventListener('keydown', function (e) {
+            var enCampo = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+            if (e.key === '/' && !enCampo && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                e.preventDefault();
+                input.focus();
+                input.select();
+            }
+        });
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && input.value) {
+                input.value = '';
+                input.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+
+    /* ---------- Filtro de las tablas maestras en el menu ---------- */
+    function initFiltroMenu() {
+        document.querySelectorAll('[data-filtro-menu]').forEach(function (lista) {
+            var input = lista.querySelector('.submenu-filtro');
+            var vacio = lista.querySelector('.submenu-vacio');
+            var enlaces = lista.querySelectorAll('.sidebar-sublink');
+            if (!input) return;
+            input.addEventListener('input', function () {
+                var termino = input.value.trim().toLowerCase();
+                var visibles = 0;
+                enlaces.forEach(function (a) {
+                    var coincide = a.textContent.toLowerCase().indexOf(termino) !== -1;
+                    a.hidden = !coincide;
+                    if (coincide) visibles++;
+                });
+                if (vacio) vacio.hidden = visibles > 0;
+            });
+            // Enter abre la primera tabla que coincide
+            input.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter') return;
+                var primero = Array.prototype.find.call(enlaces, function (a) { return !a.hidden; });
+                if (primero) { e.preventDefault(); primero.click(); }
+            });
+        });
+    }
+
+    /* ---------- Confirmacion de borrados en un dialogo propio ---------- */
+    function initConfirmar() {
+        var modalEl = document.getElementById('modalConfirmar');
+        if (!modalEl || !window.bootstrap) return;
+        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        var titulo = document.getElementById('modalConfirmarTitulo');
+        var aceptar = document.getElementById('modalConfirmarAceptar');
+        var pendiente = null;
+
+        document.addEventListener('submit', function (e) {
+            var form = e.target;
+            if (!form.matches || !form.matches('form[data-confirmar]')) return;
+            if (form.dataset.confirmado === 'si') return;   // ya confirmado: se envia
+            e.preventDefault();
+            pendiente = form;
+            titulo.textContent = form.getAttribute('data-confirmar');
+            aceptar.textContent = form.getAttribute('data-confirmar-accion') || 'Eliminar';
+            modal.show();
+        }, true);
+
+        aceptar.addEventListener('click', function () {
+            if (!pendiente) return;
+            var form = pendiente;
+            pendiente = null;
+            form.dataset.confirmado = 'si';
+            modal.hide();
+            if (form.requestSubmit) form.requestSubmit(); else form.submit();
+        });
+
+        // El foco va a "Cancelar": borrar nunca es la accion por defecto
+        modalEl.addEventListener('shown.bs.modal', function () {
+            var cancelar = modalEl.querySelector('[data-bs-dismiss="modal"]');
+            if (cancelar) cancelar.focus();
+        });
+    }
+
+    /* ---------- Envio de formularios: evita el doble clic y muestra que se esta guardando ---------- */
+    function initEnvio() {
+        document.addEventListener('submit', function (e) {
+            var form = e.target;
+            if (e.defaultPrevented || !form.matches || (form.method || '').toLowerCase() !== 'post') return;
+            // Si la validacion del cliente rechaza el formulario, no se bloquea el boton
+            if (window.jQuery && jQuery(form).data('validator') && !jQuery(form).valid()) return;
+            var boton = e.submitter || form.querySelector('[type="submit"]');
+            if (!boton || boton.classList.contains('is-busy')) return;
+            boton.classList.add('is-busy');
+            boton.setAttribute('aria-disabled', 'true');
+            var esPrincipal = boton.classList.contains('btn') && !boton.classList.contains('btn-sm');
+            if (esPrincipal) {
+                boton.dataset.textoOriginal = boton.innerHTML;
+                boton.innerHTML = '<span class="spinner-border me-2" aria-hidden="true"></span>' +
+                    (form.dataset.enviando || (form.dataset.confirmar ? 'Eliminando…' : 'Guardando…'));
+            }
+        });
+        // Al volver con "atras" el navegador restaura la pagina: se reactivan los botones
+        window.addEventListener('pageshow', function () {
+            document.querySelectorAll('.is-busy').forEach(function (b) {
+                b.classList.remove('is-busy');
+                b.removeAttribute('aria-disabled');
+                if (b.dataset.textoOriginal) b.innerHTML = b.dataset.textoOriginal;
+            });
+            document.querySelectorAll('form[data-confirmado]').forEach(function (f) { delete f.dataset.confirmado; });
         });
     }
 

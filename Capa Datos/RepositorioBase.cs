@@ -1,39 +1,45 @@
-using System.Linq.Expressions;
+using Capa_Entidades.Contratos;
 using Microsoft.EntityFrameworkCore;
 
 namespace Capa_Datos;
 
 // CRUD comun a todas las tablas: cada clase *Data hereda de aqui y solo declara lo propio (DRY).
-public abstract class RepositorioBase<T> where T : class
+public abstract class RepositorioBase<T> : IRepositorio<T> where T : class
 {
     protected readonly EvoRRLDbContext _contexto;
+    private readonly UnidadDeTrabajo _unidad;
 
-    protected RepositorioBase(EvoRRLDbContext contexto) => _contexto = contexto;
+    protected RepositorioBase(EvoRRLDbContext contexto)
+    {
+        _contexto = contexto;
+        _unidad = new UnidadDeTrabajo(contexto);
+    }
 
     protected DbSet<T> Tabla => _contexto.Set<T>();
 
     public async Task<List<T>> Listar() => await Tabla.ToListAsync();
 
-    // El filtro se ejecuta en SQL Server, no en memoria.
-    public async Task<List<T>> Buscar(Expression<Func<T, bool>> filtro) => await Tabla.Where(filtro).ToListAsync();
-
-    public async Task<T?> Primero(Expression<Func<T, bool>> filtro) => await Tabla.FirstOrDefaultAsync(filtro);
-
-    // Correlativo "maximo + 1" (1 si no hay registros), opcionalmente dentro de un grupo (ej. por empleado).
-    public async Task<int> SiguienteId(Expression<Func<T, int>> campo, Expression<Func<T, bool>>? filtro = null)
-    {
-        var consulta = filtro is null ? Tabla : Tabla.Where(filtro);
-        // Se proyecta como int? para que MAX sobre una tabla vacia devuelva NULL en lugar de fallar.
-        var campoNullable = Expression.Lambda<Func<T, int?>>(
-            Expression.Convert(campo.Body, typeof(int?)), campo.Parameters);
-        var maximo = await consulta.MaxAsync(campoNullable);
-        return (maximo ?? 0) + 1;
-    }
+    public async Task<T?> Obtener(params object[] claves) => await Tabla.FindAsync(claves);
 
     public async Task Crear(T registro)
     {
-        Tabla.Add(registro);
-        await _contexto.SaveChangesAsync();
+        var regla = Numeracion.Para<T>();
+        if (regla is null)
+        {
+            Tabla.Add(registro);
+            await _contexto.SaveChangesAsync();
+            return;
+        }
+
+        // El numero y el INSERT van en la misma transaccion para que dos usuarios no obtengan el mismo.
+        var guardo = await _unidad.EjecutarAsync(async () =>
+        {
+            await regla.AsignarAsync(Tabla, registro);
+            Tabla.Add(registro);
+            await _contexto.SaveChangesAsync();
+        });
+        if (!guardo)
+            throw new InvalidOperationException("No se pudo generar el número del registro: intente nuevamente.");
     }
 
     public async Task Actualizar(T registro)
@@ -47,6 +53,4 @@ public abstract class RepositorioBase<T> where T : class
         Tabla.Remove(registro);
         await _contexto.SaveChangesAsync();
     }
-
-    protected async Task<T?> ObtenerPorClave(params object[] claves) => await Tabla.FindAsync(claves);
 }

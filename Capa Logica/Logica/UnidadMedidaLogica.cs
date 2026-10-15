@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class UnidadMedidaLogica : LogicaBase<UnidadMedida>
 {
-    private readonly UnidadMedidaData _data;
+    private readonly IRepositorio<UnidadMedida> _data;
 
-    public UnidadMedidaLogica(UnidadMedidaData data) : base(data) => _data = data;
+    public UnidadMedidaLogica(IRepositorio<UnidadMedida> data) : base(data) => _data = data;
 
-    public async Task<UnidadMedida?> Obtener(string IdUnidadMedidaParam) => await _data.Obtener(IdUnidadMedidaParam);
+    public async Task<UnidadMedida?> Obtener(string idUnidadMedida) => await _data.Obtener(idUnidadMedida);
 }

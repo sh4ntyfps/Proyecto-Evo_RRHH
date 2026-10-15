@@ -1,18 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class RRHH_SaludLogica : LogicaBase<RRHH_Salud>
 {
-    private readonly RRHH_SaludData _data;
+    private readonly IRepositorio<RRHH_Salud> _data;
 
-    public RRHH_SaludLogica(RRHH_SaludData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public RRHH_SaludLogica(IRepositorio<RRHH_Salud> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<RRHH_Salud?> Obtener(int idSaludParam) => await _data.Obtener(idSaludParam);
-
-    public Task CrearConNuevoId(RRHH_Salud registro) =>
-        CrearNumerado(registro, x => x.idSalud, id => registro.idSalud = id);
-
-    public Task<bool> Registrar(RRHH_Salud registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<RRHH_Salud?> Obtener(int idSalud) => await _data.Obtener(idSalud);
 }

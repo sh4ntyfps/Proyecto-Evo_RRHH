@@ -1,0 +1,15 @@
+@* Mensajes de una sola vez (TempData); site.js los convierte en avisos flotantes *@
+@if (TempData["MensajeExito"] is string exito)
+{
+    <div class="alert alert-success alert-dismissible fade show alert-auto" role="alert">
+        @exito
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+@if (TempData["MensajeError"] is string error)
+{
+    <div class="alert alert-danger alert-dismissible fade show alert-auto" role="alert">
+        @error
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}

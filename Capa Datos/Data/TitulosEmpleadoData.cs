@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class TitulosEmpleadoData : RepositorioBase<TitulosEmpleado>
 {
     public TitulosEmpleadoData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<TitulosEmpleado?> Obtener(string NumColegiaturaParam) => ObtenerPorClave(NumColegiaturaParam);
 }

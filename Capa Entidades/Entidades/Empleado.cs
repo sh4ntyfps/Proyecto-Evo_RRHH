@@ -1,12 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("Empleado")]
     public class Empleado
     {
-    [Key]
     public int IdEmpleado { get; set; }
     public int Year { get; set; }
     public int idAreaOrganiz { get; set; }
@@ -59,7 +54,6 @@ namespace Capa_Entidades
     public string? NumResoIngreInstitu { get; set; }
     public DateTime? FechaResoIngreInstitu { get; set; }
     public int? idHorario { get; set; }
-    [NotMapped]
     public Guid? Userid { get; set; }
     public int? idLocal { get; set; }
     }

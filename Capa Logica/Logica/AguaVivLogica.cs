@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class AguaVivLogica : LogicaBase<AguaViv>
 {
-    private readonly AguaVivData _data;
+    private readonly IRepositorio<AguaViv> _data;
 
-    public AguaVivLogica(AguaVivData data) : base(data) => _data = data;
+    public AguaVivLogica(IRepositorio<AguaViv> data) : base(data) => _data = data;
 
-    public async Task<AguaViv?> Obtener(int IdAguaParam) => await _data.Obtener(IdAguaParam);
+    public async Task<AguaViv?> Obtener(int idAgua) => await _data.Obtener(idAgua);
 }

@@ -5,6 +5,4 @@ namespace Capa_Datos;
 public class CargoData : RepositorioBase<Cargo>
 {
     public CargoData(EvoRRLDbContext contexto) : base(contexto) { }
-
-    public Task<Cargo?> Obtener(int IdCargoParam) => ObtenerPorClave(IdCargoParam);
 }

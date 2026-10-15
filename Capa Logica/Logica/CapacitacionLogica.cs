@@ -1,18 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class CapacitacionLogica : LogicaBase<Capacitacion>
 {
-    private readonly CapacitacionData _data;
+    private readonly IRepositorio<Capacitacion> _data;
 
-    public CapacitacionLogica(CapacitacionData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public CapacitacionLogica(IRepositorio<Capacitacion> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<Capacitacion?> Obtener(int IdCapacitacionParam) => await _data.Obtener(IdCapacitacionParam);
-
-    public Task CrearConNuevoId(Capacitacion registro) =>
-        CrearNumerado(registro, x => x.IdCapacitacion, id => registro.IdCapacitacion = id);
-
-    public Task<bool> Registrar(Capacitacion registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<Capacitacion?> Obtener(int idCapacitacion) => await _data.Obtener(idCapacitacion);
 }

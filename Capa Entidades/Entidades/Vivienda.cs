@@ -1,13 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Capa_Entidades
 {
-    [Table("Vivienda")]
     public class Vivienda
     {
     public int? IdEmpleado { get; set; }
-    [Key]
     public int IdVivienda { get; set; }
     public int? IdTenencia { get; set; }
     public int? IdTipo { get; set; }

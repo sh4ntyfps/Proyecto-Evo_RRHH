@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class ViveConLogica : LogicaBase<ViveCon>
 {
-    private readonly ViveConData _data;
+    private readonly IRepositorio<ViveCon> _data;
 
-    public ViveConLogica(ViveConData data) : base(data) => _data = data;
+    public ViveConLogica(IRepositorio<ViveCon> data) : base(data) => _data = data;
 
-    public async Task<ViveCon?> Obtener(int IdViveConParam) => await _data.Obtener(IdViveConParam);
+    public async Task<ViveCon?> Obtener(int idViveCon) => await _data.Obtener(idViveCon);
 }

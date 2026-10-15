@@ -1,13 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class EstadoEstudioLogica : LogicaBase<EstadoEstudio>
 {
-    private readonly EstadoEstudioData _data;
+    private readonly IRepositorio<EstadoEstudio> _data;
 
-    public EstadoEstudioLogica(EstadoEstudioData data) : base(data) => _data = data;
+    public EstadoEstudioLogica(IRepositorio<EstadoEstudio> data) : base(data) => _data = data;
 
-    public async Task<EstadoEstudio?> Obtener(int IdEstadoEstudioParam) => await _data.Obtener(IdEstadoEstudioParam);
+    public async Task<EstadoEstudio?> Obtener(int idEstadoEstudio) => await _data.Obtener(idEstadoEstudio);
 }

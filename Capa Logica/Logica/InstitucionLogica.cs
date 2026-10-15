@@ -1,18 +1,13 @@
 ﻿using Capa_Entidades;
-using Capa_Datos;
+using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
 
 public class InstitucionLogica : LogicaBase<Institucion>
 {
-    private readonly InstitucionData _data;
+    private readonly IRepositorio<Institucion> _data;
 
-    public InstitucionLogica(InstitucionData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
+    public InstitucionLogica(IRepositorio<Institucion> data, IUnidadDeTrabajo unidad) : base(data, unidad) => _data = data;
 
-    public async Task<Institucion?> Obtener(int IdInstitucionParam) => await _data.Obtener(IdInstitucionParam);
-
-    public Task CrearConNuevoId(Institucion registro) =>
-        CrearNumerado(registro, x => x.IdInstitucion, id => registro.IdInstitucion = id);
-
-    public Task<bool> Registrar(Institucion registro) => EnTransaccion(() => CrearConNuevoId(registro));
+    public async Task<Institucion?> Obtener(int idInstitucion) => await _data.Obtener(idInstitucion);
 }
