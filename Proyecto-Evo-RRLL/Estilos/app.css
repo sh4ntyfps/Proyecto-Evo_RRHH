@@ -1,0 +1,286 @@
+/* ============================================================
+   RRHH - estilos de la aplicacion (Tailwind CSS 3.4)
+   Fuente: este archivo. Salida: wwwroot/css/app.css
+   Compilar:  npm run css:build   (o css:watch mientras se edita)
+
+   Bootstrap sigue aportando la grilla y el JS de modales y menus;
+   aqui se le da a todos sus componentes el aspecto de la app.
+   ============================================================ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Variables: Bootstrap toma la paleta de la marca ---------- */
+@layer base {
+  :root {
+    --bs-body-font-family: "Plus Jakarta Sans", Inter, "Segoe UI", system-ui, sans-serif;
+    --bs-body-bg: #f5f7fb;
+    --bs-body-color: #0f172a;
+    --bs-secondary-color: #64748b;
+    --bs-secondary-bg: #f1f5f9;
+    --bs-tertiary-bg: #f8fafc;
+    --bs-border-color: #e2e8f0;
+    --bs-border-radius: .75rem;
+    --bs-border-radius-sm: .5rem;
+    --bs-border-radius-lg: 1rem;
+    --bs-primary: #2447f0;
+    --bs-primary-rgb: 36, 71, 240;
+    --bs-primary-bg-subtle: #eef4ff;
+    --bs-primary-border-subtle: #bcd0ff;
+    --bs-primary-text-emphasis: #1d37cc;
+    --bs-link-color: #2447f0;
+    --bs-link-color-rgb: 36, 71, 240;
+    --bs-link-hover-color: #1d37cc;
+    --bs-success: #059669;
+    --bs-success-rgb: 5, 150, 105;
+    --bs-danger: #e11d48;
+    --bs-danger-rgb: 225, 29, 72;
+    --bs-warning: #f59e0b;
+    --bs-warning-rgb: 245, 158, 11;
+    --bs-focus-ring-color: rgba(36, 71, 240, .25);
+    --sidebar-width: 272px;
+    --topbar-height: 68px;
+  }
+
+  [data-bs-theme="dark"] {
+    color-scheme: dark;
+    --bs-body-bg: #0b1020;
+    --bs-body-color: #e2e8f0;
+    --bs-secondary-color: #94a3b8;
+    --bs-secondary-bg: #141b2e;
+    --bs-tertiary-bg: #111729;
+    --bs-border-color: #1f2a44;
+    --bs-primary: #5b83ff;
+    --bs-primary-rgb: 91, 131, 255;
+    --bs-primary-bg-subtle: #172154;
+    --bs-primary-border-subtle: #26368a;
+    --bs-primary-text-emphasis: #bcd0ff;
+    --bs-link-color: #8eaeff;
+    --bs-link-color-rgb: 142, 174, 255;
+    --bs-link-hover-color: #bcd0ff;
+  }
+
+  html { font-size: 15px; scroll-behavior: smooth; }
+  body { @apply tw-font-sans tw-antialiased; background: var(--bs-body-bg); }
+
+  h1, h2, h3, h4, h5, h6 { @apply tw-font-bold tw-tracking-tight tw-text-slate-900 dark:tw-text-white; }
+  h3, .h3 { font-size: 1.55rem; }
+
+  ::selection { background: rgba(36, 71, 240, .2); }
+  :focus-visible { outline: 2px solid #3461ff; outline-offset: 2px; }
+}
+
+/* ============================================================
+   Componentes de Bootstrap con el aspecto de la app
+   ============================================================ */
+@layer components {
+  /* ---------- Botones ---------- */
+  .btn {
+    @apply tw-inline-flex tw-items-center tw-justify-center tw-gap-1.5 tw-rounded-xl tw-font-semibold tw-transition tw-duration-150;
+    --bs-btn-padding-y: .55rem;
+    --bs-btn-padding-x: 1rem;
+    --bs-btn-font-size: .925rem;
+  }
+  .btn-sm { --bs-btn-padding-y: .35rem; --bs-btn-padding-x: .7rem; --bs-btn-font-size: .82rem; @apply tw-rounded-lg; }
+  .btn-lg { --bs-btn-padding-y: .8rem; --bs-btn-font-size: 1rem; }
+
+  .btn-primary {
+    @apply tw-border-0 tw-text-white tw-bg-gradient-to-br tw-from-marca-500 tw-to-marca-700 tw-shadow-elevada hover:tw-from-marca-600 hover:tw-to-marca-800 hover:tw-text-white active:tw-scale-[.98];
+  }
+  .btn-outline-primary {
+    @apply tw-border tw-border-marca-200 tw-bg-marca-50 tw-text-marca-700 hover:tw-border-marca-600 hover:tw-bg-marca-600 hover:tw-text-white dark:tw-border-marca-800 dark:tw-bg-marca-950/60 dark:tw-text-marca-200;
+  }
+  .btn-outline-secondary {
+    @apply tw-border tw-border-slate-200 tw-bg-white tw-text-slate-700 tw-shadow-sm hover:tw-border-slate-300 hover:tw-bg-slate-50 hover:tw-text-slate-900 dark:tw-border-slate-700 dark:tw-bg-slate-900 dark:tw-text-slate-200 dark:hover:tw-bg-slate-800;
+  }
+  .btn-outline-danger {
+    @apply tw-border tw-border-rose-200 tw-bg-white tw-text-rose-600 hover:tw-border-rose-600 hover:tw-bg-rose-600 hover:tw-text-white dark:tw-border-rose-900 dark:tw-bg-slate-900 dark:tw-text-rose-300;
+  }
+  .btn-danger { @apply tw-border-0 tw-bg-gradient-to-br tw-from-rose-500 tw-to-rose-700 tw-text-white hover:tw-from-rose-600 hover:tw-to-rose-800; }
+  .btn-success { @apply tw-border-0 tw-bg-gradient-to-br tw-from-emerald-500 tw-to-emerald-700 tw-text-white hover:tw-from-emerald-600 hover:tw-to-emerald-800; }
+  .btn-outline-success { @apply tw-border tw-border-emerald-200 tw-bg-emerald-50 tw-text-emerald-700 hover:tw-bg-emerald-600 hover:tw-text-white; }
+  .btn-secondary { @apply tw-border-0 tw-bg-slate-700 tw-text-white hover:tw-bg-slate-800; }
+  .btn-link { @apply tw-font-semibold tw-text-marca-600 tw-no-underline hover:tw-text-marca-800 dark:tw-text-marca-300; }
+  .table .btn { @apply tw-whitespace-nowrap; }
+
+  .btn.is-busy { @apply tw-pointer-events-none tw-opacity-80; }
+  .btn.is-busy .spinner-border { width: .9rem; height: .9rem; border-width: .15em; }
+
+  /* ---------- Formularios ---------- */
+  .form-label { @apply tw-mb-1.5 tw-text-sm tw-font-semibold tw-text-slate-700 dark:tw-text-slate-300; }
+  .form-control, .form-select {
+    @apply tw-rounded-xl tw-border-slate-200 tw-bg-white tw-px-3.5 tw-py-2.5 tw-text-[.95rem] tw-shadow-sm tw-transition dark:tw-border-slate-700 dark:tw-bg-slate-900;
+  }
+  .form-control:focus, .form-select:focus { @apply tw-border-marca-500 tw-ring-4 tw-ring-marca-500/15; box-shadow: 0 0 0 4px rgba(52, 97, 255, .15); }
+  .form-control::placeholder { @apply tw-text-slate-400; }
+  .form-control-lg { @apply tw-py-3 tw-text-base; }
+  .form-check-input { @apply tw-border-slate-300; }
+  .form-check-input:checked { @apply tw-border-marca-600 tw-bg-marca-600; }
+  .form-switch { padding-left: 3.1em; }
+  .form-switch .form-check-input { width: 2.4em; height: 1.3em; margin-left: -3.1em; margin-top: .1em; }
+  .input-group-text { @apply tw-rounded-xl tw-border-slate-200 tw-bg-slate-50 tw-text-slate-500 dark:tw-border-slate-700 dark:tw-bg-slate-800; }
+
+  /* ---------- Tarjetas ---------- */
+  .card {
+    @apply tw-overflow-hidden tw-rounded-2xl tw-border tw-border-slate-200/80 tw-bg-white tw-shadow-suave dark:tw-border-slate-800 dark:tw-bg-slate-900;
+  }
+  .card-header { @apply tw-border-b tw-border-slate-100 tw-bg-transparent tw-px-5 tw-py-4 tw-font-bold dark:tw-border-slate-800; }
+  .card-body { @apply tw-p-5; }
+  .card-footer { @apply tw-border-t tw-border-slate-100 tw-bg-slate-50/60 tw-px-5 tw-py-3.5 dark:tw-border-slate-800 dark:tw-bg-slate-900; }
+
+  /* ---------- Tablas ---------- */
+  .table-responsive {
+    @apply tw-mb-4 tw-rounded-2xl tw-border tw-border-slate-200/80 tw-bg-white tw-shadow-suave dark:tw-border-slate-800 dark:tw-bg-slate-900;
+  }
+  .card .table-responsive { @apply tw-mb-0 tw-rounded-none tw-border-0 tw-shadow-none; }
+  .table {
+    --bs-table-bg: transparent;
+    --bs-table-hover-bg: transparent;
+    @apply tw-mb-0 tw-align-middle tw-text-slate-700 dark:tw-text-slate-300;
+  }
+  .table > :not(caption) > * > * { @apply tw-border-slate-100 tw-px-4 tw-py-3 tw-text-[.92rem] dark:tw-border-slate-800; }
+  .table thead th {
+    @apply tw-whitespace-nowrap tw-border-b tw-border-slate-200 tw-bg-slate-50/80 tw-py-3 tw-text-xs tw-font-semibold tw-text-slate-500 dark:tw-border-slate-700 dark:tw-bg-slate-800/60 dark:tw-text-slate-400;
+  }
+  .table tbody tr { @apply tw-transition-colors; }
+  .table tbody tr:hover > * { @apply tw-bg-marca-50/60 dark:tw-bg-marca-950/40; }
+  .table tbody tr:last-child > * { @apply tw-border-b-0; }
+
+  /* ---------- Insignias ---------- */
+  .badge { @apply tw-inline-flex tw-items-center tw-gap-1 tw-rounded-full tw-px-2.5 tw-py-1 tw-text-xs tw-font-semibold; }
+  .text-bg-success, .bg-success { @apply !tw-bg-emerald-50 !tw-text-emerald-700 tw-ring-1 tw-ring-inset tw-ring-emerald-600/20 dark:!tw-bg-emerald-500/10 dark:!tw-text-emerald-300; }
+  .text-bg-danger, .bg-danger { @apply !tw-bg-rose-50 !tw-text-rose-700 tw-ring-1 tw-ring-inset tw-ring-rose-600/20 dark:!tw-bg-rose-500/10 dark:!tw-text-rose-300; }
+  .text-bg-warning, .bg-warning { @apply !tw-bg-amber-50 !tw-text-amber-800 tw-ring-1 tw-ring-inset tw-ring-amber-600/20 dark:!tw-bg-amber-500/10 dark:!tw-text-amber-300; }
+  .text-bg-secondary, .bg-secondary { @apply !tw-bg-slate-100 !tw-text-slate-600 tw-ring-1 tw-ring-inset tw-ring-slate-500/20 dark:!tw-bg-slate-500/10 dark:!tw-text-slate-300; }
+  .text-bg-primary, .bg-primary, .text-bg-info, .bg-info { @apply !tw-bg-marca-50 !tw-text-marca-700 tw-ring-1 tw-ring-inset tw-ring-marca-600/20 dark:!tw-bg-marca-500/10 dark:!tw-text-marca-200; }
+
+  /* ---------- Avisos ---------- */
+  .alert { @apply tw-flex tw-items-start tw-gap-2 tw-rounded-2xl tw-border tw-px-4 tw-py-3 tw-text-sm tw-font-medium tw-shadow-sm; }
+  .alert-success { @apply tw-border-emerald-200 tw-bg-emerald-50 tw-text-emerald-800 dark:tw-border-emerald-900 dark:tw-bg-emerald-950/60 dark:tw-text-emerald-200; }
+  .alert-danger { @apply tw-border-rose-200 tw-bg-rose-50 tw-text-rose-800 dark:tw-border-rose-900 dark:tw-bg-rose-950/60 dark:tw-text-rose-200; }
+  .alert-warning { @apply tw-border-amber-200 tw-bg-amber-50 tw-text-amber-900 dark:tw-border-amber-900 dark:tw-bg-amber-950/60 dark:tw-text-amber-200; }
+  .alert-info { @apply tw-border-marca-200 tw-bg-marca-50 tw-text-marca-800 dark:tw-border-marca-900 dark:tw-bg-marca-950/60 dark:tw-text-marca-200; }
+
+  /* ---------- Menus, modales, avisos flotantes ---------- */
+  .dropdown-menu { @apply tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-1.5 tw-shadow-xl dark:tw-border-slate-700 dark:tw-bg-slate-900; }
+  .dropdown-item { @apply tw-rounded-xl tw-px-3 tw-py-2 tw-text-sm tw-font-medium hover:tw-bg-marca-50 hover:tw-text-marca-700 dark:hover:tw-bg-slate-800 dark:hover:tw-text-white; }
+  .modal-content { @apply tw-rounded-3xl tw-border-0 tw-bg-white tw-shadow-2xl dark:tw-bg-slate-900; }
+  .modal-backdrop.show { opacity: .55; }
+  .breadcrumb { @apply tw-mb-0 tw-text-sm; --bs-breadcrumb-divider: '›'; }
+  .breadcrumb-item a { @apply tw-text-slate-500 tw-no-underline hover:tw-text-marca-600; }
+  .breadcrumb-item.active { @apply tw-font-semibold tw-text-slate-700 dark:tw-text-slate-200; }
+  .nav-tabs { @apply tw-gap-1 tw-border-slate-200 dark:tw-border-slate-800; }
+  .nav-tabs .nav-link { @apply tw-rounded-t-xl tw-font-semibold tw-text-slate-500; }
+  .nav-tabs .nav-link.active { @apply tw-text-marca-700 dark:tw-bg-slate-900 dark:tw-text-marca-200; }
+  .pagination { @apply tw-gap-1; }
+  .page-link { @apply tw-rounded-lg tw-border-slate-200 tw-font-semibold tw-text-slate-600; }
+  .page-item.active .page-link { @apply tw-border-marca-600 tw-bg-marca-600 tw-text-white; }
+
+  /* Encabezado de cada pagina: titulo grande y su detalle */
+  .main-content h3 { @apply tw-text-[1.65rem] tw-font-extrabold; }
+  .main-content h3 + .text-secondary, .main-content h3 + span { @apply tw-text-sm; }
+}
+
+/* ============================================================
+   Piezas propias de la app (las usa site.js)
+   ============================================================ */
+@layer components {
+  /* Menu lateral */
+  .sidebar {
+    @apply tw-fixed tw-inset-y-0 tw-left-0 tw-z-[1045] tw-flex tw-flex-col tw-overflow-y-auto tw-text-slate-300 tw-transition-transform tw-duration-300;
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    background:
+      radial-gradient(600px 300px at -20% -10%, rgba(52, 97, 255, .35), transparent 60%),
+      radial-gradient(500px 400px at 120% 110%, rgba(139, 92, 246, .22), transparent 60%),
+      #0b1120;
+  }
+  .sidebar.open { transform: translateX(0); }
+  @media (min-width: 992px) {
+    .sidebar { transform: none; }
+    .main-content, .footer { margin-left: var(--sidebar-width); }
+    .topbar { left: var(--sidebar-width) !important; }
+  }
+  .sidebar-link {
+    @apply tw-relative tw-mb-0.5 tw-flex tw-items-center tw-gap-3 tw-rounded-xl tw-px-3 tw-py-2.5 tw-text-[.92rem] tw-font-medium tw-text-slate-400 tw-no-underline tw-transition hover:tw-bg-white/5 hover:tw-text-white;
+  }
+  .sidebar-link > i:first-child { @apply tw-text-[1.05rem] tw-text-slate-500 tw-transition; }
+  .sidebar-link:hover > i:first-child { @apply tw-text-marca-300; }
+  .sidebar-link.active { @apply tw-bg-white/10 tw-text-white tw-shadow-brillo; }
+  .sidebar-link.active > i:first-child { @apply tw-text-marca-300; }
+  .sidebar-link.active::before {
+    content: '';
+    @apply tw-absolute -tw-left-3 tw-top-1/2 tw-h-6 tw-w-1 -tw-translate-y-1/2 tw-rounded-r-full tw-bg-gradient-to-b tw-from-marca-300 tw-to-violet-400;
+  }
+  .submenu-caret { @apply tw-ml-auto tw-text-xs tw-transition-transform; }
+  .sidebar-link[aria-expanded="true"] .submenu-caret { @apply tw-rotate-180; }
+  .sidebar-sublink { @apply tw-block tw-rounded-lg tw-px-3 tw-py-1.5 tw-text-[.86rem] tw-text-slate-400 tw-no-underline hover:tw-bg-white/5 hover:tw-text-white; }
+  .sidebar-sublink.active { @apply tw-bg-marca-500/20 tw-font-semibold tw-text-white; }
+  .submenu-filtro {
+    @apply tw-mb-2 tw-w-full tw-rounded-lg tw-border tw-border-white/10 tw-bg-white/5 tw-px-3 tw-py-1.5 tw-text-sm tw-text-white placeholder:tw-text-slate-500 focus:tw-border-marca-400 focus:tw-outline-none;
+  }
+  .submenu-vacio { @apply tw-px-3 tw-py-1 tw-text-xs tw-text-slate-500; }
+  .sidebar-backdrop { @apply tw-invisible tw-fixed tw-inset-0 tw-z-[1040] tw-bg-slate-950/50 tw-opacity-0 tw-backdrop-blur-sm tw-transition; }
+  .sidebar-backdrop.open { @apply tw-visible tw-opacity-100; }
+
+  .main-content { @apply tw-min-h-screen; padding-top: var(--topbar-height); }
+  .main-content.no-topbar { @apply tw-ml-0 tw-pt-0; }
+
+  /* Tablas con orden y paginacion en el cliente */
+  th.sortable { @apply tw-cursor-pointer tw-select-none hover:tw-text-slate-900 dark:hover:tw-text-white; }
+  th.sortable .si { @apply tw-ml-1 tw-text-[.7rem] tw-opacity-40; }
+  th.sort-asc .si, th.sort-desc .si, th.sortable:hover .si { @apply tw-text-marca-600 tw-opacity-100; }
+  .dt-toolbar {
+    @apply -tw-mt-4 tw-mb-4 tw-flex tw-flex-wrap tw-items-center tw-justify-between tw-gap-2 tw-rounded-b-2xl tw-border tw-border-t-0 tw-border-slate-200/80 tw-bg-white tw-px-4 tw-py-3 tw-text-sm dark:tw-border-slate-800 dark:tw-bg-slate-900;
+  }
+  .table-responsive:has(+ .dt-toolbar) { @apply tw-rounded-b-none; }
+  .dt-count { @apply tw-text-slate-500; }
+  .dt-pages { @apply tw-flex tw-items-center tw-gap-1; }
+  .dt-page-btn {
+    @apply tw-inline-flex tw-h-8 tw-min-w-[2rem] tw-cursor-pointer tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-slate-200 tw-bg-white tw-px-2 tw-text-sm tw-font-semibold tw-text-slate-600 tw-transition hover:tw-border-marca-400 hover:tw-text-marca-700 disabled:tw-cursor-default disabled:tw-opacity-40 dark:tw-border-slate-700 dark:tw-bg-slate-900 dark:tw-text-slate-300;
+  }
+  .dt-page-btn.active { @apply tw-border-transparent tw-bg-gradient-to-br tw-from-marca-500 tw-to-marca-700 tw-text-white tw-shadow-elevada; }
+  .dt-empty td { @apply tw-py-12 tw-text-center tw-text-slate-500; }
+  .dt-empty i { @apply tw-mb-2 tw-block tw-text-3xl tw-opacity-40; }
+
+  /* Avisos flotantes, volver arriba, cookies, carga */
+  .evo-toasts { z-index: 1080; }
+  .evo-toasts .toast { @apply tw-overflow-hidden tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-shadow-2xl dark:tw-border-slate-700 dark:tw-bg-slate-900; }
+  .back-to-top { @apply tw-invisible tw-fixed tw-bottom-6 tw-right-6 tw-z-[1050] tw-h-11 tw-w-11 tw-rounded-full tw-p-0 tw-opacity-0 tw-transition; }
+  .back-to-top.show { @apply tw-visible tw-opacity-100; }
+  .cookie-banner { @apply tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-[1060] tw-translate-y-full tw-transition-transform tw-duration-300; }
+  .cookie-banner.show { @apply tw-translate-y-0; }
+  .loading-spinner { @apply tw-fixed tw-inset-0 tw-z-[2000] tw-hidden tw-items-center tw-justify-center tw-bg-slate-950/40 tw-backdrop-blur-sm; }
+  .loading-spinner.show { @apply tw-flex; }
+  .skip-link { @apply tw-absolute -tw-left-[9999px] tw-top-0 tw-z-[3000] tw-rounded-br-xl tw-bg-marca-600 tw-px-4 tw-py-2 tw-text-white focus:tw-left-0; }
+
+  /* Pagina 404 y privacidad (vistas existentes) */
+  .codigo-404 { @apply tw-h-28 tw-w-48 tw-gap-1 tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-white tw-text-7xl tw-font-extrabold tw-shadow-suave dark:tw-border-slate-800 dark:tw-bg-slate-900; }
+  .codigo-404-icon { @apply tw-inline-flex tw-h-[4.5rem] tw-w-[4.5rem] tw-items-center tw-justify-center tw-rounded-2xl tw-bg-marca-50 tw-text-4xl tw-text-marca-600; }
+  .privacy-section { @apply tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-5 tw-shadow-suave dark:tw-border-slate-800 dark:tw-bg-slate-900; }
+  .privacy-section i { @apply tw-inline-flex tw-h-10 tw-w-10 tw-items-center tw-justify-center tw-rounded-xl tw-bg-marca-50 tw-text-marca-600; }
+  .empty-state { @apply tw-py-12 tw-text-center tw-text-slate-500; }
+  .empty-state i { @apply tw-mb-2 tw-block tw-text-4xl tw-opacity-40; }
+  .chart-box { @apply tw-relative tw-h-72; }
+}
+
+@layer utilities {
+  .tw-fondo-malla {
+    background-image: radial-gradient(rgba(255, 255, 255, .14) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; border: 2px solid transparent; background-clip: padding-box; }
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb { background-color: #334155; }
+.sidebar::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, .12); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .sidebar, .topbar, .footer, .back-to-top, .cookie-banner, .dt-toolbar { display: none !important; }
+  .main-content { margin: 0 !important; padding: 0 !important; }
+}

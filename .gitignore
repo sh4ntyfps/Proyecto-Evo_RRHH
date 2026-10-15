@@ -26,3 +26,6 @@ publish_test/
 ## Scripts de datos descomprimidos (>100 MB, limite de GitHub): se versiona solo el .zip
 Scripts/bd-Datos/bd-Datos.sql
 Scripts/bd-Normalizada/03-datos-RRHH_Normalizado.sql
+
+## Dependencias de Node (solo para compilar estilos)
+node_modules/

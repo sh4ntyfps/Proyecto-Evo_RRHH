@@ -40,6 +40,21 @@ Proyecto-Evo-RRLL (controllers, vistas) ──► Capa Logica ──► Capa Ent
 
 Cómo se aplica cada tema del curso (semanas 2 a 9), con su evidencia en el código: [`docs/TEMAS-DEL-CURSO.md`](docs/TEMAS-DEL-CURSO.md). Gestión de la configuración: [`docs/GESTION-CONFIGURACION.md`](docs/GESTION-CONFIGURACION.md). Gestión del cambio: [`docs/GESTION-DEL-CAMBIO.md`](docs/GESTION-DEL-CAMBIO.md).
 
+## Estilos (Tailwind CSS)
+
+El diseño usa **Tailwind CSS 3.4** junto con Bootstrap (grilla y modales). El CSS ya compilado (`wwwroot/css/app.css`) está en el repositorio, así que para ejecutar la app no hace falta Node.
+
+Solo si cambias estilos o clases `tw-` en las vistas (requiere Node.js):
+
+```
+cd Proyecto-Evo-RRLL
+npm install          # una sola vez
+npm run css:watch    # recompila al guardar; o npm run css:build para la versión final
+```
+
+- Fuente de estilos: `Proyecto-Evo-RRLL/Estilos/app.css` · Configuración: `tailwind.config.js`
+- Las clases de Tailwind llevan el prefijo `tw-` (por ejemplo `tw-rounded-2xl`) para no chocar con Bootstrap.
+
 ## Pruebas
 
 ```

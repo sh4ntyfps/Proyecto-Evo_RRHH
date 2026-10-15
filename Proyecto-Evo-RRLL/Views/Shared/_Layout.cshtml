@@ -14,12 +14,12 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
 </head>
-<body>
+<body class="tw-bg-[#f5f7fb] dark:tw-bg-[#0b1020]">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     @if (User.Identity?.IsAuthenticated == true)
@@ -28,135 +28,139 @@
         var accion = ViewContext.RouteData.Values["action"]?.ToString();
         var nombreUsuario = User.Identity?.Name ?? "";
         var partesNombre = nombreUsuario.Split(new[] { ' ', '.', '_', '-' }, StringSplitOptions.RemoveEmptyEntries);
-        string inicialesUsuario;
-        if (partesNombre.Length >= 2)
-            inicialesUsuario = (partesNombre[0].Substring(0, 1) + partesNombre[1].Substring(0, 1)).ToUpper();
-        else if (partesNombre.Length == 1)
-            inicialesUsuario = (partesNombre[0].Length >= 2 ? partesNombre[0].Substring(0, 2) : partesNombre[0].Substring(0, 1)).ToUpper();
-        else
-            inicialesUsuario = "?";
+        var inicialesUsuario = partesNombre.Length >= 2
+            ? $"{partesNombre[0][0]}{partesNombre[1][0]}".ToUpper()
+            : partesNombre.Length == 1 ? partesNombre[0][..Math.Min(2, partesNombre[0].Length)].ToUpper() : "?";
+        var esAdmin = User.IsInRole("Administrador");
 
         string Activo(string c) => controlador == c ? "active" : "";
         string? Actual(string c) => controlador == c ? "page" : null;
 
         <aside class="sidebar" id="sidebar" aria-label="Menú principal">
-            <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
-                <span class="brand-logo" aria-hidden="true"></span>
-                <span>
-                    <span class="sidebar-brand-nombre">RRHH</span>
-                    <span class="sidebar-brand-detalle">Legajo de personal</span>
+            <a class="tw-flex tw-shrink-0 tw-items-center tw-gap-3 tw-px-6 tw-pb-6 tw-pt-7 tw-no-underline" asp-controller="Home" asp-action="Index">
+                <span class="tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-xl tw-bg-gradient-to-br tw-from-marca-400 tw-via-marca-600 tw-to-violet-600 tw-text-lg tw-text-white tw-shadow-brillo">
+                    <i class="bi bi-people-fill"></i>
+                </span>
+                <span class="tw-leading-tight">
+                    <span class="tw-block tw-text-lg tw-font-extrabold tw-tracking-tight tw-text-white">RRHH</span>
+                    <span class="tw-block tw-text-xs tw-font-medium tw-text-slate-400">Gestión de personal</span>
                 </span>
             </a>
-            <nav class="sidebar-nav">
-                <div class="sidebar-section">Personal</div>
-                <a class="sidebar-link @Activo("Home")" aria-current="@Actual("Home")" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-house-door"></i><span>Inicio</span>
-                </a>
-                <a class="sidebar-link @Activo("Empleado")" aria-current="@Actual("Empleado")" asp-controller="Empleado" asp-action="Index">
-                    <i class="bi bi-people"></i><span>Empleados</span>
-                </a>
-                <a class="sidebar-link @Activo("HistorialLaboral")" aria-current="@Actual("HistorialLaboral")" asp-controller="HistorialLaboral" asp-action="Index">
-                    <i class="bi bi-briefcase"></i><span>Historial laboral</span>
-                </a>
-                <a class="sidebar-link @Activo("Asistencia")" aria-current="@Actual("Asistencia")" asp-controller="Asistencia" asp-action="Index">
-                    <i class="bi bi-clock-history"></i><span>Asistencia</span>
-                </a>
-                <a class="sidebar-link @Activo("Permiso")" aria-current="@Actual("Permiso")" asp-controller="Permiso" asp-action="Index">
-                    <i class="bi bi-calendar-check"></i><span>Permisos</span>
-                </a>
-                <a class="sidebar-link @Activo("Feriado")" aria-current="@Actual("Feriado")" asp-controller="Feriado" asp-action="Index">
-                    <i class="bi bi-calendar-event"></i><span>Feriados</span>
-                </a>
 
-                <div class="sidebar-section">Bienestar</div>
-                <a class="sidebar-link @Activo("Salud")" aria-current="@Actual("Salud")" asp-controller="Salud" asp-action="Index">
-                    <i class="bi bi-heart-pulse"></i><span>Salud</span>
-                </a>
-                <a class="sidebar-link @Activo("Familia")" aria-current="@Actual("Familia")" asp-controller="Familia" asp-action="Index">
-                    <i class="bi bi-people-fill"></i><span>Familia</span>
-                </a>
-                <a class="sidebar-link @Activo("Vivienda")" aria-current="@Actual("Vivienda")" asp-controller="Vivienda" asp-action="Index">
-                    <i class="bi bi-house"></i><span>Vivienda</span>
-                </a>
+            <nav class="tw-flex-1 tw-px-4 tw-pb-6">
+                <p class="tw-mb-2 tw-mt-1 tw-px-3 tw-text-[.7rem] tw-font-semibold tw-tracking-wider tw-text-slate-500">PERSONAL</p>
+                <a class="sidebar-link @Activo("Home")" aria-current="@Actual("Home")" asp-controller="Home" asp-action="Index"><i class="bi bi-grid-1x2"></i><span>Panel</span></a>
+                <a class="sidebar-link @Activo("Empleado")" aria-current="@Actual("Empleado")" asp-controller="Empleado" asp-action="Index"><i class="bi bi-people"></i><span>Empleados</span></a>
+                <a class="sidebar-link @Activo("HistorialLaboral")" aria-current="@Actual("HistorialLaboral")" asp-controller="HistorialLaboral" asp-action="Index"><i class="bi bi-briefcase"></i><span>Historial laboral</span></a>
+                <a class="sidebar-link @Activo("Asistencia")" aria-current="@Actual("Asistencia")" asp-controller="Asistencia" asp-action="Index"><i class="bi bi-fingerprint"></i><span>Asistencia</span></a>
+                <a class="sidebar-link @Activo("Permiso")" aria-current="@Actual("Permiso")" asp-controller="Permiso" asp-action="Index"><i class="bi bi-calendar2-check"></i><span>Permisos</span></a>
+                <a class="sidebar-link @Activo("Feriado")" aria-current="@Actual("Feriado")" asp-controller="Feriado" asp-action="Index"><i class="bi bi-calendar-heart"></i><span>Feriados</span></a>
 
-                <div class="sidebar-section">Desempeño</div>
-                <a class="sidebar-link @Activo("Capacitacion")" aria-current="@Actual("Capacitacion")" asp-controller="Capacitacion" asp-action="Index">
-                    <i class="bi bi-mortarboard"></i><span>Capacitación</span>
-                </a>
-                <a class="sidebar-link @Activo("Comportamiento")" aria-current="@Actual("Comportamiento")" asp-controller="Comportamiento" asp-action="Index">
-                    <i class="bi bi-clipboard-check"></i><span>Comportamiento</span>
-                </a>
-                <a class="sidebar-link @Activo("Inconveniente")" aria-current="@Actual("Inconveniente")" asp-controller="Inconveniente" asp-action="Index">
-                    <i class="bi bi-exclamation-octagon"></i><span>Inconvenientes</span>
-                </a>
+                <p class="tw-mb-2 tw-mt-6 tw-px-3 tw-text-[.7rem] tw-font-semibold tw-tracking-wider tw-text-slate-500">BIENESTAR</p>
+                <a class="sidebar-link @Activo("Salud")" aria-current="@Actual("Salud")" asp-controller="Salud" asp-action="Index"><i class="bi bi-heart-pulse"></i><span>Salud</span></a>
+                <a class="sidebar-link @Activo("Familia")" aria-current="@Actual("Familia")" asp-controller="Familia" asp-action="Index"><i class="bi bi-house-heart"></i><span>Familia</span></a>
+                <a class="sidebar-link @Activo("Vivienda")" aria-current="@Actual("Vivienda")" asp-controller="Vivienda" asp-action="Index"><i class="bi bi-house"></i><span>Vivienda</span></a>
 
-                <div class="sidebar-section">Institución</div>
-                <a class="sidebar-link @Activo("EstructuraOrganiz")" aria-current="@Actual("EstructuraOrganiz")" asp-controller="EstructuraOrganiz" asp-action="Index">
-                    <i class="bi bi-diagram-3"></i><span>Estructura orgánica</span>
-                </a>
+                <p class="tw-mb-2 tw-mt-6 tw-px-3 tw-text-[.7rem] tw-font-semibold tw-tracking-wider tw-text-slate-500">DESEMPEÑO</p>
+                <a class="sidebar-link @Activo("Capacitacion")" aria-current="@Actual("Capacitacion")" asp-controller="Capacitacion" asp-action="Index"><i class="bi bi-mortarboard"></i><span>Capacitación</span></a>
+                <a class="sidebar-link @Activo("Comportamiento")" aria-current="@Actual("Comportamiento")" asp-controller="Comportamiento" asp-action="Index"><i class="bi bi-award"></i><span>Comportamiento</span></a>
+                <a class="sidebar-link @Activo("Inconveniente")" aria-current="@Actual("Inconveniente")" asp-controller="Inconveniente" asp-action="Index"><i class="bi bi-exclamation-diamond"></i><span>Inconvenientes</span></a>
+
+                <p class="tw-mb-2 tw-mt-6 tw-px-3 tw-text-[.7rem] tw-font-semibold tw-tracking-wider tw-text-slate-500">ORGANIZACIÓN</p>
+                <a class="sidebar-link @Activo("EstructuraOrganiz")" aria-current="@Actual("EstructuraOrganiz")" asp-controller="EstructuraOrganiz" asp-action="Index"><i class="bi bi-diagram-3"></i><span>Estructura orgánica</span></a>
                 <a class="sidebar-link @Activo("Catalogo")" data-bs-toggle="collapse" href="#menuCatalogo" role="button"
                    aria-expanded="@(controlador == "Catalogo" ? "true" : "false")" aria-controls="menuCatalogo">
-                    <i class="bi bi-journal-text"></i><span>Tablas maestras</span><i class="bi bi-chevron-down submenu-caret"></i>
+                    <i class="bi bi-database"></i><span>Tablas maestras</span><i class="bi bi-chevron-down submenu-caret"></i>
                 </a>
                 <div class="collapse @(controlador == "Catalogo" ? "show" : "")" id="menuCatalogo">
-                    <div class="submenu-list" data-filtro-menu>
-                        <input type="search" class="submenu-filtro" placeholder="Filtrar tablas" aria-label="Filtrar tablas maestras" />
-                        @foreach (var catalogo in Proyecto_Evo_RRLL.Models.ViewModels.CatalogoNavegacion.Items)
-                        {
-                            var esActual = controlador == "Catalogo" && (Context.Request.Query["tabla"].ToString() == catalogo.Key);
-                            <a class="sidebar-sublink @(esActual ? "active" : "")" aria-current="@(esActual ? "page" : null)"
-                               asp-controller="Catalogo" asp-action="Index" asp-route-tabla="@catalogo.Key">@catalogo.Value</a>
-                        }
-                        <div class="submenu-vacio" hidden>Ninguna tabla coincide.</div>
+                    <div class="tw-ml-5 tw-mt-1 tw-border-l tw-border-white/10 tw-py-1 tw-pl-3" data-filtro-menu>
+                        <input type="search" class="submenu-filtro" placeholder="Buscar tabla..." aria-label="Buscar tabla maestra" />
+                        <div class="tw-max-h-72 tw-overflow-y-auto tw-pr-1">
+                            @foreach (var catalogo in Proyecto_Evo_RRLL.Models.ViewModels.CatalogoNavegacion.Items)
+                            {
+                                var esActual = controlador == "Catalogo" && Context.Request.Query["tabla"].ToString() == catalogo.Key;
+                                <a class="sidebar-sublink @(esActual ? "active" : "")" aria-current="@(esActual ? "page" : null)"
+                                   asp-controller="Catalogo" asp-action="Index" asp-route-tabla="@catalogo.Key">@catalogo.Value</a>
+                            }
+                            <div class="submenu-vacio" hidden>Ninguna tabla coincide.</div>
+                        </div>
                     </div>
                 </div>
 
-                @if (User.IsInRole("Administrador"))
+                @if (esAdmin)
                 {
-                    <div class="sidebar-section">Seguridad</div>
-                    <a class="sidebar-link @(controlador == "SeguridadAdmin" && accion != "Actividad" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Usuarios">
-                        <i class="bi bi-person-gear"></i><span>Usuarios y roles</span>
-                    </a>
-                    <a class="sidebar-link @(controlador == "SeguridadAdmin" && accion == "Actividad" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Actividad">
-                        <i class="bi bi-journal-check"></i><span>Bitácora de actividad</span>
-                    </a>
+                    <p class="tw-mb-2 tw-mt-6 tw-px-3 tw-text-[.7rem] tw-font-semibold tw-tracking-wider tw-text-slate-500">SEGURIDAD</p>
+                    <a class="sidebar-link @(controlador == "SeguridadAdmin" && accion != "Actividad" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Usuarios"><i class="bi bi-shield-lock"></i><span>Usuarios y roles</span></a>
+                    <a class="sidebar-link @(controlador == "SeguridadAdmin" && accion == "Actividad" ? "active" : "")" asp-controller="SeguridadAdmin" asp-action="Actividad"><i class="bi bi-activity"></i><span>Bitácora</span></a>
                 }
             </nav>
-            <div class="sidebar-footer">Sesión de @nombreUsuario</div>
+
+            <div class="tw-m-4 tw-mt-0 tw-shrink-0 tw-rounded-2xl tw-border tw-border-white/10 tw-bg-white/5 tw-p-3">
+                <div class="tw-flex tw-items-center tw-gap-3">
+                    <span class="tw-grid tw-h-9 tw-w-9 tw-place-items-center tw-rounded-full tw-bg-gradient-to-br tw-from-cyan-400 tw-to-marca-600 tw-text-xs tw-font-bold tw-text-white">@inicialesUsuario</span>
+                    <div class="tw-min-w-0 tw-leading-tight">
+                        <div class="tw-truncate tw-text-sm tw-font-semibold tw-text-white">@nombreUsuario</div>
+                        <div class="tw-text-xs tw-text-slate-400">@(esAdmin ? "Administrador" : "Usuario")</div>
+                    </div>
+                    <form asp-controller="Seguridad" asp-action="CerrarSesion" method="post" class="tw-ml-auto">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="tw-grid tw-h-8 tw-w-8 tw-place-items-center tw-rounded-lg tw-border-0 tw-bg-transparent tw-text-slate-400 tw-transition hover:tw-bg-white/10 hover:tw-text-white" title="Cerrar sesión" aria-label="Cerrar sesión">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </aside>
         <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-        <header class="topbar">
-            <div class="d-flex align-items-center gap-3 w-100">
-                <button class="icon-btn d-lg-none" type="button" id="btnMenu" aria-label="Abrir menú" aria-controls="sidebar">
-                    <i class="bi bi-list fs-5"></i>
+        <header class="topbar tw-fixed tw-left-0 tw-right-0 tw-top-0 tw-z-[1035] tw-flex tw-items-center tw-gap-3 tw-border-b tw-border-slate-200/70 tw-bg-white/75 tw-px-4 tw-backdrop-blur-xl dark:tw-border-slate-800 dark:tw-bg-[#0b1020]/75 md:tw-px-8" style="height:var(--topbar-height)">
+            <button class="tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-text-slate-700 lg:tw-hidden dark:tw-border-slate-700 dark:tw-bg-slate-900 dark:tw-text-slate-200" type="button" id="btnMenu" aria-label="Abrir menú" aria-controls="sidebar">
+                <i class="bi bi-list tw-text-xl"></i>
+            </button>
+            <div class="tw-min-w-0">
+                <nav aria-label="Ruta" class="tw-hidden sm:tw-block">
+                    <ol class="breadcrumb tw-text-xs">
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+                        @if (controlador != "Home")
+                        {
+                            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+                        }
+                    </ol>
+                </nav>
+                <h1 class="tw-m-0 tw-truncate tw-text-lg tw-font-extrabold">@ViewData["Title"]</h1>
+            </div>
+
+            <div class="tw-ml-auto tw-flex tw-items-center tw-gap-2">
+                <form class="tw-relative tw-hidden lg:tw-block" role="search" onsubmit="return false;">
+                    <i class="bi bi-search tw-pointer-events-none tw-absolute tw-left-3.5 tw-top-1/2 -tw-translate-y-1/2 tw-text-slate-400"></i>
+                    <input id="siteSearch" type="search" placeholder="Buscar en esta página..." aria-label="Buscar en esta página" aria-keyshortcuts="/"
+                           class="tw-peer tw-h-10 tw-w-72 tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-100/70 tw-pl-10 tw-pr-10 tw-text-sm tw-text-slate-800 tw-outline-none tw-transition focus:tw-border-marca-400 focus:tw-bg-white focus:tw-ring-4 focus:tw-ring-marca-500/15 dark:tw-border-slate-700 dark:tw-bg-slate-900 dark:tw-text-slate-100" />
+                    <kbd class="tw-pointer-events-none tw-absolute tw-right-2.5 tw-top-1/2 -tw-translate-y-1/2 tw-rounded-md tw-border tw-border-slate-200 tw-bg-white tw-px-1.5 tw-py-0.5 tw-font-sans tw-text-[.7rem] tw-font-semibold tw-text-slate-500 tw-shadow-none peer-focus:tw-hidden dark:tw-border-slate-700 dark:tw-bg-slate-800 dark:tw-text-slate-400">/</kbd>
+                </form>
+                <button id="themeToggle" type="button" title="Cambiar tema" aria-label="Cambiar a tema oscuro"
+                        class="tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-text-slate-600 tw-transition hover:tw-border-marca-300 hover:tw-text-marca-600 dark:tw-border-slate-700 dark:tw-bg-slate-900 dark:tw-text-amber-300">
+                    <i id="themeIcon" class="bi bi-moon-stars"></i>
                 </button>
-                <h1 class="page-title flex-grow-1 text-truncate">@ViewData["Title"]</h1>
-                <div class="d-flex align-items-center gap-2 ms-auto">
-                    <form class="d-none d-lg-block" role="search" onsubmit="return false;">
-                        <div class="search-box">
-                            <i class="bi bi-search" aria-hidden="true"></i>
-                            <input id="siteSearch" type="search" class="form-control" placeholder="Filtrar esta página" aria-label="Filtrar esta página" aria-keyshortcuts="/" />
-                            <kbd aria-hidden="true">/</kbd>
-                        </div>
-                    </form>
-                    <button id="themeToggle" class="icon-btn" type="button" aria-label="Cambiar a tema oscuro" title="Cambiar tema">
-                        <i id="themeIcon" class="bi bi-moon"></i>
+                <div class="dropdown">
+                    <button class="tw-flex tw-h-10 tw-items-center tw-gap-2 tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-pl-1 tw-pr-3 tw-text-sm tw-font-semibold tw-text-slate-700 dark:tw-border-slate-700 dark:tw-bg-slate-900 dark:tw-text-slate-200" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Mi cuenta">
+                        <span class="tw-grid tw-h-8 tw-w-8 tw-place-items-center tw-rounded-lg tw-bg-gradient-to-br tw-from-marca-500 tw-to-violet-600 tw-text-xs tw-font-bold tw-text-white">@inicialesUsuario</span>
+                        <span class="tw-hidden sm:tw-inline">@nombreUsuario</span>
+                        <i class="bi bi-chevron-down tw-text-xs tw-text-slate-400"></i>
                     </button>
-                    <div class="dropdown">
-                        <button class="user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Mi cuenta">
-                            <span class="user-avatar">@inicialesUsuario</span>
-                            <span class="d-none d-sm-inline">@nombreUsuario</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <form asp-controller="Seguridad" asp-action="CerrarSesion" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end tw-mt-2 tw-min-w-[13rem]">
+                        <li class="tw-px-3 tw-py-2">
+                            <div class="tw-text-sm tw-font-bold">@nombreUsuario</div>
+                            <div class="tw-text-xs tw-text-slate-500">@(esAdmin ? "Administrador del sistema" : "Usuario")</div>
+                        </li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" asp-controller="Home" asp-action="Ayuda"><i class="bi bi-question-circle tw-mr-2"></i>Ayuda</a></li>
+                        <li>
+                            <form asp-controller="Seguridad" asp-action="CerrarSesion" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item tw-text-rose-600"><i class="bi bi-box-arrow-right tw-mr-2"></i>Cerrar sesión</button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </header>
@@ -165,16 +169,7 @@
     <main id="contenido" role="main" class="main-content @(User.Identity?.IsAuthenticated == true ? "" : "no-topbar")">
         @if (User.Identity?.IsAuthenticated == true)
         {
-            <div class="container-fluid py-4 px-3 px-md-4">
-                @if (ViewData["Title"]?.ToString() != "Inicio")
-                {
-                    <nav aria-label="Ruta" class="breadcrumb-bar">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
-                        </ol>
-                    </nav>
-                }
+            <div class="tw-mx-auto tw-max-w-[1600px] tw-animate-entrar tw-px-4 tw-py-6 md:tw-px-8 md:tw-py-8">
                 @await Html.PartialAsync("_Avisos")
                 @RenderBody()
             </div>
@@ -185,7 +180,7 @@
         }
         else
         {
-            <div class="container py-5">
+            <div class="container tw-py-12">
                 @await Html.PartialAsync("_Avisos")
                 @RenderBody()
             </div>
@@ -194,42 +189,38 @@
 
     @if (User.Identity?.IsAuthenticated == true)
     {
-        <footer class="footer">
-            <div class="container-fluid px-3 px-md-4 d-flex justify-content-between flex-wrap gap-2">
-                <span>RRHH &copy; @DateTime.Now.Year</span>
-                <span class="d-flex gap-3">
-                    <a asp-controller="Home" asp-action="Ayuda"><i class="bi bi-question-circle me-1"></i>Ayuda</a>
-                    <a asp-controller="Home" asp-action="Privacidad"><i class="bi bi-shield-lock me-1"></i>Privacidad</a>
+        <footer class="footer tw-border-t tw-border-slate-200/70 tw-px-4 tw-py-5 tw-text-sm tw-text-slate-500 dark:tw-border-slate-800 md:tw-px-8">
+            <div class="tw-mx-auto tw-flex tw-max-w-[1600px] tw-flex-wrap tw-items-center tw-justify-between tw-gap-2">
+                <span>© @DateTime.Now.Year RRHH · Gestión de personal</span>
+                <span class="tw-flex tw-gap-4">
+                    <a class="tw-text-slate-500 tw-no-underline hover:tw-text-marca-600" asp-controller="Home" asp-action="Ayuda">Ayuda</a>
+                    <a class="tw-text-slate-500 tw-no-underline hover:tw-text-marca-600" asp-controller="Home" asp-action="Privacidad">Privacidad</a>
                 </span>
             </div>
         </footer>
 
-        <button id="backToTop" type="button" class="btn btn-primary back-to-top" aria-label="Volver arriba">
-            <i class="bi bi-arrow-up"></i>
-        </button>
+        <button id="backToTop" type="button" class="btn btn-primary back-to-top" aria-label="Volver arriba"><i class="bi bi-arrow-up"></i></button>
     }
 
     <div class="toast-container position-fixed bottom-0 end-0 p-3 evo-toasts" id="toastHost" aria-live="polite" aria-atomic="true"></div>
 
     <div id="cookieBanner" class="cookie-banner" role="region" aria-label="Aviso de cookies">
-        <div class="container py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <p class="mb-0 small">Usamos cookies para mantener tu sesión y recordar si prefieres el tema claro u oscuro.</p>
+        <div class="tw-mx-auto tw-mb-4 tw-flex tw-max-w-3xl tw-flex-wrap tw-items-center tw-justify-between tw-gap-3 tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white/95 tw-px-5 tw-py-4 tw-shadow-2xl tw-backdrop-blur dark:tw-border-slate-700 dark:tw-bg-slate-900/95" style="width:calc(100% - 2rem)">
+            <p class="tw-m-0 tw-text-sm tw-text-slate-600 dark:tw-text-slate-300"><i class="bi bi-cookie tw-mr-1 tw-text-amber-500"></i>Usamos cookies para mantener tu sesión y recordar tu tema preferido.</p>
             <button id="cookieAccept" type="button" class="btn btn-primary btn-sm">Entendido</button>
         </div>
     </div>
 
     @* Confirmacion de acciones destructivas: los formularios con data-confirmar la usan en lugar de confirm() *@
-    <div class="modal fade modal-confirmar" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+    <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width:420px">
-            <div class="modal-content">
-                <div class="modal-body d-flex gap-3">
-                    <span class="icono-alerta" aria-hidden="true"><i class="bi bi-trash3"></i></span>
-                    <div>
-                        <h2 class="modal-title mb-1" id="modalConfirmarTitulo">¿Eliminar el registro?</h2>
-                        <p class="mb-0 text-secondary small">Esta acción no se puede deshacer.</p>
-                    </div>
+            <div class="modal-content tw-p-2">
+                <div class="modal-body tw-text-center">
+                    <span class="tw-mx-auto tw-mb-4 tw-grid tw-h-14 tw-w-14 tw-place-items-center tw-rounded-2xl tw-bg-rose-50 tw-text-2xl tw-text-rose-600 dark:tw-bg-rose-500/10" aria-hidden="true"><i class="bi bi-trash3"></i></span>
+                    <h2 class="tw-mb-1 tw-text-xl" id="modalConfirmarTitulo">¿Eliminar el registro?</h2>
+                    <p class="tw-m-0 tw-text-sm tw-text-slate-500">Esta acción no se puede deshacer.</p>
                 </div>
-                <div class="modal-footer">
+                <div class="tw-grid tw-grid-cols-2 tw-gap-2 tw-px-3 tw-pb-3">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-danger" id="modalConfirmarAceptar">Eliminar</button>
                 </div>
@@ -238,9 +229,7 @@
     </div>
 
     <div id="loadingSpinner" class="loading-spinner" aria-hidden="true">
-        <div class="spinner-border text-light" role="status">
-            <span class="visually-hidden">Cargando...</span>
-        </div>
+        <div class="spinner-border text-light" role="status"><span class="visually-hidden">Cargando...</span></div>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

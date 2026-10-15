@@ -40,7 +40,7 @@
             root.setAttribute('data-bs-theme', t);
             try { localStorage.setItem(STORE, t); } catch (e) { }
             var icono = document.getElementById('themeIcon');
-            if (icono) icono.className = t === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
+            if (icono) icono.className = t === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars';
             toggle.setAttribute('aria-label', t === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
             // Avisa a quien lo necesite (p. ej. los gráficos del dashboard) para recolorear sin recargar
             document.dispatchEvent(new CustomEvent('evo:theme', { detail: { tema: t } }));

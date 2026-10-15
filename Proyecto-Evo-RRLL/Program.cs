@@ -80,7 +80,7 @@ static async Task SeedAdminAsync(IServiceProvider servicios, string adminClave)
     if (await usuarioLogica.ObtenerPorLogin(LoginAdmin) is not null)
         return;
 
-    // Rol administrador del sistema RRHH (SistemaOpcion '0500000'); en los datos legados es el rol 13
+    // Rol administrador del sistema RRHH (SistemaOpcion '0500000'); en los datos legados es el rol 13 , usuario admin  , contrasena: Admin.2026
     var rolLogica = servicios.GetRequiredService<RolLogica>();
     var rol = (await rolLogica.Listar()).FirstOrDefault(r => r.IdSistema?.Trim() == SeguridadController.SistemaRRHH
         && r.Descripcion != null && r.Descripcion.Trim().ToUpper() == "ADMINISTRADOR");

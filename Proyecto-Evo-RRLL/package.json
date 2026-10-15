@@ -1,0 +1,12 @@
+{
+  "name": "proyecto-evo-rrll-estilos",
+  "private": true,
+  "description": "Compila los estilos Tailwind de la app. El resultado (wwwroot/css/app.css) se versiona, asi que Node solo hace falta para cambiar estilos.",
+  "scripts": {
+    "css:build": "tailwindcss -i ./Estilos/app.css -o ./wwwroot/css/app.css --minify",
+    "css:watch": "tailwindcss -i ./Estilos/app.css -o ./wwwroot/css/app.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}
