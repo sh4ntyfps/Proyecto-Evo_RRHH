@@ -3,16 +3,16 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class RRHH_DinamicaFamiliarLogica
+public class RRHH_DinamicaFamiliarLogica : LogicaBase<RRHH_DinamicaFamiliar>
 {
     private readonly RRHH_DinamicaFamiliarData _data;
 
-    public RRHH_DinamicaFamiliarLogica(RRHH_DinamicaFamiliarData data) => _data = data;
+    public RRHH_DinamicaFamiliarLogica(RRHH_DinamicaFamiliarData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<RRHH_DinamicaFamiliar>> Listar() => await _data.Listar();
     public async Task<RRHH_DinamicaFamiliar?> Obtener(int idDinamicaParam) => await _data.Obtener(idDinamicaParam);
-    public async Task Crear(RRHH_DinamicaFamiliar registro) => await _data.Crear(registro);
-    public async Task Actualizar(RRHH_DinamicaFamiliar registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(RRHH_DinamicaFamiliar registro) => await _data.Eliminar(registro);
-}
 
+    public Task CrearConNuevoId(RRHH_DinamicaFamiliar registro) =>
+        CrearNumerado(registro, x => x.idDinamica, id => registro.idDinamica = id);
+
+    public Task<bool> Registrar(RRHH_DinamicaFamiliar registro) => EnTransaccion(() => CrearConNuevoId(registro));
+}

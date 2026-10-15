@@ -3,16 +3,17 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class ResolucionLogica
+public class ResolucionLogica : LogicaBase<Resolucion>
 {
     private readonly ResolucionData _data;
 
-    public ResolucionLogica(ResolucionData data) => _data = data;
+    public ResolucionLogica(ResolucionData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<Resolucion>> Listar() => await _data.Listar();
     public async Task<Resolucion?> Obtener(int idEmpleadoParam, int idResolucionParam) => await _data.Obtener(idEmpleadoParam, idResolucionParam);
-    public async Task Crear(Resolucion registro) => await _data.Crear(registro);
-    public async Task Actualizar(Resolucion registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Resolucion registro) => await _data.Eliminar(registro);
-}
 
+    // Numero de resolucion correlativo por empleado.
+    public Task CrearConNuevoId(Resolucion registro) =>
+        CrearNumerado(registro, x => x.idResolucion, id => registro.idResolucion = id, x => x.idEmpleado == registro.idEmpleado);
+
+    public Task<bool> Registrar(Resolucion registro) => EnTransaccion(() => CrearConNuevoId(registro));
+}

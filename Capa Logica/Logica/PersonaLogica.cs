@@ -3,16 +3,16 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class PersonaLogica
+public class PersonaLogica : LogicaBase<Persona>
 {
     private readonly PersonaData _data;
 
-    public PersonaLogica(PersonaData data) => _data = data;
+    public PersonaLogica(PersonaData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<Persona>> Listar() => await _data.Listar();
     public async Task<Persona?> Obtener(int IdPersonaParam) => await _data.Obtener(IdPersonaParam);
-    public async Task Crear(Persona registro) => await _data.Crear(registro);
-    public async Task Actualizar(Persona registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Persona registro) => await _data.Eliminar(registro);
-}
 
+    public Task CrearConNuevoId(Persona registro) =>
+        CrearNumerado(registro, x => x.IdPersona, id => registro.IdPersona = id);
+
+    public Task<bool> Registrar(Persona registro) => EnTransaccion(() => CrearConNuevoId(registro));
+}

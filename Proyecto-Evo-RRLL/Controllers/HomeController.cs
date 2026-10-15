@@ -10,35 +10,35 @@ namespace Proyecto_Evo_RRLL.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly EmpleadoLogica _empleadoData;
-        private readonly PersonaLogica _personaData;
-        private readonly AsistenciaLogica _asistenciaData;
-        private readonly EstructOrganizLogica _estructOrganizData;
-private readonly CargoLogica _cargoData;
-    private readonly RRHH_FeriadoLogica _feriadoData;
+        private readonly EmpleadoLogica _empleadoLogica;
+        private readonly PersonaLogica _personaLogica;
+        private readonly AsistenciaLogica _asistenciaLogica;
+        private readonly EstructOrganizLogica _estructOrganizLogica;
+private readonly CargoLogica _cargoLogica;
+    private readonly RRHH_FeriadoLogica _feriadoLogica;
 
     public HomeController(
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        AsistenciaLogica asistenciaData,
-        EstructOrganizLogica estructuraOrganizData,
-        CargoLogica cargoData,
-        RRHH_FeriadoLogica feriadoData)
+        EmpleadoLogica empleadoLogica,
+        PersonaLogica personaLogica,
+        AsistenciaLogica asistenciaLogica,
+        EstructOrganizLogica estructuraOrganizLogica,
+        CargoLogica cargoLogica,
+        RRHH_FeriadoLogica feriadoLogica)
     {
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _asistenciaData = asistenciaData;
-        _estructOrganizData = estructuraOrganizData;
-        _cargoData = cargoData;
-        _feriadoData = feriadoData;
+        _empleadoLogica = empleadoLogica;
+        _personaLogica = personaLogica;
+        _asistenciaLogica = asistenciaLogica;
+        _estructOrganizLogica = estructuraOrganizLogica;
+        _cargoLogica = cargoLogica;
+        _feriadoLogica = feriadoLogica;
     }
 
         public async Task<IActionResult> Index()
         {
-            var empleados = await _empleadoData.Listar();
-            var estructuras = await _estructOrganizData.Listar();
-            var personas = await _personaData.Listar();
-            var cargos = await _cargoData.Listar();
+            var empleados = await _empleadoLogica.Listar();
+            var estructuras = await _estructOrganizLogica.Listar();
+            var personas = await _personaLogica.Listar();
+            var cargos = await _cargoLogica.Listar();
 
             // Empleados por área
             var areaPorKey = estructuras.ToDictionary(e => $"{e.Year}|{e.idAreaOrganiz}", e => e.AreaOrganizacional ?? $"Área {e.idAreaOrganiz}");
@@ -62,7 +62,7 @@ private readonly CargoLogica _cargoData;
             {
                 var fecha = hoy.AddDays(-d);
                 ultimos7.Add(fecha.ToString("dd/MM"));
-                asisUltimos7.Add(await _asistenciaData.ContarEntreFechas(fecha, fecha));
+                asisUltimos7.Add(await _asistenciaLogica.ContarEntreFechas(fecha, fecha));
             }
 
             // Empleados por estado
@@ -79,7 +79,7 @@ private readonly CargoLogica _cargoData;
                 Empleados = empleados.Count,
                 EmpleadosActivos = empleados.Count(e => e.Estado == "A"),
                 Personas = personas.Count,
-                asistenciasHoy = await _asistenciaData.ContarEntreFechas(hoy, hoy),
+                asistenciasHoy = await _asistenciaLogica.ContarEntreFechas(hoy, hoy),
                 Areas = estructuras.Count,
                 Cargos = cargos.Count,
                 AreasNombres = areasNombres,
@@ -97,7 +97,7 @@ private readonly CargoLogica _cargoData;
         {
             try
             {
-                return (await _feriadoData.Listar())
+                return (await _feriadoLogica.Listar())
                     .Where(f => f.Fecha?.Year == hoy.Year && f.Fecha!.Value.Month == hoy.Month)
                     .OrderBy(f => f.Fecha)
                     .Select(f => string.IsNullOrWhiteSpace(f.Motivo) ? $"{f.Fecha:dd/MM}" : $"{f.Fecha:dd/MM} - {f.Motivo}")

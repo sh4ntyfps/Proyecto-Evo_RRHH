@@ -1,5 +1,4 @@
 using Capa_Logica;
-using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,53 +8,47 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class FamiliaController : Controller
 {
-    private readonly FamiliarLogica _familiarData;
-    private readonly RRHH_DinamicaFamiliarLogica _dinamicaData;
-    private readonly RRHH_FuncFamLogica _funcFamData;
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly TipoFamiliarLogica _tipoFamiliarData;
-    private readonly RRHH_TipoFamiliaLogica _tipoFamiliaData;
-    private readonly RRHH_RelacParejaLogica _relacParejaData;
-    private readonly RRHH_RelacPHLogica _relacPHData;
-    private readonly RRHH_RelacHermanoLogica _relacHermanoData;
-    private readonly EstadoCivilLogica _estadoCivilData;
-    private readonly DiscapacidadLogica _discapacidadData;
-    private readonly TipoSangreLogica _tipoSangreData;
-    private readonly SecuenciaService _secuencia;
-    private readonly Services.EmpleadoServicio _empleados;
+    private readonly FamiliarLogica _familiarLogica;
+    private readonly RRHH_DinamicaFamiliarLogica _dinamicaLogica;
+    private readonly RRHH_FuncFamLogica _funcFamLogica;
+    private readonly PersonaLogica _personaLogica;
+    private readonly TipoFamiliarLogica _tipoFamiliarLogica;
+    private readonly RRHH_TipoFamiliaLogica _tipoFamiliaLogica;
+    private readonly RRHH_RelacParejaLogica _relacParejaLogica;
+    private readonly RRHH_RelacPHLogica _relacPHLogica;
+    private readonly RRHH_RelacHermanoLogica _relacHermanoLogica;
+    private readonly EstadoCivilLogica _estadoCivilLogica;
+    private readonly DiscapacidadLogica _discapacidadLogica;
+    private readonly TipoSangreLogica _tipoSangreLogica;
+    private readonly EmpleadoServicio _empleados;
 
     public FamiliaController(
-        FamiliarLogica familiarData,
-        RRHH_DinamicaFamiliarLogica dinamicaData,
-        RRHH_FuncFamLogica funcFamData,
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        TipoFamiliarLogica tipoFamiliarData,
-        RRHH_TipoFamiliaLogica tipoFamiliaData,
-        RRHH_RelacParejaLogica relacParejaData,
-        RRHH_RelacPHLogica relacPHData,
-        RRHH_RelacHermanoLogica relacHermanoData,
-        EstadoCivilLogica estadoCivilData,
-        DiscapacidadLogica discapacidadData,
-        TipoSangreLogica tipoSangreData,
-        SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados)
+        FamiliarLogica familiarLogica,
+        RRHH_DinamicaFamiliarLogica dinamicaLogica,
+        RRHH_FuncFamLogica funcFamLogica,
+        PersonaLogica personaLogica,
+        TipoFamiliarLogica tipoFamiliarLogica,
+        RRHH_TipoFamiliaLogica tipoFamiliaLogica,
+        RRHH_RelacParejaLogica relacParejaLogica,
+        RRHH_RelacPHLogica relacPHLogica,
+        RRHH_RelacHermanoLogica relacHermanoLogica,
+        EstadoCivilLogica estadoCivilLogica,
+        DiscapacidadLogica discapacidadLogica,
+        TipoSangreLogica tipoSangreLogica,
+        EmpleadoServicio empleados)
     {
-        _familiarData = familiarData;
-        _dinamicaData = dinamicaData;
-        _funcFamData = funcFamData;
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _tipoFamiliarData = tipoFamiliarData;
-        _tipoFamiliaData = tipoFamiliaData;
-        _relacParejaData = relacParejaData;
-        _relacPHData = relacPHData;
-        _relacHermanoData = relacHermanoData;
-        _estadoCivilData = estadoCivilData;
-        _discapacidadData = discapacidadData;
-        _tipoSangreData = tipoSangreData;
-        _secuencia = secuencia;
+        _familiarLogica = familiarLogica;
+        _dinamicaLogica = dinamicaLogica;
+        _funcFamLogica = funcFamLogica;
+        _personaLogica = personaLogica;
+        _tipoFamiliarLogica = tipoFamiliarLogica;
+        _tipoFamiliaLogica = tipoFamiliaLogica;
+        _relacParejaLogica = relacParejaLogica;
+        _relacPHLogica = relacPHLogica;
+        _relacHermanoLogica = relacHermanoLogica;
+        _estadoCivilLogica = estadoCivilLogica;
+        _discapacidadLogica = discapacidadLogica;
+        _tipoSangreLogica = tipoSangreLogica;
         _empleados = empleados;
     }
 
@@ -64,7 +57,7 @@ public class FamiliaController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(int? idEmpleado)
     {
-        var familiares = (await _familiarData.Listar())
+        var familiares = (await _familiarLogica.Listar())
             .Where(f => idEmpleado is null || f.IdEmpleado == idEmpleado)
             .OrderBy(f => f.IdEmpleado)
             .ThenBy(f => f.IdPersona);
@@ -72,10 +65,10 @@ public class FamiliaController : Controller
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.TiposFamiliar = await _tipoFamiliarData.Listar();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
-        ViewBag.Discapacidades = await _discapacidadData.Listar();
-        ViewBag.TiposSangre = await _tipoSangreData.Listar();
+        ViewBag.TiposFamiliar = await _tipoFamiliarLogica.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
+        ViewBag.Discapacidades = await _discapacidadLogica.Listar();
+        ViewBag.TiposSangre = await _tipoSangreLogica.Listar();
         return View(familiares.ToList());
     }
 
@@ -85,10 +78,10 @@ public class FamiliaController : Controller
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.TiposFamiliar = await _tipoFamiliarData.Listar();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
-        ViewBag.Discapacidades = await _discapacidadData.Listar();
-        ViewBag.TiposSangre = await _tipoSangreData.Listar();
+        ViewBag.TiposFamiliar = await _tipoFamiliarLogica.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
+        ViewBag.Discapacidades = await _discapacidadLogica.Listar();
+        ViewBag.TiposSangre = await _tipoSangreLogica.Listar();
         return View("FamiliarForm", new Familiar { IdEmpleado = idEmpleado ?? 0 });
     }
 
@@ -96,12 +89,12 @@ public class FamiliaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> FamiliarNuevo(Familiar modelo)
     {
-        if (await _familiarData.Obtener(modelo.IdEmpleado, modelo.IdPersona) is not null)
+        if (await _familiarLogica.Obtener(modelo.IdEmpleado, modelo.IdPersona) is not null)
             ModelState.AddModelError("", "Ese familiar ya está registrado para el empleado.");
 
         if (ModelState.IsValid)
         {
-            await _familiarData.Crear(modelo);
+            await _familiarLogica.Crear(modelo);
             TempData["MensajeExito"] = "Familiar registrado.";
             return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
         }
@@ -109,26 +102,26 @@ public class FamiliaController : Controller
         ViewBag.IdEmpleado = modelo.IdEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.TiposFamiliar = await _tipoFamiliarData.Listar();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
-        ViewBag.Discapacidades = await _discapacidadData.Listar();
-        ViewBag.TiposSangre = await _tipoSangreData.Listar();
+        ViewBag.TiposFamiliar = await _tipoFamiliarLogica.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
+        ViewBag.Discapacidades = await _discapacidadLogica.Listar();
+        ViewBag.TiposSangre = await _tipoSangreLogica.Listar();
         return View("FamiliarForm", modelo);
     }
 
     [HttpGet]
     public async Task<IActionResult> FamiliarEditar(int idEmpleado, int idPersona)
     {
-        var registro = await _familiarData.Obtener(idEmpleado, idPersona);
+        var registro = await _familiarLogica.Obtener(idEmpleado, idPersona);
         if (registro is null)
             return NotFound();
 
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.TiposFamiliar = await _tipoFamiliarData.Listar();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
-        ViewBag.Discapacidades = await _discapacidadData.Listar();
-        ViewBag.TiposSangre = await _tipoSangreData.Listar();
+        ViewBag.TiposFamiliar = await _tipoFamiliarLogica.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
+        ViewBag.Discapacidades = await _discapacidadLogica.Listar();
+        ViewBag.TiposSangre = await _tipoSangreLogica.Listar();
         return View("FamiliarForm", registro);
     }
 
@@ -136,7 +129,7 @@ public class FamiliaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> FamiliarEditar(Familiar modelo)
     {
-        var actual = await _familiarData.Obtener(modelo.IdEmpleado, modelo.IdPersona);
+        var actual = await _familiarLogica.Obtener(modelo.IdEmpleado, modelo.IdPersona);
         if (actual is null)
             return NotFound();
 
@@ -154,7 +147,7 @@ public class FamiliaController : Controller
         actual.Enfermedad = modelo.Enfermedad;
         actual.TiempoEnfermedad = modelo.TiempoEnfermedad;
         actual.IdTipoSangre = modelo.IdTipoSangre;
-        await _familiarData.Actualizar(actual);
+        await _familiarLogica.Actualizar(actual);
         TempData["MensajeExito"] = "Familiar actualizado.";
         return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
     }
@@ -163,10 +156,10 @@ public class FamiliaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> FamiliarEliminar(int idEmpleado, int idPersona)
     {
-        var actual = await _familiarData.Obtener(idEmpleado, idPersona);
+        var actual = await _familiarLogica.Obtener(idEmpleado, idPersona);
         if (actual is not null)
         {
-            await _familiarData.Eliminar(actual);
+            await _familiarLogica.Eliminar(actual);
             TempData["MensajeExito"] = "Familiar eliminado.";
         }
         return RedirectToAction(nameof(Index), new { idEmpleado });
@@ -177,16 +170,16 @@ public class FamiliaController : Controller
     [HttpGet]
     public async Task<IActionResult> Dinamica(int? idEmpleado)
     {
-        var registros = (await _dinamicaData.Listar())
+        var registros = (await _dinamicaLogica.Listar())
             .Where(d => idEmpleado is null || d.IdEmpleado == idEmpleado)
             .OrderByDescending(d => d.idDinamica);
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.TiposFamilia = await _tipoFamiliaData.Listar();
-        ViewBag.RelacPareja = await _relacParejaData.Listar();
-        ViewBag.RelacPH = await _relacPHData.Listar();
-        ViewBag.RelacHermano = await _relacHermanoData.Listar();
+        ViewBag.TiposFamilia = await _tipoFamiliaLogica.Listar();
+        ViewBag.RelacPareja = await _relacParejaLogica.Listar();
+        ViewBag.RelacPH = await _relacPHLogica.Listar();
+        ViewBag.RelacHermano = await _relacHermanoLogica.Listar();
         return View(registros.ToList());
     }
 
@@ -195,10 +188,10 @@ public class FamiliaController : Controller
     {
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.TiposFamilia = await _tipoFamiliaData.Listar();
-        ViewBag.RelacPareja = await _relacParejaData.Listar();
-        ViewBag.RelacPH = await _relacPHData.Listar();
-        ViewBag.RelacHermano = await _relacHermanoData.Listar();
+        ViewBag.TiposFamilia = await _tipoFamiliaLogica.Listar();
+        ViewBag.RelacPareja = await _relacParejaLogica.Listar();
+        ViewBag.RelacPH = await _relacPHLogica.Listar();
+        ViewBag.RelacHermano = await _relacHermanoLogica.Listar();
         return View("DinamicaForm", new RRHH_DinamicaFamiliar { IdEmpleado = idEmpleado });
     }
 
@@ -208,18 +201,7 @@ public class FamiliaController : Controller
     {
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _dinamicaData.Listar();
-                    return lista.Count == 0 ? 1 : lista.Max(d => d.idDinamica) + 1;
-                },
-                async id =>
-                {
-                    modelo.idDinamica = id;
-                    await _dinamicaData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _dinamicaLogica.Registrar(modelo);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Dinámica familiar guardada.";
@@ -230,26 +212,26 @@ public class FamiliaController : Controller
 
         ViewBag.IdEmpleado = modelo.IdEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.TiposFamilia = await _tipoFamiliaData.Listar();
-        ViewBag.RelacPareja = await _relacParejaData.Listar();
-        ViewBag.RelacPH = await _relacPHData.Listar();
-        ViewBag.RelacHermano = await _relacHermanoData.Listar();
+        ViewBag.TiposFamilia = await _tipoFamiliaLogica.Listar();
+        ViewBag.RelacPareja = await _relacParejaLogica.Listar();
+        ViewBag.RelacPH = await _relacPHLogica.Listar();
+        ViewBag.RelacHermano = await _relacHermanoLogica.Listar();
         return View("DinamicaForm", modelo);
     }
 
     [HttpGet]
     public async Task<IActionResult> DinamicaEditar(int id)
     {
-        var registro = await _dinamicaData.Obtener(id);
+        var registro = await _dinamicaLogica.Obtener(id);
         if (registro is null)
             return NotFound();
 
         ViewBag.IdEmpleado = registro.IdEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.TiposFamilia = await _tipoFamiliaData.Listar();
-        ViewBag.RelacPareja = await _relacParejaData.Listar();
-        ViewBag.RelacPH = await _relacPHData.Listar();
-        ViewBag.RelacHermano = await _relacHermanoData.Listar();
+        ViewBag.TiposFamilia = await _tipoFamiliaLogica.Listar();
+        ViewBag.RelacPareja = await _relacParejaLogica.Listar();
+        ViewBag.RelacPH = await _relacPHLogica.Listar();
+        ViewBag.RelacHermano = await _relacHermanoLogica.Listar();
         return View("DinamicaForm", registro);
     }
 
@@ -257,7 +239,7 @@ public class FamiliaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DinamicaEditar(RRHH_DinamicaFamiliar modelo)
     {
-        var actual = await _dinamicaData.Obtener(modelo.idDinamica);
+        var actual = await _dinamicaLogica.Obtener(modelo.idDinamica);
         if (actual is null)
             return NotFound();
 
@@ -267,7 +249,7 @@ public class FamiliaController : Controller
         actual.idRelaPH = modelo.idRelaPH;
         actual.idRelacHermano = modelo.idRelacHermano;
         actual.Observacion = modelo.Observacion;
-        await _dinamicaData.Actualizar(actual);
+        await _dinamicaLogica.Actualizar(actual);
         TempData["MensajeExito"] = "Dinámica familiar actualizada.";
         return RedirectToAction(nameof(Dinamica), new { idEmpleado = actual.IdEmpleado });
     }
@@ -276,10 +258,10 @@ public class FamiliaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DinamicaEliminar(int id)
     {
-        var actual = await _dinamicaData.Obtener(id);
+        var actual = await _dinamicaLogica.Obtener(id);
         if (actual is not null)
         {
-            await _dinamicaData.Eliminar(actual);
+            await _dinamicaLogica.Eliminar(actual);
             TempData["MensajeExito"] = "Dinámica familiar eliminada.";
         }
         return RedirectToAction(nameof(Dinamica), new { idEmpleado = actual?.IdEmpleado });
@@ -290,7 +272,7 @@ public class FamiliaController : Controller
     [HttpGet]
     public async Task<IActionResult> FuncFam(int? idEmpleado)
     {
-        var registros = (await _funcFamData.Listar())
+        var registros = (await _funcFamLogica.Listar())
             .Where(f => idEmpleado is null || f.IdEmpleado == idEmpleado)
             .OrderByDescending(f => f.idFuncFamiliar);
 
@@ -313,18 +295,7 @@ public class FamiliaController : Controller
     {
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _funcFamData.Listar();
-                    return lista.Count == 0 ? 1 : lista.Max(f => f.idFuncFamiliar) + 1;
-                },
-                async id =>
-                {
-                    modelo.idFuncFamiliar = id;
-                    await _funcFamData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _funcFamLogica.Registrar(modelo);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Funcionalidad familiar guardada.";
@@ -341,7 +312,7 @@ public class FamiliaController : Controller
     [HttpGet]
     public async Task<IActionResult> FuncFamEditar(int id)
     {
-        var registro = await _funcFamData.Obtener(id);
+        var registro = await _funcFamLogica.Obtener(id);
         if (registro is null)
             return NotFound();
 
@@ -354,7 +325,7 @@ public class FamiliaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> FuncFamEditar(RRHH_FuncFam modelo)
     {
-        var actual = await _funcFamData.Obtener(modelo.idFuncFamiliar);
+        var actual = await _funcFamLogica.Obtener(modelo.idFuncFamiliar);
         if (actual is null)
             return NotFound();
 
@@ -368,7 +339,7 @@ public class FamiliaController : Controller
         actual.Soc1 = modelo.Soc1;
         actual.Soc2 = modelo.Soc2;
         actual.Soc3 = modelo.Soc3;
-        await _funcFamData.Actualizar(actual);
+        await _funcFamLogica.Actualizar(actual);
         TempData["MensajeExito"] = "Funcionalidad familiar actualizada.";
         return RedirectToAction(nameof(FuncFam), new { idEmpleado = actual.IdEmpleado });
     }
@@ -377,10 +348,10 @@ public class FamiliaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> FuncFamEliminar(int id)
     {
-        var actual = await _funcFamData.Obtener(id);
+        var actual = await _funcFamLogica.Obtener(id);
         if (actual is not null)
         {
-            await _funcFamData.Eliminar(actual);
+            await _funcFamLogica.Eliminar(actual);
             TempData["MensajeExito"] = "Funcionalidad familiar eliminada.";
         }
         return RedirectToAction(nameof(FuncFam), new { idEmpleado = actual?.IdEmpleado });
@@ -393,9 +364,9 @@ public class FamiliaController : Controller
 
     private async Task<List<(int Id, string Nombre)>> PersonasAsync()
     {
-        var personas = await _personaData.Listar();
+        var personas = await _personaLogica.Listar();
         return personas
-            .Select(p => (p.IdPersona, $"{p.Nombres} {p.Apellido_Paterno} {p.Apellido_Materno}".Trim()))
+            .Select(p => (p.IdPersona, p.NombreCompleto()))
             .OrderBy(x => x.Item2)
             .Select(x => (x.Item1, x.Item2))
             .ToList();

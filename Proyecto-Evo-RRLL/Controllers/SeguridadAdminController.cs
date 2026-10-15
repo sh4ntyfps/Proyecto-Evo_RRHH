@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Capa_Logica;
-using Capa_Datos;
 using Capa_Entidades;
 using Proyecto_Evo_RRLL.Models.ViewModels;
 
@@ -11,37 +10,34 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize(Roles = "Administrador")]
 public class SeguridadAdminController : Controller
 {
-    private readonly UsuarioLogica _usuarioData;
-    private readonly Usuario_RolLogica _usuarioRolData;
-    private readonly RolLogica _rolData;
-    private readonly Rol_AccesoLogica _rolAccesoData;
-    private readonly SistemaOpcionLogica _sistemaOpcionData;
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly SecuenciaService _secuencia;
-    private readonly Services.EmpleadoServicio _empleados;
+    private readonly UsuarioLogica _usuarioLogica;
+    private readonly Usuario_RolLogica _usuarioRolLogica;
+    private readonly RolLogica _rolLogica;
+    private readonly Rol_AccesoLogica _rolAccesoLogica;
+    private readonly SistemaOpcionLogica _sistemaOpcionLogica;
+    private readonly EmpleadoLogica _empleadoLogica;
+    private readonly PersonaLogica _personaLogica;
+    private readonly EmpleadoServicio _empleados;
     private readonly BitacoraLogica _bitacora;
 
     public SeguridadAdminController(
-        UsuarioLogica usuarioData,
-        Usuario_RolLogica usuarioRolData,
-        RolLogica rolData,
-        Rol_AccesoLogica rolAccesoData,
-        SistemaOpcionLogica sistemaOpcionData,
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados,
+        UsuarioLogica usuarioLogica,
+        Usuario_RolLogica usuarioRolLogica,
+        RolLogica rolLogica,
+        Rol_AccesoLogica rolAccesoLogica,
+        SistemaOpcionLogica sistemaOpcionLogica,
+        EmpleadoLogica empleadoLogica,
+        PersonaLogica personaLogica,
+        EmpleadoServicio empleados,
         BitacoraLogica bitacora)
     {
-        _usuarioData = usuarioData;
-        _usuarioRolData = usuarioRolData;
-        _rolData = rolData;
-        _rolAccesoData = rolAccesoData;
-        _sistemaOpcionData = sistemaOpcionData;
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _secuencia = secuencia;
+        _usuarioLogica = usuarioLogica;
+        _usuarioRolLogica = usuarioRolLogica;
+        _rolLogica = rolLogica;
+        _rolAccesoLogica = rolAccesoLogica;
+        _sistemaOpcionLogica = sistemaOpcionLogica;
+        _empleadoLogica = empleadoLogica;
+        _personaLogica = personaLogica;
         _empleados = empleados;
         _bitacora = bitacora;
     }
@@ -50,11 +46,11 @@ public class SeguridadAdminController : Controller
 
     public async Task<IActionResult> Usuarios(string? q)
     {
-        var usuarios = await _usuarioData.Listar();
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        var relaciones = await _usuarioRolData.Listar();
-        var roles = await _rolData.Listar();
+        var usuarios = await _usuarioLogica.Listar();
+        var empleados = await _empleadoLogica.Listar();
+        var personas = await _personaLogica.Listar();
+        var relaciones = await _usuarioRolLogica.Listar();
+        var roles = await _rolLogica.Listar();
 
         var vm = new List<UsuarioFila>();
         foreach (var u in usuarios)
@@ -68,7 +64,7 @@ public class SeguridadAdminController : Controller
             var persona = emp?.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == emp.IdPersona);
             var nombre = persona is null
                 ? ""
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+                : persona.NombreCompleto();
 
             var rolesUs = relaciones.Where(r => r.IdUsuario == u.IdUsuario)
                 .Select(r => roles.FirstOrDefault(x => x.IdRol == r.IdRol)?.Descripcion)
@@ -102,20 +98,15 @@ public class SeguridadAdminController : Controller
             ModelState.AddModelError("clave", "La clave es obligatoria.");
 
         if (string.IsNullOrWhiteSpace(modelo.Login) == false
-            && await _usuarioData.ObtenerPorLogin(modelo.Login.Trim()) is not null)
+            && await _usuarioLogica.ObtenerPorLogin(modelo.Login.Trim()) is not null)
             ModelState.AddModelError("", "Ya existe un usuario con ese login.");
 
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
-            {
-                var lista = await _usuarioData.Listar();
-                modelo.IdUsuario = lista.Count == 0 ? 1 : lista.Max(u => u.IdUsuario) + 1;
-                modelo.Login = modelo.Login!.Trim();
-                modelo.PasswordHash = new PasswordHasher<Usuario>().HashPassword(modelo, clave);
-                modelo.Fecha = DateTime.Now;
-                await _usuarioData.Crear(modelo);
-            });
+            modelo.Login = modelo.Login!.Trim();
+            modelo.PasswordHash = new PasswordHasher<Usuario>().HashPassword(modelo, clave);
+            modelo.Fecha = DateTime.Now;
+            var guardo = await _usuarioLogica.Registrar(modelo);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Usuario creado.";
@@ -132,7 +123,7 @@ public class SeguridadAdminController : Controller
     [HttpGet]
     public async Task<IActionResult> UsuarioEditar(int id)
     {
-        var usuario = await _usuarioData.Obtener(id);
+        var usuario = await _usuarioLogica.Obtener(id);
         if (usuario is null)
             return NotFound();
 
@@ -144,13 +135,13 @@ public class SeguridadAdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UsuarioEditar(Usuario modelo, string clave)
     {
-        var actual = await _usuarioData.Obtener(modelo.IdUsuario);
+        var actual = await _usuarioLogica.Obtener(modelo.IdUsuario);
         if (actual is null)
             return NotFound();
 
         if (!string.IsNullOrEmpty(actual.Login) && !string.IsNullOrEmpty(modelo.Login)
             && actual.Login.Trim() != modelo.Login.Trim()
-            && await _usuarioData.ObtenerPorLogin(modelo.Login.Trim()) is not null)
+            && await _usuarioLogica.ObtenerPorLogin(modelo.Login.Trim()) is not null)
             ModelState.AddModelError("", "Ya existe un usuario con ese login.");
 
         if (ModelState.IsValid)
@@ -161,7 +152,7 @@ public class SeguridadAdminController : Controller
             actual.IdEmpleado = modelo.IdEmpleado;
             if (!string.IsNullOrWhiteSpace(clave))
                 actual.PasswordHash = new PasswordHasher<Usuario>().HashPassword(actual, clave);
-            await _usuarioData.Actualizar(actual);
+            await _usuarioLogica.Actualizar(actual);
             TempData["MensajeExito"] = "Usuario actualizado.";
             await _bitacora.Registrar(User.Identity?.Name ?? "?", "Editar", "Usuario", $"id={actual.IdUsuario}, login={actual.Login}");
             return RedirectToAction(nameof(Usuarios));
@@ -175,13 +166,13 @@ public class SeguridadAdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UsuarioEliminar(int id)
     {
-        var actual = await _usuarioData.Obtener(id);
+        var actual = await _usuarioLogica.Obtener(id);
         if (actual is not null)
         {
-            var relaciones = (await _usuarioRolData.Listar()).Where(r => r.IdUsuario == id).ToList();
+            var relaciones = (await _usuarioRolLogica.Listar()).Where(r => r.IdUsuario == id).ToList();
             foreach (var r in relaciones)
-                await _usuarioRolData.Eliminar(r);
-            await _usuarioData.Eliminar(actual);
+                await _usuarioRolLogica.Eliminar(r);
+            await _usuarioLogica.Eliminar(actual);
             TempData["MensajeExito"] = "Usuario eliminado.";
             await _bitacora.Registrar(User.Identity?.Name ?? "?", "Eliminar", "Usuario", $"id={id}, login={actual.Login}");
         }
@@ -193,12 +184,12 @@ public class SeguridadAdminController : Controller
     [HttpGet]
     public async Task<IActionResult> UsuarioRoles(int id)
     {
-        var usuario = await _usuarioData.Obtener(id);
+        var usuario = await _usuarioLogica.Obtener(id);
         if (usuario is null)
             return NotFound();
 
-        var roles = await _rolData.Listar();
-        var asignados = (await _usuarioRolData.Listar()).Where(r => r.IdUsuario == id).Select(r => r.IdRol).ToHashSet();
+        var roles = await _rolLogica.Listar();
+        var asignados = (await _usuarioRolLogica.Listar()).Where(r => r.IdUsuario == id).Select(r => r.IdRol).ToHashSet();
 
         ViewBag.Usuario = usuario;
         ViewBag.Roles = roles
@@ -211,21 +202,21 @@ public class SeguridadAdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UsuarioRoles(int id, int[] roles)
     {
-        var usuario = await _usuarioData.Obtener(id);
+        var usuario = await _usuarioLogica.Obtener(id);
         if (usuario is null)
             return NotFound();
 
-        var listaRoles = await _rolData.Listar();
-        var actuales = (await _usuarioRolData.Listar()).Where(r => r.IdUsuario == id).ToList();
+        var listaRoles = await _rolLogica.Listar();
+        var actuales = (await _usuarioRolLogica.Listar()).Where(r => r.IdUsuario == id).ToList();
 
         foreach (var r in actuales.Where(r => !roles.Contains(r.IdRol)))
-            await _usuarioRolData.Eliminar(r);
+            await _usuarioRolLogica.Eliminar(r);
 
         foreach (var r in roles)
         {
             if (actuales.Any(a => a.IdRol == r))
                 continue;
-            await _usuarioRolData.Crear(new Usuario_Rol { IdUsuario = id, IdRol = r });
+            await _usuarioRolLogica.Crear(new Usuario_Rol { IdUsuario = id, IdRol = r });
         }
 
         TempData["MensajeExito"] = "Roles del usuario actualizados.";
@@ -236,9 +227,9 @@ public class SeguridadAdminController : Controller
 
     public async Task<IActionResult> Roles()
     {
-        var roles = await _rolData.Listar();
-        var usuarios = await _usuarioData.Listar();
-        var relaciones = await _usuarioRolData.Listar();
+        var roles = await _rolLogica.Listar();
+        var usuarios = await _usuarioLogica.Listar();
+        var relaciones = await _usuarioRolLogica.Listar();
 
         var vm = roles.Select(r => new RolFila
         {
@@ -262,12 +253,7 @@ public class SeguridadAdminController : Controller
     {
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
-            {
-                var lista = await _rolData.Listar();
-                modelo.IdRol = lista.Count == 0 ? 1 : lista.Max(r => r.IdRol) + 1;
-                await _rolData.Crear(modelo);
-            });
+            var guardo = await _rolLogica.Registrar(modelo);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Rol creado.";
@@ -282,7 +268,7 @@ public class SeguridadAdminController : Controller
     [HttpGet]
     public async Task<IActionResult> RolEditar(int id)
     {
-        var rol = await _rolData.Obtener(id);
+        var rol = await _rolLogica.Obtener(id);
         if (rol is null)
             return NotFound();
         return View("RolForm", rol);
@@ -292,13 +278,13 @@ public class SeguridadAdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RolEditar(Rol modelo)
     {
-        var actual = await _rolData.Obtener(modelo.IdRol);
+        var actual = await _rolLogica.Obtener(modelo.IdRol);
         if (actual is null)
             return NotFound();
 
         actual.Descripcion = modelo.Descripcion;
         actual.IdSistema = modelo.IdSistema;
-        await _rolData.Actualizar(actual);
+        await _rolLogica.Actualizar(actual);
         TempData["MensajeExito"] = "Rol actualizado.";
         await _bitacora.Registrar(User.Identity?.Name ?? "?", "Editar", "Rol", $"id={actual.IdRol}, descripcion={actual.Descripcion}");
         return RedirectToAction(nameof(Roles));
@@ -308,18 +294,18 @@ public class SeguridadAdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RolEliminar(int id)
     {
-        var actual = await _rolData.Obtener(id);
+        var actual = await _rolLogica.Obtener(id);
         if (actual is not null)
         {
-            var rel = (await _usuarioRolData.Listar()).Where(r => r.IdRol == id).ToList();
+            var rel = (await _usuarioRolLogica.Listar()).Where(r => r.IdRol == id).ToList();
             foreach (var r in rel)
-                await _usuarioRolData.Eliminar(r);
+                await _usuarioRolLogica.Eliminar(r);
 
-            var accesos = (await _rolAccesoData.Listar()).Where(a => a.IdRol == id).ToList();
+            var accesos = (await _rolAccesoLogica.Listar()).Where(a => a.IdRol == id).ToList();
             foreach (var a in accesos)
-                await _rolAccesoData.Eliminar(a);
+                await _rolAccesoLogica.Eliminar(a);
 
-            await _rolData.Eliminar(actual);
+            await _rolLogica.Eliminar(actual);
             TempData["MensajeExito"] = "Rol eliminado.";
             await _bitacora.Registrar(User.Identity?.Name ?? "?", "Eliminar", "Rol", $"id={id}, descripcion={actual.Descripcion}");
         }
@@ -331,12 +317,12 @@ public class SeguridadAdminController : Controller
     [HttpGet]
     public async Task<IActionResult> RolAccesos(int id)
     {
-        var rol = await _rolData.Obtener(id);
+        var rol = await _rolLogica.Obtener(id);
         if (rol is null)
             return NotFound();
 
-        var opciones = await _sistemaOpcionData.Listar();
-        var actuales = (await _rolAccesoData.Listar()).Where(a => a.IdRol == id).ToList();
+        var opciones = await _sistemaOpcionLogica.Listar();
+        var actuales = (await _rolAccesoLogica.Listar()).Where(a => a.IdRol == id).ToList();
 
         ViewBag.Rol = rol;
         ViewBag.Opciones = opciones
@@ -354,20 +340,20 @@ public class SeguridadAdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RolAccesos(int id, string[] opciones)
     {
-        var rol = await _rolData.Obtener(id);
+        var rol = await _rolLogica.Obtener(id);
         if (rol is null)
             return NotFound();
 
-        var actuales = (await _rolAccesoData.Listar()).Where(a => a.IdRol == id).ToList();
+        var actuales = (await _rolAccesoLogica.Listar()).Where(a => a.IdRol == id).ToList();
 
         foreach (var a in actuales.Where(a => !opciones.Contains(a.IdSistemaOpcion ?? "")))
-            await _rolAccesoData.Eliminar(a);
+            await _rolAccesoLogica.Eliminar(a);
 
         foreach (var o in opciones)
         {
             if (actuales.Any(a => a.IdSistemaOpcion == o))
                 continue;
-            await _rolAccesoData.Crear(new Rol_Acceso { IdRol = id, IdSistemaOpcion = o, Permiso = "A" });
+            await _rolAccesoLogica.Crear(new Rol_Acceso { IdRol = id, IdSistemaOpcion = o, Permiso = "A" });
         }
 
         TempData["MensajeExito"] = "Permisos del rol actualizados.";

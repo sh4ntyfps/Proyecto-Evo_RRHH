@@ -3,16 +3,16 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class RolLogica
+public class RolLogica : LogicaBase<Rol>
 {
     private readonly RolData _data;
 
-    public RolLogica(RolData data) => _data = data;
+    public RolLogica(RolData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<Rol>> Listar() => await _data.Listar();
     public async Task<Rol?> Obtener(int IdRolParam) => await _data.Obtener(IdRolParam);
-    public async Task Crear(Rol registro) => await _data.Crear(registro);
-    public async Task Actualizar(Rol registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Rol registro) => await _data.Eliminar(registro);
-}
 
+    public Task CrearConNuevoId(Rol registro) =>
+        CrearNumerado(registro, x => x.IdRol, id => registro.IdRol = id);
+
+    public Task<bool> Registrar(Rol registro) => EnTransaccion(() => CrearConNuevoId(registro));
+}

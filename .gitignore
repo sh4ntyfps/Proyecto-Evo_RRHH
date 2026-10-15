@@ -10,6 +10,10 @@ x64/
 x86/
 [Bb]uild/
 
+## Salidas de publicacion (se generan con dotnet publish, no se versionan)
+publish/
+publish_test/
+
 ## IDE
 .idea/
 *.swp
@@ -18,3 +22,7 @@ x86/
 ## Logs y temporales
 *.log
 *.tmp
+
+## Scripts de datos descomprimidos (>100 MB, limite de GitHub): se versiona solo el .zip
+Scripts/bd-Datos/bd-Datos.sql
+Scripts/bd-Normalizada/03-datos-RRHH_Normalizado.sql

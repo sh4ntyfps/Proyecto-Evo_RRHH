@@ -1,5 +1,4 @@
 using Capa_Logica;
-using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,39 +9,30 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class EstructuraOrganizController : Controller
 {
-    private readonly EstructOrganizLogica _areaData;
-    private readonly ResponsableXUOLogica _responsableData;
-    private readonly Empleado_AreaLogica _empleadoAreaData;
-    private readonly LocalLogica _localData;
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly SecuenciaService _secuencia;
-    private readonly Services.EmpleadoServicio _empleados;
+    private readonly EstructOrganizLogica _areaLogica;
+    private readonly ResponsableXUOLogica _responsableLogica;
+    private readonly Empleado_AreaLogica _empleadoAreaLogica;
+    private readonly LocalLogica _localLogica;
+    private readonly EmpleadoServicio _empleados;
 
     public EstructuraOrganizController(
-        EstructOrganizLogica areaData,
-        ResponsableXUOLogica responsableData,
-        Empleado_AreaLogica empleadoAreaData,
-        LocalLogica localData,
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados)
+        EstructOrganizLogica areaLogica,
+        ResponsableXUOLogica responsableLogica,
+        Empleado_AreaLogica empleadoAreaLogica,
+        LocalLogica localLogica,
+        EmpleadoServicio empleados)
     {
-        _areaData = areaData;
-        _responsableData = responsableData;
-        _empleadoAreaData = empleadoAreaData;
-        _localData = localData;
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _secuencia = secuencia;
+        _areaLogica = areaLogica;
+        _responsableLogica = responsableLogica;
+        _empleadoAreaLogica = empleadoAreaLogica;
+        _localLogica = localLogica;
         _empleados = empleados;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index(int? year)
     {
-        var areas = await _areaData.Listar();
+        var areas = await _areaLogica.Listar();
         var anios = areas.Select(a => a.Year).Distinct().OrderByDescending(x => x).ToList();
         var anio = year ?? anios.FirstOrDefault();
         var empleados = await EmpleadosAsync();
@@ -85,18 +75,7 @@ public class EstructuraOrganizController : Controller
 
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var porAnio = (await _areaData.Listar()).Where(a => a.Year == modelo.Year).ToList();
-                    return porAnio.Count > 0 ? porAnio.Max(a => a.idAreaOrganiz) + 1 : 1;
-                },
-                async id =>
-                {
-                    modelo.idAreaOrganiz = id;
-                    await _areaData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _areaLogica.Registrar(modelo);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Unidad orgánica registrada.";
@@ -112,7 +91,7 @@ public class EstructuraOrganizController : Controller
     [HttpGet]
     public async Task<IActionResult> Editar(int year, int idAreaOrganiz)
     {
-        var area = await _areaData.Obtener(year, idAreaOrganiz);
+        var area = await _areaLogica.Obtener(year, idAreaOrganiz);
         if (area is null)
             return NotFound();
 
@@ -124,7 +103,7 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Editar(EstructOrganiz modelo)
     {
-        var actual = await _areaData.Obtener(modelo.Year, modelo.idAreaOrganiz);
+        var actual = await _areaLogica.Obtener(modelo.Year, modelo.idAreaOrganiz);
         if (actual is null)
             return NotFound();
 
@@ -145,7 +124,7 @@ public class EstructuraOrganizController : Controller
         actual.MontoAprobacion = modelo.MontoAprobacion;
         actual.PresupCompra = modelo.PresupCompra;
         actual.PresupUtilizado = modelo.PresupUtilizado;
-        await _areaData.Actualizar(actual);
+        await _areaLogica.Actualizar(actual);
 
         TempData["MensajeExito"] = "Unidad orgánica actualizada.";
         return RedirectToAction(nameof(Index), new { year = modelo.Year });
@@ -155,25 +134,25 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Eliminar(int year, int idAreaOrganiz)
     {
-        var actual = await _areaData.Obtener(year, idAreaOrganiz);
+        var actual = await _areaLogica.Obtener(year, idAreaOrganiz);
         if (actual is not null)
-            await _areaData.Eliminar(actual);
+            await _areaLogica.Eliminar(actual);
         return RedirectToAction(nameof(Index), new { year });
     }
 
     [HttpGet]
     public async Task<IActionResult> Detalles(int year, int idAreaOrganiz)
     {
-        var area = await _areaData.Obtener(year, idAreaOrganiz);
+        var area = await _areaLogica.Obtener(year, idAreaOrganiz);
         if (area is null)
             return NotFound();
 
-        var areas = await _areaData.Listar();
+        var areas = await _areaLogica.Listar();
         var empleados = await EmpleadosAsync();
-        var asignaciones = (await _empleadoAreaData.Listar())
+        var asignaciones = (await _empleadoAreaLogica.Listar())
             .Where(ea => ea.Year == year && ea.idAreaOrganiz == idAreaOrganiz)
             .ToList();
-        var responsables = (await _responsableData.Listar())
+        var responsables = (await _responsableLogica.Listar())
             .Where(r => r.Year == year && r.idAreaOrganiz == idAreaOrganiz)
             .ToList();
 
@@ -183,7 +162,6 @@ public class EstructuraOrganizController : Controller
         ViewBag.Empleados = empleados;
         ViewBag.Asignaciones = asignaciones;
         ViewBag.Responsables = responsables;
-        ViewBag.ResponsableData = _responsableData;
         return View();
     }
 
@@ -191,12 +169,12 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AgregarEmpleado(int year, int idAreaOrganiz, int idEmpleado)
     {
-        if (await _areaData.Obtener(year, idAreaOrganiz) is null)
+        if (await _areaLogica.Obtener(year, idAreaOrganiz) is null)
             return NotFound();
 
-        var existente = await _empleadoAreaData.Obtener(year, idAreaOrganiz, idEmpleado);
+        var existente = await _empleadoAreaLogica.Obtener(year, idAreaOrganiz, idEmpleado);
         if (existente is null)
-            await _empleadoAreaData.Crear(new Empleado_Area { Year = year, idAreaOrganiz = idAreaOrganiz, IdEmpleado = idEmpleado });
+            await _empleadoAreaLogica.Crear(new Empleado_Area { Year = year, idAreaOrganiz = idAreaOrganiz, IdEmpleado = idEmpleado });
 
         return RedirectToAction(nameof(Detalles), new { year, idAreaOrganiz });
     }
@@ -205,9 +183,9 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> QuitarEmpleado(int year, int idAreaOrganiz, int idEmpleado)
     {
-        var existente = await _empleadoAreaData.Obtener(year, idAreaOrganiz, idEmpleado);
+        var existente = await _empleadoAreaLogica.Obtener(year, idAreaOrganiz, idEmpleado);
         if (existente is not null)
-            await _empleadoAreaData.Eliminar(existente);
+            await _empleadoAreaLogica.Eliminar(existente);
         return RedirectToAction(nameof(Detalles), new { year, idAreaOrganiz });
     }
 
@@ -215,19 +193,8 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResponsableNuevo(ResponsableXUO modelo)
     {
-        var guardo = await _secuencia.EjecutarConBloqueoAsync(
-            async () =>
-            {
-                var lista = await _responsableData.Listar();
-                return lista.Count > 0 ? lista.Max(r => r.IdResponsable) + 1 : 1;
-            },
-            async id =>
-            {
-                modelo.IdResponsable = id;
-                modelo.AreaOrganizacional = (await _areaData.Obtener(modelo.Year ?? 0, modelo.idAreaOrganiz ?? 0))?.AreaOrganizacional;
-                await _responsableData.Crear(modelo);
-                return true;
-            });
+        modelo.AreaOrganizacional = (await _areaLogica.Obtener(modelo.Year ?? 0, modelo.idAreaOrganiz ?? 0))?.AreaOrganizacional;
+        var guardo = await _responsableLogica.Registrar(modelo);
         if (guardo)
         {
             TempData["MensajeExito"] = "Responsable asignado.";
@@ -240,16 +207,16 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResponsableEliminar(int idResponsable)
     {
-        var actual = await _responsableData.Obtener(idResponsable);
+        var actual = await _responsableLogica.Obtener(idResponsable);
         if (actual is not null)
-            await _responsableData.Eliminar(actual);
+            await _responsableLogica.Eliminar(actual);
         return RedirectToAction(nameof(Detalles), new { year = actual?.Year, idAreaOrganiz = actual?.idAreaOrganiz });
     }
 
     [HttpGet]
     public async Task<IActionResult> Locales()
     {
-        return View(await _localData.Listar());
+        return View(await _localLogica.Listar());
     }
 
     [HttpPost]
@@ -261,18 +228,7 @@ public class EstructuraOrganizController : Controller
 
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _localData.Listar();
-                    return lista.Count > 0 ? lista.Max(l => l.idLocal) + 1 : 1;
-                },
-                async id =>
-                {
-                    modelo.idLocal = id;
-                    await _localData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _localLogica.Registrar(modelo);
             if (!guardo)
                 ModelState.AddModelError(nameof(modelo.NombreLocal), "No se pudo registrar el local: intente nuevamente.");
         }
@@ -283,9 +239,9 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> LocalEliminar(int idLocal)
     {
-        var actual = await _localData.Obtener(idLocal);
+        var actual = await _localLogica.Obtener(idLocal);
         if (actual is not null)
-            await _localData.Eliminar(actual);
+            await _localLogica.Eliminar(actual);
         return RedirectToAction(nameof(Locales));
     }
 
@@ -293,7 +249,7 @@ public class EstructuraOrganizController : Controller
 
     private async Task CargarCatalogos(int year)
     {
-        var areas = await _areaData.Listar();
+        var areas = await _areaLogica.Listar();
         ViewBag.Year = year;
         ViewBag.Areas = areas.Where(a => a.Year == year).OrderBy(a => a.AreaOrganizacional).ToList();
         ViewBag.Empleados = await EmpleadosAsync();

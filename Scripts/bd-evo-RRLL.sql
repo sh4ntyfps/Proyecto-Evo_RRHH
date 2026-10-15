@@ -1834,7 +1834,7 @@ ALTER TABLE [dbo].[Comportamiento] ADD CONSTRAINT [FK_Comportamiento_TipoComport
 ALTER TABLE [dbo].[Resolucion] ADD CONSTRAINT [FK_Resolucion_TipoResolucion] FOREIGN KEY([idTipoResolucion]) REFERENCES [dbo].[TipoResolucion]([idTipoResolucion])
 ALTER TABLE [dbo].[ExpLaboral] ADD CONSTRAINT [FK_ExpLaboral_TipoInstitucion] FOREIGN KEY([IdTipoInstitucion]) REFERENCES [dbo].[TipoInstitucion]([IdTipoInstitucion])
 ALTER TABLE [dbo].[Rol] ADD CONSTRAINT [FK_Rol_SistemaOpcion] FOREIGN KEY([IdSistema]) REFERENCES [dbo].[SistemaOpcion]([IdSistemaOpcion])
-ALTER TABLE [dbo].[RRHH_Asegurado] ADD CONSTRAINT [FK_RRHH_Asegurado_EstadoCivil] FOREIGN KEY([idEstadoCivil]) REFERENCES [dbo].[EstadoCivil]([IdEstadoCivil])
+ALTER TABLE [dbo].[Rol_Acceso] ADD CONSTRAINT [FK_Rol_Acceso_SistemaOpcion] FOREIGN KEY([IdSistemaOpcion]) REFERENCES [dbo].[SistemaOpcion]([IdSistemaOpcion])
 ALTER TABLE [dbo].[Persona] ADD CONSTRAINT [FK_Persona_Ubigeo] FOREIGN KEY([IdUbigeo]) REFERENCES [dbo].[Ubigeo]([IdUbigeo])
 ALTER TABLE [dbo].[Persona] ADD CONSTRAINT [FK_Persona_TipoDocID] FOREIGN KEY([TipoDocID]) REFERENCES [dbo].[TipoDocID]([TipoDocID])
 

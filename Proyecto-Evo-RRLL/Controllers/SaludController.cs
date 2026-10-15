@@ -1,5 +1,4 @@
 using Capa_Logica;
-using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,35 +8,29 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class SaludController : Controller
 {
-    private readonly RRHH_SaludLogica _saludData;
-    private readonly RRHH_AseguradoLogica _aseguradoData;
-    private readonly RRHH_AcudeEnfermLogica _acudeEnfermData;
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly EstadoCivilLogica _estadoCivilData;
-    private readonly MotivoBajaLogica _motivoBajaData;
-    private readonly SecuenciaService _secuencia;
-    private readonly Services.EmpleadoServicio _empleados;
+    private readonly RRHH_SaludLogica _saludLogica;
+    private readonly RRHH_AseguradoLogica _aseguradoLogica;
+    private readonly RRHH_AcudeEnfermLogica _acudeEnfermLogica;
+    private readonly PersonaLogica _personaLogica;
+    private readonly EstadoCivilLogica _estadoCivilLogica;
+    private readonly MotivoBajaLogica _motivoBajaLogica;
+    private readonly EmpleadoServicio _empleados;
 
     public SaludController(
-        RRHH_SaludLogica saludData,
-        RRHH_AseguradoLogica aseguradoData,
-        RRHH_AcudeEnfermLogica acudeEnfermData,
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        EstadoCivilLogica estadoCivilData,
-        MotivoBajaLogica motivoBajaData,
-        SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados)
+        RRHH_SaludLogica saludLogica,
+        RRHH_AseguradoLogica aseguradoLogica,
+        RRHH_AcudeEnfermLogica acudeEnfermLogica,
+        PersonaLogica personaLogica,
+        EstadoCivilLogica estadoCivilLogica,
+        MotivoBajaLogica motivoBajaLogica,
+        EmpleadoServicio empleados)
     {
-        _saludData = saludData;
-        _aseguradoData = aseguradoData;
-        _acudeEnfermData = acudeEnfermData;
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _estadoCivilData = estadoCivilData;
-        _motivoBajaData = motivoBajaData;
-        _secuencia = secuencia;
+        _saludLogica = saludLogica;
+        _aseguradoLogica = aseguradoLogica;
+        _acudeEnfermLogica = acudeEnfermLogica;
+        _personaLogica = personaLogica;
+        _estadoCivilLogica = estadoCivilLogica;
+        _motivoBajaLogica = motivoBajaLogica;
         _empleados = empleados;
     }
 
@@ -46,13 +39,13 @@ public class SaludController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(int? idEmpleado)
     {
-        var fichas = (await _saludData.Listar())
+        var fichas = (await _saludLogica.Listar())
             .Where(f => idEmpleado is null || f.IdEmpleado == idEmpleado)
             .OrderByDescending(f => f.idSalud);
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.AcudeEnferm = await _acudeEnfermData.Listar();
+        ViewBag.AcudeEnferm = await _acudeEnfermLogica.Listar();
         return View(fichas.ToList());
     }
 
@@ -61,7 +54,7 @@ public class SaludController : Controller
     {
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.AcudeEnferm = await _acudeEnfermData.Listar();
+        ViewBag.AcudeEnferm = await _acudeEnfermLogica.Listar();
         return View("SaludForm", new RRHH_Salud { IdEmpleado = idEmpleado });
     }
 
@@ -71,18 +64,7 @@ public class SaludController : Controller
     {
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _saludData.Listar();
-                    return lista.Count == 0 ? 1 : lista.Max(s => s.idSalud) + 1;
-                },
-                async id =>
-                {
-                    modelo.idSalud = id;
-                    await _saludData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _saludLogica.Registrar(modelo);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Ficha de salud guardada.";
@@ -93,19 +75,19 @@ public class SaludController : Controller
 
         ViewBag.IdEmpleado = modelo.IdEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.AcudeEnferm = await _acudeEnfermData.Listar();
+        ViewBag.AcudeEnferm = await _acudeEnfermLogica.Listar();
         return View("SaludForm", modelo);
     }
 
     [HttpGet]
     public async Task<IActionResult> SaludEditar(int id)
     {
-        var ficha = await _saludData.Obtener(id);
+        var ficha = await _saludLogica.Obtener(id);
         if (ficha is null)
             return NotFound();
 
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.AcudeEnferm = await _acudeEnfermData.Listar();
+        ViewBag.AcudeEnferm = await _acudeEnfermLogica.Listar();
         return View("SaludForm", ficha);
     }
 
@@ -113,7 +95,7 @@ public class SaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SaludEditar(RRHH_Salud modelo)
     {
-        var actual = await _saludData.Obtener(modelo.idSalud);
+        var actual = await _saludLogica.Obtener(modelo.idSalud);
         if (actual is null)
             return NotFound();
 
@@ -125,7 +107,7 @@ public class SaludController : Controller
         actual.Alergico = modelo.Alergico;
         actual.AlergicoDescrip = modelo.AlergicoDescrip;
         actual.idAcudeEnferm = modelo.idAcudeEnferm;
-        await _saludData.Actualizar(actual);
+        await _saludLogica.Actualizar(actual);
         TempData["MensajeExito"] = "Ficha de salud actualizada.";
         return RedirectToAction(nameof(Index), new { idEmpleado = actual.IdEmpleado });
     }
@@ -134,10 +116,10 @@ public class SaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SaludEliminar(int id)
     {
-        var actual = await _saludData.Obtener(id);
+        var actual = await _saludLogica.Obtener(id);
         if (actual is not null)
         {
-            await _saludData.Eliminar(actual);
+            await _saludLogica.Eliminar(actual);
             TempData["MensajeExito"] = "Ficha de salud eliminada.";
         }
         return RedirectToAction(nameof(Index), new { idEmpleado = actual?.IdEmpleado });
@@ -148,7 +130,7 @@ public class SaludController : Controller
     [HttpGet]
     public async Task<IActionResult> Asegurados(int? idEmpleado)
     {
-        var registros = (await _aseguradoData.Listar())
+        var registros = (await _aseguradoLogica.Listar())
             .Where(a => idEmpleado is null || a.idEmpleado == idEmpleado)
             .OrderBy(a => a.idEmpleado)
             .ThenBy(a => a.NroBeneficiario);
@@ -165,8 +147,8 @@ public class SaludController : Controller
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
-        ViewBag.MotivosBaja = await _motivoBajaData.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
+        ViewBag.MotivosBaja = await _motivoBajaLogica.Listar();
         return View("AseguradoForm", new RRHH_Asegurado { idEmpleado = idEmpleado ?? 0 });
     }
 
@@ -174,18 +156,7 @@ public class SaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AseguradoNuevo(RRHH_Asegurado modelo)
     {
-        var guardo = await _secuencia.EjecutarConBloqueoAsync(
-            async () =>
-            {
-                var lista = await _aseguradoData.Listar();
-                return lista.Where(a => a.idEmpleado == modelo.idEmpleado).Select(a => a.NroBeneficiario).DefaultIfEmpty(0).Max() + 1;
-            },
-            async id =>
-            {
-                modelo.NroBeneficiario = id;
-                await _aseguradoData.Crear(modelo);
-                return true;
-            });
+        var guardo = await _aseguradoLogica.Registrar(modelo);
         if (!guardo)
             ModelState.AddModelError("", "No se pudo agregar el beneficiario: intente nuevamente.");
         else
@@ -197,22 +168,22 @@ public class SaludController : Controller
         ViewBag.IdEmpleado = modelo.idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
-        ViewBag.MotivosBaja = await _motivoBajaData.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
+        ViewBag.MotivosBaja = await _motivoBajaLogica.Listar();
         return View("AseguradoForm", modelo);
     }
 
     [HttpGet]
     public async Task<IActionResult> AseguradoEditar(int idEmpleado, int nroBeneficiario)
     {
-        var registro = await _aseguradoData.Obtener(idEmpleado, nroBeneficiario);
+        var registro = await _aseguradoLogica.Obtener(idEmpleado, nroBeneficiario);
         if (registro is null)
             return NotFound();
 
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
-        ViewBag.MotivosBaja = await _motivoBajaData.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
+        ViewBag.MotivosBaja = await _motivoBajaLogica.Listar();
         return View("AseguradoForm", registro);
     }
 
@@ -220,7 +191,7 @@ public class SaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AseguradoEditar(RRHH_Asegurado modelo)
     {
-        var actual = await _aseguradoData.Obtener(modelo.idEmpleado, modelo.NroBeneficiario);
+        var actual = await _aseguradoLogica.Obtener(modelo.idEmpleado, modelo.NroBeneficiario);
         if (actual is null)
             return NotFound();
 
@@ -236,7 +207,7 @@ public class SaludController : Controller
         actual.OtrosMotivos = modelo.OtrosMotivos;
         actual.FechaFinVinculo = modelo.FechaFinVinculo;
         actual.Reevaluar = modelo.Reevaluar;
-        await _aseguradoData.Actualizar(actual);
+        await _aseguradoLogica.Actualizar(actual);
         TempData["MensajeExito"] = "Beneficiario actualizado.";
         return RedirectToAction(nameof(Asegurados), new { idEmpleado = modelo.idEmpleado });
     }
@@ -245,10 +216,10 @@ public class SaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AseguradoEliminar(int idEmpleado, int nroBeneficiario)
     {
-        var actual = await _aseguradoData.Obtener(idEmpleado, nroBeneficiario);
+        var actual = await _aseguradoLogica.Obtener(idEmpleado, nroBeneficiario);
         if (actual is not null)
         {
-            await _aseguradoData.Eliminar(actual);
+            await _aseguradoLogica.Eliminar(actual);
             TempData["MensajeExito"] = "Beneficiario eliminado.";
         }
         return RedirectToAction(nameof(Asegurados), new { idEmpleado });
@@ -260,7 +231,7 @@ public class SaludController : Controller
     public async Task<IActionResult> AcudeEnferm()
     {
         ViewBag.Empleados = await EmpleadosAsync();
-        return View((await _acudeEnfermData.Listar()).OrderBy(a => a.idAcudeEnferm).ToList());
+        return View((await _acudeEnfermLogica.Listar()).OrderBy(a => a.idAcudeEnferm).ToList());
     }
 
     [HttpGet]
@@ -275,18 +246,7 @@ public class SaludController : Controller
     {
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _acudeEnfermData.Listar();
-                    return lista.Count == 0 ? 1 : lista.Max(a => a.idAcudeEnferm) + 1;
-                },
-                async id =>
-                {
-                    modelo.idAcudeEnferm = id;
-                    await _acudeEnfermData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _acudeEnfermLogica.Registrar(modelo);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Opción agregada.";
@@ -300,7 +260,7 @@ public class SaludController : Controller
     [HttpGet]
     public async Task<IActionResult> AcudeEnfermEditar(int id)
     {
-        var registro = await _acudeEnfermData.Obtener(id);
+        var registro = await _acudeEnfermLogica.Obtener(id);
         if (registro is null)
             return NotFound();
         return View("AcudeEnfermForm", registro);
@@ -310,12 +270,12 @@ public class SaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AcudeEnfermEditar(RRHH_AcudeEnferm modelo)
     {
-        var actual = await _acudeEnfermData.Obtener(modelo.idAcudeEnferm);
+        var actual = await _acudeEnfermLogica.Obtener(modelo.idAcudeEnferm);
         if (actual is null)
             return NotFound();
 
         actual.AcudeEnfermDescrip = modelo.AcudeEnfermDescrip;
-        await _acudeEnfermData.Actualizar(actual);
+        await _acudeEnfermLogica.Actualizar(actual);
         TempData["MensajeExito"] = "Opción actualizada.";
         return RedirectToAction(nameof(AcudeEnferm));
     }
@@ -324,15 +284,15 @@ public class SaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AcudeEnfermEliminar(int id)
     {
-        var actual = await _acudeEnfermData.Obtener(id);
+        var actual = await _acudeEnfermLogica.Obtener(id);
         if (actual is not null)
         {
-            var enUso = (await _saludData.Listar()).Any(s => s.idAcudeEnferm == id);
+            var enUso = (await _saludLogica.Listar()).Any(s => s.idAcudeEnferm == id);
             if (enUso)
                 TempData["MensajeError"] = "No se puede eliminar: la opción está en uso por fichas de salud.";
             else
             {
-                await _acudeEnfermData.Eliminar(actual);
+                await _acudeEnfermLogica.Eliminar(actual);
                 TempData["MensajeExito"] = "Opción eliminada.";
             }
         }
@@ -346,8 +306,8 @@ public class SaludController : Controller
 
     private async Task<List<(int Id, string Nombre)>> PersonasAsync()
     {
-        var personas = await _personaData.Listar();
-        return personas.Select(p => (p.IdPersona, $"{p.Nombres} {p.Apellido_Paterno} {p.Apellido_Materno}".Trim()))
+        var personas = await _personaLogica.Listar();
+        return personas.Select(p => (p.IdPersona, p.NombreCompleto()))
             .OrderBy(x => x.Item2)
             .Select(x => (x.Item1, x.Item2))
             .ToList();

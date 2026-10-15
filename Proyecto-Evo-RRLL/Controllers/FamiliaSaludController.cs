@@ -10,65 +10,65 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class FamiliaSaludController : Controller
 {
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly FamiliarLogica _familiarData;
-    private readonly RRHH_SaludLogica _saludData;
-    private readonly RRHH_DinamicaFamiliarLogica _dinamicaData;
-    private readonly RRHH_AspSocioLogica _aspSocioData;
-    private readonly RRHH_FuncFamLogica _funcFamData;
-    private readonly RRHH_AseguradoLogica _aseguradoData;
+    private readonly EmpleadoLogica _empleadoLogica;
+    private readonly PersonaLogica _personaLogica;
+    private readonly FamiliarLogica _familiarLogica;
+    private readonly RRHH_SaludLogica _saludLogica;
+    private readonly RRHH_DinamicaFamiliarLogica _dinamicaLogica;
+    private readonly RRHH_AspSocioLogica _aspSocioLogica;
+    private readonly RRHH_FuncFamLogica _funcFamLogica;
+    private readonly RRHH_AseguradoLogica _aseguradoLogica;
 
-    private readonly RRHH_AcudeEnfermLogica _acudeEnfermData;
-    private readonly RRHH_TipoFamiliaLogica _tipoFamiliaData;
-    private readonly RRHH_RelacParejaLogica _relacParejaData;
-    private readonly RRHH_RelacPHLogica _relacPHData;
-    private readonly RRHH_RelacHermanoLogica _relacHermanoData;
-    private readonly TipoFamiliarLogica _tipoFamiliarData;
-    private readonly EstadoCivilLogica _estadoCivilData;
-    private readonly TipoSangreLogica _tipoSangreData;
-    private readonly DiscapacidadLogica _discapacidadData;
+    private readonly RRHH_AcudeEnfermLogica _acudeEnfermLogica;
+    private readonly RRHH_TipoFamiliaLogica _tipoFamiliaLogica;
+    private readonly RRHH_RelacParejaLogica _relacParejaLogica;
+    private readonly RRHH_RelacPHLogica _relacPHLogica;
+    private readonly RRHH_RelacHermanoLogica _relacHermanoLogica;
+    private readonly TipoFamiliarLogica _tipoFamiliarLogica;
+    private readonly EstadoCivilLogica _estadoCivilLogica;
+    private readonly TipoSangreLogica _tipoSangreLogica;
+    private readonly DiscapacidadLogica _discapacidadLogica;
     private readonly SecuenciaService _secuencia;
-    private readonly Services.EmpleadoServicio _empleados;
+    private readonly EmpleadoServicio _empleados;
 
     public FamiliaSaludController(
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        FamiliarLogica familiarData,
-        RRHH_SaludLogica saludData,
-        RRHH_DinamicaFamiliarLogica dinamicaData,
-        RRHH_AspSocioLogica aspSocioData,
-        RRHH_FuncFamLogica funcFamData,
-        RRHH_AseguradoLogica aseguradoData,
-        RRHH_AcudeEnfermLogica acudeEnfermData,
-        RRHH_TipoFamiliaLogica tipoFamiliaData,
-        RRHH_RelacParejaLogica relacParejaData,
-        RRHH_RelacPHLogica relacPHData,
-        RRHH_RelacHermanoLogica relacHermanoData,
-        TipoFamiliarLogica tipoFamiliarData,
-        EstadoCivilLogica estadoCivilData,
-        TipoSangreLogica tipoSangreData,
-        DiscapacidadLogica discapacidadData,
+        EmpleadoLogica empleadoLogica,
+        PersonaLogica personaLogica,
+        FamiliarLogica familiarLogica,
+        RRHH_SaludLogica saludLogica,
+        RRHH_DinamicaFamiliarLogica dinamicaLogica,
+        RRHH_AspSocioLogica aspSocioLogica,
+        RRHH_FuncFamLogica funcFamLogica,
+        RRHH_AseguradoLogica aseguradoLogica,
+        RRHH_AcudeEnfermLogica acudeEnfermLogica,
+        RRHH_TipoFamiliaLogica tipoFamiliaLogica,
+        RRHH_RelacParejaLogica relacParejaLogica,
+        RRHH_RelacPHLogica relacPHLogica,
+        RRHH_RelacHermanoLogica relacHermanoLogica,
+        TipoFamiliarLogica tipoFamiliarLogica,
+        EstadoCivilLogica estadoCivilLogica,
+        TipoSangreLogica tipoSangreLogica,
+        DiscapacidadLogica discapacidadLogica,
         SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados)
+        EmpleadoServicio empleados)
     {
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _familiarData = familiarData;
-        _saludData = saludData;
-        _dinamicaData = dinamicaData;
-        _aspSocioData = aspSocioData;
-        _funcFamData = funcFamData;
-        _aseguradoData = aseguradoData;
-        _acudeEnfermData = acudeEnfermData;
-        _tipoFamiliaData = tipoFamiliaData;
-        _relacParejaData = relacParejaData;
-        _relacPHData = relacPHData;
-        _relacHermanoData = relacHermanoData;
-        _tipoFamiliarData = tipoFamiliarData;
-        _estadoCivilData = estadoCivilData;
-        _tipoSangreData = tipoSangreData;
-        _discapacidadData = discapacidadData;
+        _empleadoLogica = empleadoLogica;
+        _personaLogica = personaLogica;
+        _familiarLogica = familiarLogica;
+        _saludLogica = saludLogica;
+        _dinamicaLogica = dinamicaLogica;
+        _aspSocioLogica = aspSocioLogica;
+        _funcFamLogica = funcFamLogica;
+        _aseguradoLogica = aseguradoLogica;
+        _acudeEnfermLogica = acudeEnfermLogica;
+        _tipoFamiliaLogica = tipoFamiliaLogica;
+        _relacParejaLogica = relacParejaLogica;
+        _relacPHLogica = relacPHLogica;
+        _relacHermanoLogica = relacHermanoLogica;
+        _tipoFamiliarLogica = tipoFamiliarLogica;
+        _estadoCivilLogica = estadoCivilLogica;
+        _tipoSangreLogica = tipoSangreLogica;
+        _discapacidadLogica = discapacidadLogica;
         _secuencia = secuencia;
         _empleados = empleados;
     }
@@ -76,15 +76,15 @@ public class FamiliaSaludController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(int idEmpleado)
     {
-        if (await _empleadoData.Obtener(idEmpleado) is null)
+        if (await _empleadoLogica.Obtener(idEmpleado) is null)
             return NotFound();
 
-        var salud = (await _saludData.Listar()).FirstOrDefault(s => s.IdEmpleado == idEmpleado);
-        var dinamica = (await _dinamicaData.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
-        var aspSocio = (await _aspSocioData.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
-        var funcFam = (await _funcFamData.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
-        var familiares = (await _familiarData.Listar()).Count(f => f.IdEmpleado == idEmpleado);
-        var asegurados = (await _aseguradoData.Listar()).Count(a => a.idEmpleado == idEmpleado);
+        var salud = (await _saludLogica.Listar()).FirstOrDefault(s => s.IdEmpleado == idEmpleado);
+        var dinamica = (await _dinamicaLogica.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
+        var aspSocio = (await _aspSocioLogica.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
+        var funcFam = (await _funcFamLogica.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
+        var familiares = (await _familiarLogica.Listar()).Count(f => f.IdEmpleado == idEmpleado);
+        var asegurados = (await _aseguradoLogica.Listar()).Count(a => a.idEmpleado == idEmpleado);
 
         return View(new FamiliaSaludViewModel
         {
@@ -104,12 +104,12 @@ public class FamiliaSaludController : Controller
     [HttpGet]
     public async Task<IActionResult> Familiares(int idEmpleado)
     {
-        var familiarRows = (await _familiarData.Listar()).Where(f => f.IdEmpleado == idEmpleado);
-        var personas = await _personaData.Listar();
-        var tipoFams = await _tipoFamiliarData.Listar();
-        var estadoCiviles = await _estadoCivilData.Listar();
-        var discapacidades = await _discapacidadData.Listar();
-        var tipoSangres = await _tipoSangreData.Listar();
+        var familiarRows = (await _familiarLogica.Listar()).Where(f => f.IdEmpleado == idEmpleado);
+        var personas = await _personaLogica.Listar();
+        var tipoFams = await _tipoFamiliarLogica.Listar();
+        var estadoCiviles = await _estadoCivilLogica.Listar();
+        var discapacidades = await _discapacidadLogica.Listar();
+        var tipoSangres = await _tipoSangreLogica.Listar();
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.NombreEmpleado = await NombreEmpleadoAsync(idEmpleado);
@@ -121,7 +121,7 @@ public class FamiliaSaludController : Controller
             {
                 IdEmpleado = f.IdEmpleado,
                 IdPersona = f.IdPersona,
-                Nombres = persona is null ? null : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim(),
+                Nombres = persona is null ? null : persona.NombreCompleto(),
                 TipoFamiliar = f.IdTipoFam is null ? null : tipoFams.FirstOrDefault(t => t.IdTipoFam == f.IdTipoFam)?.DescripTipoFam,
                 Sexo = f.FamSexo,
                 Ocupacion = f.FamOcupacion,
@@ -141,14 +141,14 @@ public class FamiliaSaludController : Controller
     [HttpGet]
     public async Task<IActionResult> Salud(int idEmpleado)
     {
-        if (await _empleadoData.Obtener(idEmpleado) is null)
+        if (await _empleadoLogica.Obtener(idEmpleado) is null)
             return NotFound();
 
-        var registro = (await _saludData.Listar()).FirstOrDefault(s => s.IdEmpleado == idEmpleado) ?? new RRHH_Salud();
+        var registro = (await _saludLogica.Listar()).FirstOrDefault(s => s.IdEmpleado == idEmpleado) ?? new RRHH_Salud();
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.NombreEmpleado = await NombreEmpleadoAsync(idEmpleado);
-        ViewBag.Acudes = await _acudeEnfermData.Listar();
+        ViewBag.Acudes = await _acudeEnfermLogica.Listar();
         return View(registro);
     }
 
@@ -156,16 +156,11 @@ public class FamiliaSaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Salud(RRHH_Salud modelo)
     {
-        var actual = (await _saludData.Listar()).FirstOrDefault(s => s.IdEmpleado == modelo.IdEmpleado);
+        var actual = (await _saludLogica.Listar()).FirstOrDefault(s => s.IdEmpleado == modelo.IdEmpleado);
 
         if (actual is null)
         {
-            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
-            {
-                var lista = await _saludData.Listar();
-                modelo.idSalud = lista.Count > 0 ? lista.Max(x => x.idSalud) + 1 : 1;
-                await _saludData.Crear(modelo);
-            });
+            var guardo = await _saludLogica.Registrar(modelo);
             if (!guardo)
             {
                 TempData["MensajeError"] = "No se pudo guardar la ficha de salud: intente nuevamente.";
@@ -181,7 +176,7 @@ public class FamiliaSaludController : Controller
             actual.Alergico = modelo.Alergico;
             actual.AlergicoDescrip = modelo.AlergicoDescrip;
             actual.idAcudeEnferm = modelo.idAcudeEnferm;
-            await _saludData.Actualizar(actual);
+            await _saludLogica.Actualizar(actual);
         }
 
         return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado ?? 0 });
@@ -191,9 +186,9 @@ public class FamiliaSaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EliminarSalud(int idEmpleado)
     {
-        var actual = (await _saludData.Listar()).FirstOrDefault(s => s.IdEmpleado == idEmpleado);
+        var actual = (await _saludLogica.Listar()).FirstOrDefault(s => s.IdEmpleado == idEmpleado);
         if (actual is not null)
-            await _saludData.Eliminar(actual);
+            await _saludLogica.Eliminar(actual);
         return RedirectToAction(nameof(Index), new { idEmpleado });
     }
 
@@ -204,18 +199,18 @@ public class FamiliaSaludController : Controller
     {
         var vm = new FichaSocialViewModel { IdEmpleado = idEmpleado, NombreEmpleado = await NombreEmpleadoAsync(idEmpleado) };
 
-        var dinamica = (await _dinamicaData.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
-        var aspSocio = (await _aspSocioData.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
-        var funcFam = (await _funcFamData.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
+        var dinamica = (await _dinamicaLogica.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
+        var aspSocio = (await _aspSocioLogica.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
+        var funcFam = (await _funcFamLogica.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
 
         if (dinamica is not null) vm.Dinamica = dinamica;
         if (aspSocio is not null) vm.AspSocio = aspSocio;
         if (funcFam is not null) vm.FuncFam = funcFam;
 
-        ViewBag.TiposFamilia = await _tipoFamiliaData.Listar();
-        ViewBag.RelacParejas = await _relacParejaData.Listar();
-        ViewBag.RelacPHs = await _relacPHData.Listar();
-        ViewBag.RelacHermanos = await _relacHermanoData.Listar();
+        ViewBag.TiposFamilia = await _tipoFamiliaLogica.Listar();
+        ViewBag.RelacParejas = await _relacParejaLogica.Listar();
+        ViewBag.RelacPHs = await _relacPHLogica.Listar();
+        ViewBag.RelacHermanos = await _relacHermanoLogica.Listar();
         return View(vm);
     }
 
@@ -227,46 +222,40 @@ public class FamiliaSaludController : Controller
 
         var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
         {
-            var dinamicaActual = (await _dinamicaData.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
+            var dinamicaActual = (await _dinamicaLogica.Listar()).FirstOrDefault(d => d.IdEmpleado == idEmpleado);
             if (dinamicaActual is null)
             {
-                var lista = await _dinamicaData.Listar();
                 modelo.Dinamica.IdEmpleado = idEmpleado;
-                modelo.Dinamica.idDinamica = lista.Count > 0 ? lista.Max(x => x.idDinamica) + 1 : 1;
-                await _dinamicaData.Crear(modelo.Dinamica);
+                await _dinamicaLogica.CrearConNuevoId(modelo.Dinamica);
             }
             else
             {
                 CopiarDinamica(dinamicaActual, modelo.Dinamica);
-                await _dinamicaData.Actualizar(dinamicaActual);
+                await _dinamicaLogica.Actualizar(dinamicaActual);
             }
 
-            var aspSocioActual = (await _aspSocioData.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
+            var aspSocioActual = (await _aspSocioLogica.Listar()).FirstOrDefault(a => a.IdEmpleado == idEmpleado);
             if (aspSocioActual is null)
             {
-                var lista = await _aspSocioData.Listar();
                 modelo.AspSocio.IdEmpleado = idEmpleado;
-                modelo.AspSocio.idAspSocio = lista.Count > 0 ? lista.Max(x => x.idAspSocio) + 1 : 1;
-                await _aspSocioData.Crear(modelo.AspSocio);
+                await _aspSocioLogica.CrearConNuevoId(modelo.AspSocio);
             }
             else
             {
                 CopiarAspSocio(aspSocioActual, modelo.AspSocio);
-                await _aspSocioData.Actualizar(aspSocioActual);
+                await _aspSocioLogica.Actualizar(aspSocioActual);
             }
 
-            var funcFamActual = (await _funcFamData.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
+            var funcFamActual = (await _funcFamLogica.Listar()).FirstOrDefault(f => f.IdEmpleado == idEmpleado);
             if (funcFamActual is null)
             {
-                var lista = await _funcFamData.Listar();
                 modelo.FuncFam.IdEmpleado = idEmpleado;
-                modelo.FuncFam.idFuncFamiliar = lista.Count > 0 ? lista.Max(x => x.idFuncFamiliar) + 1 : 1;
-                await _funcFamData.Crear(modelo.FuncFam);
+                await _funcFamLogica.CrearConNuevoId(modelo.FuncFam);
             }
             else
             {
                 CopiarFuncFam(funcFamActual, modelo.FuncFam);
-                await _funcFamData.Actualizar(funcFamActual);
+                await _funcFamLogica.Actualizar(funcFamActual);
             }
         });
 
@@ -281,9 +270,9 @@ public class FamiliaSaludController : Controller
     [HttpGet]
     public async Task<IActionResult> Asegurados(int idEmpleado)
     {
-        var asegurados = (await _aseguradoData.Listar()).Where(a => a.idEmpleado == idEmpleado);
-        var personas = await _personaData.Listar();
-        var estadoCiviles = await _estadoCivilData.Listar();
+        var asegurados = (await _aseguradoLogica.Listar()).Where(a => a.idEmpleado == idEmpleado);
+        var personas = await _personaLogica.Listar();
+        var estadoCiviles = await _estadoCivilLogica.Listar();
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.NombreEmpleado = await NombreEmpleadoAsync(idEmpleado);
@@ -294,7 +283,7 @@ public class FamiliaSaludController : Controller
             return new AseguradoFila
             {
                 NroBeneficiario = a.NroBeneficiario,
-                Nombre = persona is null ? null : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim(),
+                Nombre = persona is null ? null : persona.NombreCompleto(),
                 EstadoCivil = a.idEstadoCivil is null ? null : estadoCiviles.FirstOrDefault(e => e.IdEstadoCivil == a.idEstadoCivil)?.DescripEstCivil,
                 VinculoFamiliar = a.VinculoFamiliar,
                 Sexo = a.Sexo,
@@ -312,7 +301,7 @@ public class FamiliaSaludController : Controller
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.NombreEmpleado = await NombreEmpleadoAsync(idEmpleado);
         ViewBag.EsEdicion = false;
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
         return View("AseguradoForm", new RRHH_Asegurado { idEmpleado = idEmpleado });
     }
 
@@ -320,21 +309,21 @@ public class FamiliaSaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AseguradoCrear(RRHH_Asegurado modelo)
     {
-        await _aseguradoData.Crear(modelo);
+        await _aseguradoLogica.Crear(modelo);
         return RedirectToAction(nameof(Asegurados), new { idEmpleado = modelo.idEmpleado });
     }
 
     [HttpGet]
     public async Task<IActionResult> AseguradoEditar(int idEmpleado, int nro)
     {
-        var registro = await _aseguradoData.Obtener(idEmpleado, nro);
+        var registro = await _aseguradoLogica.Obtener(idEmpleado, nro);
         if (registro is null)
             return NotFound();
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.NombreEmpleado = await NombreEmpleadoAsync(idEmpleado);
         ViewBag.EsEdicion = true;
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
         return View("AseguradoForm", registro);
     }
 
@@ -342,7 +331,7 @@ public class FamiliaSaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AseguradoEditar(RRHH_Asegurado modelo)
     {
-        var actual = await _aseguradoData.Obtener(modelo.idEmpleado, modelo.NroBeneficiario);
+        var actual = await _aseguradoLogica.Obtener(modelo.idEmpleado, modelo.NroBeneficiario);
         if (actual is null)
             return NotFound();
 
@@ -358,7 +347,7 @@ public class FamiliaSaludController : Controller
         actual.OtrosMotivos = modelo.OtrosMotivos;
         actual.FechaFinVinculo = modelo.FechaFinVinculo;
         actual.Reevaluar = modelo.Reevaluar;
-        await _aseguradoData.Actualizar(actual);
+        await _aseguradoLogica.Actualizar(actual);
 
         return RedirectToAction(nameof(Asegurados), new { idEmpleado = modelo.idEmpleado });
     }
@@ -367,9 +356,9 @@ public class FamiliaSaludController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AseguradoEliminar(int idEmpleado, int nro)
     {
-        var actual = await _aseguradoData.Obtener(idEmpleado, nro);
+        var actual = await _aseguradoLogica.Obtener(idEmpleado, nro);
         if (actual is not null)
-            await _aseguradoData.Eliminar(actual);
+            await _aseguradoLogica.Eliminar(actual);
         return RedirectToAction(nameof(Asegurados), new { idEmpleado });
     }
 

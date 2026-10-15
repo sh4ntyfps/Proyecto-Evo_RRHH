@@ -1,5 +1,4 @@
 using Capa_Logica;
-using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,44 +9,41 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class AsistenciaController : Controller
 {
-    private readonly AsistenciaLogica _asistenciaData;
-    private readonly MarcacionLogica _marcacionData;
-    private readonly RegAsisDiarioLogica _regAsisData;
-    private readonly HorarioTemporalLogica _horarioTemporalData;
-    private readonly HorarioLogica _horarioData;
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly SecuenciaService _secuencia;
-    private readonly Services.EmpleadoServicio _empleados;
+    private readonly AsistenciaLogica _asistenciaLogica;
+    private readonly MarcacionLogica _marcacionLogica;
+    private readonly RegAsisDiarioLogica _regAsisLogica;
+    private readonly HorarioTemporalLogica _horarioTemporalLogica;
+    private readonly HorarioLogica _horarioLogica;
+    private readonly EmpleadoLogica _empleadoLogica;
+    private readonly PersonaLogica _personaLogica;
+    private readonly EmpleadoServicio _empleados;
 
     public AsistenciaController(
-        AsistenciaLogica asistenciaData,
-        MarcacionLogica marcacionData,
-        RegAsisDiarioLogica regAsisData,
-        HorarioTemporalLogica horarioTemporalData,
-        HorarioLogica horarioData,
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados)
+        AsistenciaLogica asistenciaLogica,
+        MarcacionLogica marcacionLogica,
+        RegAsisDiarioLogica regAsisLogica,
+        HorarioTemporalLogica horarioTemporalLogica,
+        HorarioLogica horarioLogica,
+        EmpleadoLogica empleadoLogica,
+        PersonaLogica personaLogica,
+        EmpleadoServicio empleados)
     {
-        _asistenciaData = asistenciaData;
-        _marcacionData = marcacionData;
-        _regAsisData = regAsisData;
-        _horarioTemporalData = horarioTemporalData;
-        _horarioData = horarioData;
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _secuencia = secuencia;
+        _asistenciaLogica = asistenciaLogica;
+        _marcacionLogica = marcacionLogica;
+        _regAsisLogica = regAsisLogica;
+        _horarioTemporalLogica = horarioTemporalLogica;
+        _horarioLogica = horarioLogica;
+        _empleadoLogica = empleadoLogica;
+        _personaLogica = personaLogica;
         _empleados = empleados;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index(DateTime? desde, DateTime? hasta, string? q)
     {
-        var registros = await _asistenciaData.Listar();
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
+        var registros = await _asistenciaLogica.Listar();
+        var empleados = await _empleadoLogica.Listar();
+        var personas = await _personaLogica.Listar();
 
         var desdeEf = desde ?? DateTime.Today.AddMonths(-1);
         var hastaEf = hasta ?? DateTime.Today.AddDays(1);
@@ -60,7 +56,7 @@ public class AsistenciaController : Controller
             var persona = empleado?.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == empleado.IdPersona);
             var nombre = persona is null
                 ? $"(Empleado {r.IdEmpleado})"
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+                : persona.NombreCompleto();
 
             if (!string.IsNullOrWhiteSpace(q)
                 && !nombre.Contains(q, StringComparison.OrdinalIgnoreCase)
@@ -92,7 +88,7 @@ public class AsistenciaController : Controller
     [HttpGet]
     public async Task<IActionResult> Marcaciones(DateTime? desde, DateTime? hasta, int? idEmpleado)
     {
-        var registros = (await _marcacionData.Listar())
+        var registros = (await _marcacionLogica.Listar())
             .Where(m => idEmpleado is null || m.IdEmpleado == idEmpleado)
             .Where(m => !desde.HasValue || m.Fecha.Date >= desde.Value.Date)
             .Where(m => !hasta.HasValue || m.Fecha.Date <= hasta.Value.Date)
@@ -100,7 +96,7 @@ public class AsistenciaController : Controller
             .ThenBy(m => m.IdEmpleado)
             .Take(2000);
 
-        var horarios = await _horarioData.Listar();
+        var horarios = await _horarioLogica.Listar();
 
         ViewBag.Desde = desde;
         ViewBag.Hasta = hasta;
@@ -114,7 +110,7 @@ public class AsistenciaController : Controller
     public async Task<IActionResult> MarcacionNuevo()
     {
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        ViewBag.Horarios = await _horarioLogica.Listar();
         return View("MarcacionForm", new Marcacion { Fecha = DateTime.Today });
     }
 
@@ -122,29 +118,29 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> MarcacionNuevo(Marcacion modelo)
     {
-        if (await _marcacionData.Obtener(modelo.Fecha, modelo.IdEmpleado) is not null)
+        if (await _marcacionLogica.Obtener(modelo.Fecha, modelo.IdEmpleado) is not null)
             ModelState.AddModelError("", "Ya existe una marcación para este empleado en esa fecha.");
 
         if (ModelState.IsValid)
         {
-            await _marcacionData.Crear(modelo);
+            await _marcacionLogica.Crear(modelo);
             return RedirectToAction(nameof(Marcaciones), new { idEmpleado = modelo.IdEmpleado });
         }
 
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        ViewBag.Horarios = await _horarioLogica.Listar();
         return View("MarcacionForm", modelo);
     }
 
     [HttpGet]
     public async Task<IActionResult> MarcacionEditar(DateTime fecha, int idEmpleado)
     {
-        var registro = await _marcacionData.Obtener(fecha, idEmpleado);
+        var registro = await _marcacionLogica.Obtener(fecha, idEmpleado);
         if (registro is null)
             return NotFound();
 
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        ViewBag.Horarios = await _horarioLogica.Listar();
         return View("MarcacionForm", registro);
     }
 
@@ -152,14 +148,14 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> MarcacionEditar(Marcacion modelo)
     {
-        var actual = await _marcacionData.Obtener(modelo.Fecha, modelo.IdEmpleado);
+        var actual = await _marcacionLogica.Obtener(modelo.Fecha, modelo.IdEmpleado);
         if (actual is null)
             return NotFound();
 
         actual.Estado = modelo.Estado;
         actual.Lugar = modelo.Lugar;
         actual.idHorario = modelo.idHorario;
-        await _marcacionData.Actualizar(actual);
+        await _marcacionLogica.Actualizar(actual);
 
         return RedirectToAction(nameof(Marcaciones), new { idEmpleado = modelo.IdEmpleado });
     }
@@ -168,9 +164,9 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> MarcacionEliminar(DateTime fecha, int idEmpleado)
     {
-        var actual = await _marcacionData.Obtener(fecha, idEmpleado);
+        var actual = await _marcacionLogica.Obtener(fecha, idEmpleado);
         if (actual is not null)
-            await _marcacionData.Eliminar(actual);
+            await _marcacionLogica.Eliminar(actual);
         return RedirectToAction(nameof(Marcaciones), new { idEmpleado });
     }
 
@@ -179,7 +175,7 @@ public class AsistenciaController : Controller
     [HttpGet]
     public async Task<IActionResult> RegDiario(DateTime? desde, DateTime? hasta, int? idEmpleado)
     {
-        var registros = (await _regAsisData.Listar())
+        var registros = (await _regAsisLogica.Listar())
             .Where(m => idEmpleado is null || m.IdEmpleado == idEmpleado)
             .Where(m => !desde.HasValue || m.Fecha.Date >= desde.Value.Date)
             .Where(m => !hasta.HasValue || m.Fecha.Date <= hasta.Value.Date)
@@ -205,12 +201,12 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RegDiarioNuevo(RegAsisDiario modelo)
     {
-        if (await _regAsisData.Obtener(modelo.Fecha, modelo.IdEmpleado) is not null)
+        if (await _regAsisLogica.Obtener(modelo.Fecha, modelo.IdEmpleado) is not null)
             ModelState.AddModelError("", "Ya existe un registro diario para este empleado en esa fecha.");
 
         if (ModelState.IsValid)
         {
-            await _regAsisData.Crear(modelo);
+            await _regAsisLogica.Crear(modelo);
             return RedirectToAction(nameof(RegDiario), new { idEmpleado = modelo.IdEmpleado });
         }
 
@@ -221,7 +217,7 @@ public class AsistenciaController : Controller
     [HttpGet]
     public async Task<IActionResult> RegDiarioEditar(DateTime fecha, int idEmpleado)
     {
-        var registro = await _regAsisData.Obtener(fecha, idEmpleado);
+        var registro = await _regAsisLogica.Obtener(fecha, idEmpleado);
         if (registro is null)
             return NotFound();
 
@@ -233,14 +229,14 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RegDiarioEditar(RegAsisDiario modelo)
     {
-        var actual = await _regAsisData.Obtener(modelo.Fecha, modelo.IdEmpleado);
+        var actual = await _regAsisLogica.Obtener(modelo.Fecha, modelo.IdEmpleado);
         if (actual is null)
             return NotFound();
 
         actual.MinNormales = modelo.MinNormales;
         actual.MinTarde = modelo.MinTarde;
         actual.Estado = modelo.Estado;
-        await _regAsisData.Actualizar(actual);
+        await _regAsisLogica.Actualizar(actual);
 
         return RedirectToAction(nameof(RegDiario), new { idEmpleado = modelo.IdEmpleado });
     }
@@ -249,9 +245,9 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RegDiarioEliminar(DateTime fecha, int idEmpleado)
     {
-        var actual = await _regAsisData.Obtener(fecha, idEmpleado);
+        var actual = await _regAsisLogica.Obtener(fecha, idEmpleado);
         if (actual is not null)
-            await _regAsisData.Eliminar(actual);
+            await _regAsisLogica.Eliminar(actual);
         return RedirectToAction(nameof(RegDiario), new { idEmpleado });
     }
 
@@ -260,13 +256,13 @@ public class AsistenciaController : Controller
     [HttpGet]
     public async Task<IActionResult> HorariosTemporal(int? idEmpleado)
     {
-        var registros = (await _horarioTemporalData.Listar())
+        var registros = (await _horarioTemporalLogica.Listar())
             .Where(h => idEmpleado is null || h.idEmpleado == idEmpleado)
             .OrderByDescending(h => h.FechaInicio);
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        ViewBag.Horarios = await _horarioLogica.Listar();
         return View(registros.ToList());
     }
 
@@ -275,7 +271,7 @@ public class AsistenciaController : Controller
     {
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        ViewBag.Horarios = await _horarioLogica.Listar();
         return View("HorarioTemporalForm", new HorarioTemporal { idEmpleado = idEmpleado ?? 0, FechaRegistro = DateTime.Now });
     }
 
@@ -283,24 +279,13 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> HorarioTemporalNuevo(HorarioTemporal modelo)
     {
-        var guardo = await _secuencia.EjecutarConBloqueoAsync(
-            async () =>
-            {
-                var lista = await _horarioTemporalData.Listar();
-                return lista.Where(h => h.idEmpleado == modelo.idEmpleado).Select(h => h.N).DefaultIfEmpty(0).Max() + 1;
-            },
-            async id =>
-            {
-                modelo.N = id;
-                await _horarioTemporalData.Crear(modelo);
-                return true;
-            });
+        var guardo = await _horarioTemporalLogica.Registrar(modelo);
         if (guardo)
             return RedirectToAction(nameof(HorariosTemporal), new { idEmpleado = modelo.idEmpleado });
 
         ViewBag.IdEmpleado = modelo.idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        ViewBag.Horarios = await _horarioLogica.Listar();
         ModelState.AddModelError("", "No se pudo registrar el horario temporal: intente nuevamente.");
         return View("HorarioTemporalForm", modelo);
     }
@@ -308,13 +293,13 @@ public class AsistenciaController : Controller
     [HttpGet]
     public async Task<IActionResult> HorarioTemporalEditar(int idEmpleado, int n)
     {
-        var registro = await _horarioTemporalData.Obtener(idEmpleado, n);
+        var registro = await _horarioTemporalLogica.Obtener(idEmpleado, n);
         if (registro is null)
             return NotFound();
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        ViewBag.Horarios = await _horarioLogica.Listar();
         return View("HorarioTemporalForm", registro);
     }
 
@@ -322,7 +307,7 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> HorarioTemporalEditar(HorarioTemporal modelo)
     {
-        var actual = await _horarioTemporalData.Obtener(modelo.idEmpleado, modelo.N);
+        var actual = await _horarioTemporalLogica.Obtener(modelo.idEmpleado, modelo.N);
         if (actual is null)
             return NotFound();
 
@@ -332,7 +317,7 @@ public class AsistenciaController : Controller
         actual.NroDocumento = modelo.NroDocumento;
         actual.Sisgedo = modelo.Sisgedo;
         actual.FechaRegistro = modelo.FechaRegistro;
-        await _horarioTemporalData.Actualizar(actual);
+        await _horarioTemporalLogica.Actualizar(actual);
 
         return RedirectToAction(nameof(HorariosTemporal), new { idEmpleado = modelo.idEmpleado });
     }
@@ -341,9 +326,9 @@ public class AsistenciaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> HorarioTemporalEliminar(int idEmpleado, int n)
     {
-        var actual = await _horarioTemporalData.Obtener(idEmpleado, n);
+        var actual = await _horarioTemporalLogica.Obtener(idEmpleado, n);
         if (actual is not null)
-            await _horarioTemporalData.Eliminar(actual);
+            await _horarioTemporalLogica.Eliminar(actual);
         return RedirectToAction(nameof(HorariosTemporal), new { idEmpleado });
     }
 

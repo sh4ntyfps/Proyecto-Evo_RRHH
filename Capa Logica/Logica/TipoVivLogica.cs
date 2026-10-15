@@ -3,16 +3,11 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class TipoVivLogica
+public class TipoVivLogica : LogicaBase<TipoViv>
 {
     private readonly TipoVivData _data;
 
-    public TipoVivLogica(TipoVivData data) => _data = data;
+    public TipoVivLogica(TipoVivData data) : base(data) => _data = data;
 
-    public async Task<List<TipoViv>> Listar() => await _data.Listar();
     public async Task<TipoViv?> Obtener(int IdTipoParam) => await _data.Obtener(IdTipoParam);
-    public async Task Crear(TipoViv registro) => await _data.Crear(registro);
-    public async Task Actualizar(TipoViv registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(TipoViv registro) => await _data.Eliminar(registro);
 }
-

@@ -1,5 +1,4 @@
 using Capa_Logica;
-using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,47 +9,41 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class ViviendaController : Controller
 {
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly ViviendaLogica _viviendaData;
-    private readonly TipoVivLogica _tipoVivData;
-    private readonly TenenciaVivLogica _tenenciaVivData;
-    private readonly UbicacionVivLogica _ubicacionVivData;
-    private readonly AguaVivLogica _aguaVivData;
-    private readonly AlumbradoVivLogica _alumbradoVivData;
-    private readonly ConservacionVivLogica _conservacionVivData;
-    private readonly ExcretasVivLogica _excretasVivData;
-    private readonly MaterialVivLogica _materialVivData;
-    private readonly SecuenciaService _secuencia;
-    private readonly Services.EmpleadoServicio _empleados;
+    private readonly EmpleadoLogica _empleadoLogica;
+    private readonly ViviendaLogica _viviendaLogica;
+    private readonly TipoVivLogica _tipoVivLogica;
+    private readonly TenenciaVivLogica _tenenciaVivLogica;
+    private readonly UbicacionVivLogica _ubicacionVivLogica;
+    private readonly AguaVivLogica _aguaVivLogica;
+    private readonly AlumbradoVivLogica _alumbradoVivLogica;
+    private readonly ConservacionVivLogica _conservacionVivLogica;
+    private readonly ExcretasVivLogica _excretasVivLogica;
+    private readonly MaterialVivLogica _materialVivLogica;
+    private readonly EmpleadoServicio _empleados;
 
     public ViviendaController(
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        ViviendaLogica viviendaData,
-        TipoVivLogica tipoVivData,
-        TenenciaVivLogica tenenciaVivData,
-        UbicacionVivLogica ubicacionVivData,
-        AguaVivLogica aguaVivData,
-        AlumbradoVivLogica alumbradoVivData,
-        ConservacionVivLogica conservacionVivData,
-        ExcretasVivLogica excretasVivData,
-        MaterialVivLogica materialVivData,
-        SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados)
+        EmpleadoLogica empleadoLogica,
+        ViviendaLogica viviendaLogica,
+        TipoVivLogica tipoVivLogica,
+        TenenciaVivLogica tenenciaVivLogica,
+        UbicacionVivLogica ubicacionVivLogica,
+        AguaVivLogica aguaVivLogica,
+        AlumbradoVivLogica alumbradoVivLogica,
+        ConservacionVivLogica conservacionVivLogica,
+        ExcretasVivLogica excretasVivLogica,
+        MaterialVivLogica materialVivLogica,
+        EmpleadoServicio empleados)
     {
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _viviendaData = viviendaData;
-        _tipoVivData = tipoVivData;
-        _tenenciaVivData = tenenciaVivData;
-        _ubicacionVivData = ubicacionVivData;
-        _aguaVivData = aguaVivData;
-        _alumbradoVivData = alumbradoVivData;
-        _conservacionVivData = conservacionVivData;
-        _excretasVivData = excretasVivData;
-        _materialVivData = materialVivData;
-        _secuencia = secuencia;
+        _empleadoLogica = empleadoLogica;
+        _viviendaLogica = viviendaLogica;
+        _tipoVivLogica = tipoVivLogica;
+        _tenenciaVivLogica = tenenciaVivLogica;
+        _ubicacionVivLogica = ubicacionVivLogica;
+        _aguaVivLogica = aguaVivLogica;
+        _alumbradoVivLogica = alumbradoVivLogica;
+        _conservacionVivLogica = conservacionVivLogica;
+        _excretasVivLogica = excretasVivLogica;
+        _materialVivLogica = materialVivLogica;
         _empleados = empleados;
     }
 
@@ -63,19 +56,19 @@ public class ViviendaController : Controller
             return View("Indice", ViewBag.Empleados);
 
         int id = idEmpleado.Value;
-        if (await _empleadoData.Obtener(id) is null)
+        if (await _empleadoLogica.Obtener(id) is null)
             return NotFound();
 
-        var registro = (await _viviendaData.Listar()).FirstOrDefault(v => v.IdEmpleado == id);
+        var registro = (await _viviendaLogica.Listar()).FirstOrDefault(v => v.IdEmpleado == id);
 
-        var tipos = await _tipoVivData.Listar();
-        var tenencias = await _tenenciaVivData.Listar();
-        var ubicaciones = await _ubicacionVivData.Listar();
-        var aguas = await _aguaVivData.Listar();
-        var alumbrados = await _alumbradoVivData.Listar();
-        var conservaciones = await _conservacionVivData.Listar();
-        var excretas = await _excretasVivData.Listar();
-        var materiales = await _materialVivData.Listar();
+        var tipos = await _tipoVivLogica.Listar();
+        var tenencias = await _tenenciaVivLogica.Listar();
+        var ubicaciones = await _ubicacionVivLogica.Listar();
+        var aguas = await _aguaVivLogica.Listar();
+        var alumbrados = await _alumbradoVivLogica.Listar();
+        var conservaciones = await _conservacionVivLogica.Listar();
+        var excretas = await _excretasVivLogica.Listar();
+        var materiales = await _materialVivLogica.Listar();
 
         var vm = new ViviendaViewModel
         {
@@ -98,21 +91,21 @@ public class ViviendaController : Controller
     [HttpGet]
     public async Task<IActionResult> ViviendaForm(int idEmpleado)
     {
-        if (await _empleadoData.Obtener(idEmpleado) is null)
+        if (await _empleadoLogica.Obtener(idEmpleado) is null)
             return NotFound();
 
-        var registro = (await _viviendaData.Listar()).FirstOrDefault(v => v.IdEmpleado == idEmpleado) ?? new Vivienda();
+        var registro = (await _viviendaLogica.Listar()).FirstOrDefault(v => v.IdEmpleado == idEmpleado) ?? new Vivienda();
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.NombreEmpleado = await NombreEmpleadoAsync(idEmpleado);
-        ViewBag.Tipos = await _tipoVivData.Listar();
-        ViewBag.Tenencias = await _tenenciaVivData.Listar();
-        ViewBag.Ubicaciones = await _ubicacionVivData.Listar();
-        ViewBag.Aguas = await _aguaVivData.Listar();
-        ViewBag.Alumbrados = await _alumbradoVivData.Listar();
-        ViewBag.Conservaciones = await _conservacionVivData.Listar();
-        ViewBag.Excretas = await _excretasVivData.Listar();
-        ViewBag.Materiales = await _materialVivData.Listar();
+        ViewBag.Tipos = await _tipoVivLogica.Listar();
+        ViewBag.Tenencias = await _tenenciaVivLogica.Listar();
+        ViewBag.Ubicaciones = await _ubicacionVivLogica.Listar();
+        ViewBag.Aguas = await _aguaVivLogica.Listar();
+        ViewBag.Alumbrados = await _alumbradoVivLogica.Listar();
+        ViewBag.Conservaciones = await _conservacionVivLogica.Listar();
+        ViewBag.Excretas = await _excretasVivLogica.Listar();
+        ViewBag.Materiales = await _materialVivLogica.Listar();
         return View(registro);
     }
 
@@ -120,34 +113,23 @@ public class ViviendaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ViviendaForm(Vivienda modelo)
     {
-        var actual = (await _viviendaData.Listar()).FirstOrDefault(v => v.IdEmpleado == modelo.IdEmpleado);
+        var actual = (await _viviendaLogica.Listar()).FirstOrDefault(v => v.IdEmpleado == modelo.IdEmpleado);
 
         if (actual is null)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _viviendaData.Listar();
-                    return lista.Count > 0 ? lista.Max(x => x.IdVivienda) + 1 : 1;
-                },
-                async id =>
-                {
-                    modelo.IdVivienda = id;
-                    await _viviendaData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _viviendaLogica.Registrar(modelo);
             if (!guardo)
             {
                 ViewBag.IdEmpleado = modelo.IdEmpleado;
                 ViewBag.NombreEmpleado = await NombreEmpleadoAsync(modelo.IdEmpleado ?? 0);
-                ViewBag.Tipos = await _tipoVivData.Listar();
-                ViewBag.Tenencias = await _tenenciaVivData.Listar();
-                ViewBag.Ubicaciones = await _ubicacionVivData.Listar();
-                ViewBag.Aguas = await _aguaVivData.Listar();
-                ViewBag.Alumbrados = await _alumbradoVivData.Listar();
-                ViewBag.Conservaciones = await _conservacionVivData.Listar();
-                ViewBag.Excretas = await _excretasVivData.Listar();
-                ViewBag.Materiales = await _materialVivData.Listar();
+                ViewBag.Tipos = await _tipoVivLogica.Listar();
+                ViewBag.Tenencias = await _tenenciaVivLogica.Listar();
+                ViewBag.Ubicaciones = await _ubicacionVivLogica.Listar();
+                ViewBag.Aguas = await _aguaVivLogica.Listar();
+                ViewBag.Alumbrados = await _alumbradoVivLogica.Listar();
+                ViewBag.Conservaciones = await _conservacionVivLogica.Listar();
+                ViewBag.Excretas = await _excretasVivLogica.Listar();
+                ViewBag.Materiales = await _materialVivLogica.Listar();
                 ModelState.AddModelError("", "No se pudo guardar la vivienda: intente nuevamente.");
                 return View(modelo);
             }
@@ -155,7 +137,7 @@ public class ViviendaController : Controller
         else
         {
             Copiar(actual, modelo);
-            await _viviendaData.Actualizar(actual);
+            await _viviendaLogica.Actualizar(actual);
         }
 
         return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
@@ -165,9 +147,9 @@ public class ViviendaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Eliminar(int idEmpleado)
     {
-        var actual = (await _viviendaData.Listar()).FirstOrDefault(v => v.IdEmpleado == idEmpleado);
+        var actual = (await _viviendaLogica.Listar()).FirstOrDefault(v => v.IdEmpleado == idEmpleado);
         if (actual is not null)
-            await _viviendaData.Eliminar(actual);
+            await _viviendaLogica.Eliminar(actual);
         return RedirectToAction(nameof(Index), new { idEmpleado });
     }
 

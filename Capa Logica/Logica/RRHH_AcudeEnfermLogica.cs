@@ -3,16 +3,16 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class RRHH_AcudeEnfermLogica
+public class RRHH_AcudeEnfermLogica : LogicaBase<RRHH_AcudeEnferm>
 {
     private readonly RRHH_AcudeEnfermData _data;
 
-    public RRHH_AcudeEnfermLogica(RRHH_AcudeEnfermData data) => _data = data;
+    public RRHH_AcudeEnfermLogica(RRHH_AcudeEnfermData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<RRHH_AcudeEnferm>> Listar() => await _data.Listar();
     public async Task<RRHH_AcudeEnferm?> Obtener(int idAcudeEnfermParam) => await _data.Obtener(idAcudeEnfermParam);
-    public async Task Crear(RRHH_AcudeEnferm registro) => await _data.Crear(registro);
-    public async Task Actualizar(RRHH_AcudeEnferm registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(RRHH_AcudeEnferm registro) => await _data.Eliminar(registro);
-}
 
+    public Task CrearConNuevoId(RRHH_AcudeEnferm registro) =>
+        CrearNumerado(registro, x => x.idAcudeEnferm, id => registro.idAcudeEnferm = id);
+
+    public Task<bool> Registrar(RRHH_AcudeEnferm registro) => EnTransaccion(() => CrearConNuevoId(registro));
+}

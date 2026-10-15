@@ -12,12 +12,15 @@ namespace Proyecto_Evo_RRLL.Controllers;
 
 public class SeguridadController : Controller
 {
-    private readonly UsuarioLogica _usuarioData;
+    // Codigo del sistema RRHH en SistemaOpcion (el legado solo daba acceso con roles de este sistema)
+    public const string SistemaRRHH = "0500000";
+
+    private readonly UsuarioLogica _usuarioLogica;
     private readonly BitacoraLogica _bitacora;
 
-    public SeguridadController(UsuarioLogica usuarioData, BitacoraLogica bitacora)
+    public SeguridadController(UsuarioLogica usuarioLogica, BitacoraLogica bitacora)
     {
-        _usuarioData = usuarioData;
+        _usuarioLogica = usuarioLogica;
         _bitacora = bitacora;
     }
 
@@ -37,7 +40,7 @@ public class SeguridadController : Controller
         if (!ModelState.IsValid)
             return View(modelo);
 
-        var usuario = await _usuarioData.ObtenerPorLogin(modelo.Login.Trim());
+        var usuario = await _usuarioLogica.ObtenerPorLogin(modelo.Login.Trim());
         if (usuario is null || usuario.Estado != true || string.IsNullOrEmpty(usuario.PasswordHash))
         {
             modelo.Error = "Usuario o clave incorrectos.";
@@ -54,7 +57,7 @@ public class SeguridadController : Controller
         TempData["MensajeExito"] = $"Bienvenido, {usuario.Login!.Trim()}.";
         await _bitacora.Registrar(usuario.Login.Trim(), "IniciarSesion", "Seguridad", "Acceso correcto al sistema");
 
-        var roles = await _usuarioData.ObtenerRoles(usuario.IdUsuario);
+        var roles = await _usuarioLogica.ObtenerRoles(usuario.IdUsuario);
 
         var claims = new List<Claim>
         {
@@ -62,7 +65,7 @@ public class SeguridadController : Controller
             new(ClaimTypes.Name, usuario.Login!.Trim()),
             new(ClaimTypes.GivenName, usuario.Descripcion ?? usuario.Login!.Trim())
         };
-        claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r.Descripcion ?? "SinRol")));
+        claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, EsAdministradorRRHH(r) ? "Administrador" : r.Descripcion ?? "SinRol")));
 
         var identidad = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identidad);
@@ -88,4 +91,9 @@ public class SeguridadController : Controller
     {
         return View();
     }
+
+    // El rol legado se llama "ADMINISTRADOR" (mayusculas); la app autoriza con "Administrador"
+    private static bool EsAdministradorRRHH(Rol rol) =>
+        rol.IdSistema?.Trim() == SistemaRRHH
+        && string.Equals(rol.Descripcion?.Trim(), "Administrador", StringComparison.OrdinalIgnoreCase);
 }

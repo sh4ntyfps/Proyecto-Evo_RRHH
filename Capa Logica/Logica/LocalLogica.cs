@@ -3,16 +3,16 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class LocalLogica
+public class LocalLogica : LogicaBase<Local>
 {
     private readonly LocalData _data;
 
-    public LocalLogica(LocalData data) => _data = data;
+    public LocalLogica(LocalData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<Local>> Listar() => await _data.Listar();
     public async Task<Local?> Obtener(int idLocalParam) => await _data.Obtener(idLocalParam);
-    public async Task Crear(Local registro) => await _data.Crear(registro);
-    public async Task Actualizar(Local registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(Local registro) => await _data.Eliminar(registro);
-}
 
+    public Task CrearConNuevoId(Local registro) =>
+        CrearNumerado(registro, x => x.idLocal, id => registro.idLocal = id);
+
+    public Task<bool> Registrar(Local registro) => EnTransaccion(() => CrearConNuevoId(registro));
+}

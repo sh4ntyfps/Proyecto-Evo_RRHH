@@ -3,16 +3,17 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class ExpLaboralLogica
+public class ExpLaboralLogica : LogicaBase<ExpLaboral>
 {
     private readonly ExpLaboralData _data;
 
-    public ExpLaboralLogica(ExpLaboralData data) => _data = data;
+    public ExpLaboralLogica(ExpLaboralData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<ExpLaboral>> Listar() => await _data.Listar();
     public async Task<ExpLaboral?> Obtener(int IdEmpleadoParam, int IdExpLabParam) => await _data.Obtener(IdEmpleadoParam, IdExpLabParam);
-    public async Task Crear(ExpLaboral registro) => await _data.Crear(registro);
-    public async Task Actualizar(ExpLaboral registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(ExpLaboral registro) => await _data.Eliminar(registro);
-}
 
+    // Numero de experiencia correlativo por empleado.
+    public Task CrearConNuevoId(ExpLaboral registro) =>
+        CrearNumerado(registro, x => x.IdExpLab, id => registro.IdExpLab = id, x => x.IdEmpleado == registro.IdEmpleado);
+
+    public Task<bool> Registrar(ExpLaboral registro) => EnTransaccion(() => CrearConNuevoId(registro));
+}

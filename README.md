@@ -14,11 +14,22 @@ Sistema de Recursos Humanos (RR.HH.) en ASP.NET Core MVC (net10.0), arquitectura
 2. Abrir `Scripts/bd-evo-RRLL.sql` en SQL Server Management Studio y ejecutarlo.
    - Crea la base de datos `RRHH_Nuevo` con sus 76 tablas y claves foráneas.
 3. Descomprimir `Scripts/bd-Datos.zip` y ejecutar el `bd-Datos.sql` resultante sobre `RRHH_Nuevo`.
-   - Carga los datos del sistema (puede tardar unos minutos).
-4. Abrir el proyecto en Visual Studio y presionar **F5**
-5. Iniciar sesión con el usuario creado automáticamente al arrancar:
+   - Carga los datos del sistema (puede tardar unos minutos). Por su tamaño, conviene ejecutarlo con
+     `sqlcmd -S "(localdb)\MSSQLLocalDB" -E -f 65001 -i bd-Datos.sql`.
+4. Ejecutar `Scripts/crear_bitacora.sql` sobre `RRHH_Nuevo` (tabla de la bitácora de actividad).
+5. Abrir el proyecto en Visual Studio y presionar **F5**
+6. Iniciar sesión con el usuario creado automáticamente al arrancar:
    - **Usuario:** `admin`
-   - **Contraseña:** `Admin.2026`
+   - **Contraseña:** la de `Seguridad:AdminClave` en `appsettings.Development.json` (`Admin.2026` en desarrollo).
+     Fuera de desarrollo se define con la variable de entorno `Seguridad__AdminClave`; si no existe, no se crea el usuario.
+
+## Pruebas
+
+```
+dotnet test
+```
+
+El proyecto `Capa Logica.Tests` (xUnit) usa SQLite en memoria, así que no necesita SQL Server.
 
 ## Conexión a la base de datos
 

@@ -3,16 +3,16 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class EstudiosRealizadoLogica
+public class EstudiosRealizadoLogica : LogicaBase<EstudiosRealizado>
 {
     private readonly EstudiosRealizadoData _data;
 
-    public EstudiosRealizadoLogica(EstudiosRealizadoData data) => _data = data;
+    public EstudiosRealizadoLogica(EstudiosRealizadoData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<EstudiosRealizado>> Listar() => await _data.Listar();
     public async Task<EstudiosRealizado?> Obtener(int IdTipoEstudiosParam, int IdEmpleadoParam, int CorrelativoParam) => await _data.Obtener(IdTipoEstudiosParam, IdEmpleadoParam, CorrelativoParam);
-    public async Task Crear(EstudiosRealizado registro) => await _data.Crear(registro);
-    public async Task Actualizar(EstudiosRealizado registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(EstudiosRealizado registro) => await _data.Eliminar(registro);
-}
 
+    // Correlativo por empleado y tipo de estudio.
+    public Task<bool> Registrar(EstudiosRealizado registro) => EnTransaccion(() =>
+        CrearNumerado(registro, x => x.Correlativo, id => registro.Correlativo = id,
+            x => x.IdTipoEstudios == registro.IdTipoEstudios && x.IdEmpleado == registro.IdEmpleado));
+}

@@ -1,5 +1,4 @@
 using Capa_Logica;
-using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,40 +8,31 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class ComportamientoController : Controller
 {
-    private readonly ComportamientoLogica _comportamientoData;
-    private readonly TipoComportamientoLogica _tipoData;
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly SecuenciaService _secuencia;
-    private readonly Services.EmpleadoServicio _empleados;
+    private readonly ComportamientoLogica _comportamientoLogica;
+    private readonly TipoComportamientoLogica _tipoLogica;
+    private readonly EmpleadoServicio _empleados;
 
     public ComportamientoController(
-        ComportamientoLogica comportamientoData,
-        TipoComportamientoLogica tipoData,
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        SecuenciaService secuencia,
-        Services.EmpleadoServicio empleados)
+        ComportamientoLogica comportamientoLogica,
+        TipoComportamientoLogica tipoLogica,
+        EmpleadoServicio empleados)
     {
-        _comportamientoData = comportamientoData;
-        _tipoData = tipoData;
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _secuencia = secuencia;
+        _comportamientoLogica = comportamientoLogica;
+        _tipoLogica = tipoLogica;
         _empleados = empleados;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index(int? idEmpleado)
     {
-        var registros = (await _comportamientoData.Listar())
+        var registros = (await _comportamientoLogica.Listar())
             .Where(c => idEmpleado is null || c.IdEmpleado == idEmpleado)
             .OrderByDescending(c => c.Fecha);
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.NombreEmpleado = idEmpleado is null ? null : await NombreEmpleadoAsync(idEmpleado.Value);
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Tipos = await _tipoData.Listar();
+        ViewBag.Tipos = await _tipoLogica.Listar();
         return View(registros.ToList());
     }
 
@@ -51,7 +41,7 @@ public class ComportamientoController : Controller
     {
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Tipos = await _tipoData.Listar();
+        ViewBag.Tipos = await _tipoLogica.Listar();
         return View("Form", new Comportamiento { IdEmpleado = idEmpleado, Fecha = DateTime.Today });
     }
 
@@ -64,18 +54,7 @@ public class ComportamientoController : Controller
 
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _comportamientoData.Listar();
-                    return lista.Count > 0 ? lista.Max(c => c.idComportamiento) + 1 : 1;
-                },
-                async id =>
-                {
-                    modelo.idComportamiento = id;
-                    await _comportamientoData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _comportamientoLogica.Registrar(modelo);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Comportamiento registrado.";
@@ -86,20 +65,20 @@ public class ComportamientoController : Controller
 
         ViewBag.IdEmpleado = modelo.IdEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Tipos = await _tipoData.Listar();
+        ViewBag.Tipos = await _tipoLogica.Listar();
         return View("Form", modelo);
     }
 
     [HttpGet]
     public async Task<IActionResult> Editar(int id)
     {
-        var registro = await _comportamientoData.Obtener(id);
+        var registro = await _comportamientoLogica.Obtener(id);
         if (registro is null)
             return NotFound();
 
         ViewBag.IdEmpleado = registro.IdEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Tipos = await _tipoData.Listar();
+        ViewBag.Tipos = await _tipoLogica.Listar();
         return View("Form", registro);
     }
 
@@ -107,7 +86,7 @@ public class ComportamientoController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Editar(Comportamiento modelo)
     {
-        var actual = await _comportamientoData.Obtener(modelo.idComportamiento);
+        var actual = await _comportamientoLogica.Obtener(modelo.idComportamiento);
         if (actual is null)
             return NotFound();
 
@@ -117,7 +96,7 @@ public class ComportamientoController : Controller
         actual.Titulo = modelo.Titulo;
         actual.Descripcion = modelo.Descripcion;
         actual.idTipoComportamiento = modelo.idTipoComportamiento;
-        await _comportamientoData.Actualizar(actual);
+        await _comportamientoLogica.Actualizar(actual);
 
         TempData["MensajeExito"] = "Comportamiento actualizado.";
         return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
@@ -127,9 +106,9 @@ public class ComportamientoController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Eliminar(int id)
     {
-        var actual = await _comportamientoData.Obtener(id);
+        var actual = await _comportamientoLogica.Obtener(id);
         if (actual is not null)
-            await _comportamientoData.Eliminar(actual);
+            await _comportamientoLogica.Eliminar(actual);
         return RedirectToAction(nameof(Index), new { idEmpleado = actual?.IdEmpleado });
     }
 

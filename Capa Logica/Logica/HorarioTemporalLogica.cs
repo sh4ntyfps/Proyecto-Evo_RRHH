@@ -3,16 +3,17 @@ using Capa_Datos;
 
 namespace Capa_Logica;
 
-public class HorarioTemporalLogica
+public class HorarioTemporalLogica : LogicaBase<HorarioTemporal>
 {
     private readonly HorarioTemporalData _data;
 
-    public HorarioTemporalLogica(HorarioTemporalData data) => _data = data;
+    public HorarioTemporalLogica(HorarioTemporalData data, SecuenciaService secuencia) : base(data, secuencia) => _data = data;
 
-    public async Task<List<HorarioTemporal>> Listar() => await _data.Listar();
     public async Task<HorarioTemporal?> Obtener(int idEmpleadoParam, int NParam) => await _data.Obtener(idEmpleadoParam, NParam);
-    public async Task Crear(HorarioTemporal registro) => await _data.Crear(registro);
-    public async Task Actualizar(HorarioTemporal registro) => await _data.Actualizar(registro);
-    public async Task Eliminar(HorarioTemporal registro) => await _data.Eliminar(registro);
-}
 
+    // Numero de horario temporal correlativo por empleado.
+    public Task CrearConNuevoId(HorarioTemporal registro) =>
+        CrearNumerado(registro, x => x.N, id => registro.N = id, x => x.idEmpleado == registro.idEmpleado);
+
+    public Task<bool> Registrar(HorarioTemporal registro) => EnTransaccion(() => CrearConNuevoId(registro));
+}

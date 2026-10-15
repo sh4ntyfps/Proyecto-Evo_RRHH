@@ -1,6 +1,5 @@
 using Capa_Logica;
-using Proyecto_Evo_RRLL.Utilidades;
-using Capa_Datos;
+using Capa_Logica.Exportacion;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,57 +10,57 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class EmpleadoController : Controller
 {
-    private readonly EmpleadoLogica _empleadoData;
-    private readonly PersonaLogica _personaData;
-    private readonly CargoLogica _cargoData;
-    private readonly EstructOrganizLogica _estructOrganizData;
-    private readonly LocalLogica _localData;
-    private readonly HorarioLogica _horarioData;
-    private readonly TipoTrabajadorLogica _tipoTrabajadorData;
-    private readonly RegimenPensionLogica _regimenPensionData;
-    private readonly TipoDocIDLogica _tipoDocData;
-    private readonly AFPLogica _afpData;
-    private readonly EstadoCivilLogica _estadoCivilData;
-    private readonly TipoSangreLogica _tipoSangreData;
-    private readonly DiscapacidadLogica _discapacidadData;
-    private readonly ViveConLogica _viveConData;
-    private readonly NacionalidadLogica _nacionalidadData;
-    private readonly SecuenciaService _secuencia;
+    private readonly EmpleadoLogica _empleadoLogica;
+    private readonly PersonaLogica _personaLogica;
+    private readonly CargoLogica _cargoLogica;
+    private readonly EstructOrganizLogica _estructOrganizLogica;
+    private readonly LocalLogica _localLogica;
+    private readonly HorarioLogica _horarioLogica;
+    private readonly TipoTrabajadorLogica _tipoTrabajadorLogica;
+    private readonly RegimenPensionLogica _regimenPensionLogica;
+    private readonly TipoDocIDLogica _tipoDocLogica;
+    private readonly AFPLogica _afpLogica;
+    private readonly EstadoCivilLogica _estadoCivilLogica;
+    private readonly TipoSangreLogica _tipoSangreLogica;
+    private readonly DiscapacidadLogica _discapacidadLogica;
+    private readonly ViveConLogica _viveConLogica;
+    private readonly NacionalidadLogica _nacionalidadLogica;
+    private readonly ExportadorTablas _exportador;
 
     public EmpleadoController(
-        EmpleadoLogica empleadoData,
-        PersonaLogica personaData,
-        CargoLogica cargoData,
-        EstructOrganizLogica estructuraOrganizData,
-        LocalLogica localData,
-        HorarioLogica horarioData,
-        TipoTrabajadorLogica tipoTrabajadorData,
-        RegimenPensionLogica regimenPensionData,
-        TipoDocIDLogica tipoDocData,
-        AFPLogica afpData,
-        EstadoCivilLogica estadoCivilData,
-        TipoSangreLogica tipoSangreData,
-        DiscapacidadLogica discapacidadData,
-        ViveConLogica viveConData,
-        NacionalidadLogica nacionalidadData,
-        SecuenciaService secuencia)
+        EmpleadoLogica empleadoLogica,
+        PersonaLogica personaLogica,
+        CargoLogica cargoLogica,
+        EstructOrganizLogica estructuraOrganizLogica,
+        LocalLogica localLogica,
+        HorarioLogica horarioLogica,
+        TipoTrabajadorLogica tipoTrabajadorLogica,
+        RegimenPensionLogica regimenPensionLogica,
+        TipoDocIDLogica tipoDocLogica,
+        AFPLogica afpLogica,
+        EstadoCivilLogica estadoCivilLogica,
+        TipoSangreLogica tipoSangreLogica,
+        DiscapacidadLogica discapacidadLogica,
+        ViveConLogica viveConLogica,
+        NacionalidadLogica nacionalidadLogica,
+        ExportadorTablas exportador)
     {
-        _empleadoData = empleadoData;
-        _personaData = personaData;
-        _cargoData = cargoData;
-        _estructOrganizData = estructuraOrganizData;
-        _localData = localData;
-        _horarioData = horarioData;
-        _tipoTrabajadorData = tipoTrabajadorData;
-        _regimenPensionData = regimenPensionData;
-        _tipoDocData = tipoDocData;
-        _afpData = afpData;
-        _estadoCivilData = estadoCivilData;
-        _tipoSangreData = tipoSangreData;
-        _discapacidadData = discapacidadData;
-        _viveConData = viveConData;
-        _nacionalidadData = nacionalidadData;
-        _secuencia = secuencia;
+        _empleadoLogica = empleadoLogica;
+        _personaLogica = personaLogica;
+        _cargoLogica = cargoLogica;
+        _estructOrganizLogica = estructuraOrganizLogica;
+        _localLogica = localLogica;
+        _horarioLogica = horarioLogica;
+        _tipoTrabajadorLogica = tipoTrabajadorLogica;
+        _regimenPensionLogica = regimenPensionLogica;
+        _tipoDocLogica = tipoDocLogica;
+        _afpLogica = afpLogica;
+        _estadoCivilLogica = estadoCivilLogica;
+        _tipoSangreLogica = tipoSangreLogica;
+        _discapacidadLogica = discapacidadLogica;
+        _viveConLogica = viveConLogica;
+        _nacionalidadLogica = nacionalidadLogica;
+        _exportador = exportador;
     }
 
     [HttpGet]
@@ -82,7 +81,7 @@ public class EmpleadoController : Controller
             var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
             var nombre = persona is null
                 ? null
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+                : persona.NombreCompleto();
             var cargo = e.IdCargo is null ? null : cargosPorId.GetValueOrDefault(e.IdCargo.Value)?.Descripcion;
             var area = areasPorKey.TryGetValue($"{e.Year}|{e.idAreaOrganiz}", out var areaRegistro) ? areaRegistro.AreaOrganizacional : null;
 
@@ -103,8 +102,11 @@ public class EmpleadoController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Exportar(string? q)
+    public async Task<IActionResult> Exportar(string? q, string formato = "csv")
     {
+        if (!_exportador.Soporta(formato))
+            return NotFound();
+
         var (filtrados, personasPorId, cargosPorId, areasPorKey) = await FiltrarEmpleadosAsync(q);
 
         var filas = new List<string[]>
@@ -115,7 +117,7 @@ public class EmpleadoController : Controller
         foreach (var e in filtrados)
         {
             var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
-            var nombre = persona is null ? null : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+            var nombre = persona is null ? null : persona.NombreCompleto();
             var cargo = e.IdCargo is null ? null : cargosPorId.GetValueOrDefault(e.IdCargo.Value)?.Descripcion;
             var area = areasPorKey.TryGetValue($"{e.Year}|{e.idAreaOrganiz}", out var areaRegistro) ? areaRegistro.AreaOrganizacional : null;
 
@@ -131,17 +133,17 @@ public class EmpleadoController : Controller
             });
         }
 
-        var contenido = string.Join("\r\n", filas.Select(f => string.Join(";", f.Select(CsvUtilidad.EscaparCsv))));
-        var nombreArchivo = $"empleados_{(string.IsNullOrWhiteSpace(q) ? "todos" : "filtro")}_{DateTime.Now:yyyyMMdd_HHmm}.csv";
-        return File(new System.Text.UTF8Encoding(true).GetBytes(contenido), "text/csv; charset=utf-8", nombreArchivo);
+        var archivo = _exportador.Exportar(formato, filas);
+        var nombreArchivo = $"empleados_{(string.IsNullOrWhiteSpace(q) ? "todos" : "filtro")}_{DateTime.Now:yyyyMMdd_HHmm}.{archivo.Extension}";
+        return File(archivo.Contenido, archivo.TipoContenido, nombreArchivo);
     }
 
     private async Task<(List<Empleado> Filtrados, Dictionary<int, Persona> Personas, Dictionary<int, Cargo> Cargos, Dictionary<string, EstructOrganiz> Areas)> FiltrarEmpleadosAsync(string? q)
     {
-        var empleados = await _empleadoData.Listar();
-        var personas = await _personaData.Listar();
-        var cargos = await _cargoData.Listar();
-        var areas = await _estructOrganizData.Listar();
+        var empleados = await _empleadoLogica.Listar();
+        var personas = await _personaLogica.Listar();
+        var cargos = await _cargoLogica.Listar();
+        var areas = await _estructOrganizLogica.Listar();
 
         var personasPorId = personas.ToDictionary(p => p.IdPersona);
         var cargosPorId = cargos.ToDictionary(c => c.IdCargo);
@@ -154,7 +156,7 @@ public class EmpleadoController : Controller
         foreach (var e in empleados)
         {
             var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
-            var nombre = persona is null ? null : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim();
+            var nombre = persona is null ? null : persona.NombreCompleto();
             if (nombre?.Contains(q, StringComparison.OrdinalIgnoreCase) == true
                 || persona?.NumDocID?.Contains(q, StringComparison.OrdinalIgnoreCase) == true)
                 filtrados.Add(e);
@@ -167,11 +169,11 @@ public class EmpleadoController : Controller
     [HttpGet]
     public async Task<IActionResult> Detalles(int id)
     {
-        var empleado = await _empleadoData.Obtener(id);
+        var empleado = await _empleadoLogica.Obtener(id);
         if (empleado is null)
             return NotFound();
 
-        var personas = await _personaData.Listar();
+        var personas = await _personaLogica.Listar();
         var persona = empleado.IdPersona is null ? null : personas.FirstOrDefault(p => p.IdPersona == empleado.IdPersona);
 
         var vm = new EmpleadoDetalleViewModel
@@ -181,22 +183,22 @@ public class EmpleadoController : Controller
             Persona = persona,
             NombresCompletos = persona is null
                 ? null
-                : $"{persona.Nombres} {persona.Apellido_Paterno} {persona.Apellido_Materno}".Trim(),
-            TipoDoc = persona?.TipoDocID is null ? null : (await _tipoDocData.Listar()).FirstOrDefault(t => t.Nombre == persona.TipoDocID)?.Descripcion,
-            Cargo = empleado.IdCargo is null ? null : (await _cargoData.Listar()).FirstOrDefault(c => c.IdCargo == empleado.IdCargo)?.Descripcion,
-            Area = (await _estructOrganizData.Listar())
+                : persona.NombreCompleto(),
+            TipoDoc = persona?.TipoDocID is null ? null : (await _tipoDocLogica.Listar()).FirstOrDefault(t => t.Nombre == persona.TipoDocID)?.Descripcion,
+            Cargo = empleado.IdCargo is null ? null : (await _cargoLogica.Listar()).FirstOrDefault(c => c.IdCargo == empleado.IdCargo)?.Descripcion,
+            Area = (await _estructOrganizLogica.Listar())
                 .FirstOrDefault(a => a.Year == empleado.Year && a.idAreaOrganiz == empleado.idAreaOrganiz)?.AreaOrganizacional,
-            Local = empleado.idLocal is null ? null : (await _localData.Listar()).FirstOrDefault(l => l.idLocal == empleado.idLocal)?.NombreLocal,
-            Horario = empleado.idHorario is null ? null : (await _horarioData.Listar()).FirstOrDefault(h => h.idHorario == empleado.idHorario)?.Descrip_Horario,
+            Local = empleado.idLocal is null ? null : (await _localLogica.Listar()).FirstOrDefault(l => l.idLocal == empleado.idLocal)?.NombreLocal,
+            Horario = empleado.idHorario is null ? null : (await _horarioLogica.Listar()).FirstOrDefault(h => h.idHorario == empleado.idHorario)?.Descrip_Horario,
             Estado = empleado.Estado,
-            AFP = empleado.IdAFP is null ? null : (await _afpData.Listar()).FirstOrDefault(a => a.IdAFP == empleado.IdAFP)?.DescripAFP,
-            EstadoCivil = empleado.IdEstadoCivil is null ? null : (await _estadoCivilData.Listar()).FirstOrDefault(ec => ec.IdEstadoCivil == empleado.IdEstadoCivil)?.DescripEstCivil,
-            TipoSangre = empleado.IdTipoSangre is null ? null : (await _tipoSangreData.Listar()).FirstOrDefault(s => s.IdTipoSangre == empleado.IdTipoSangre)?.DescripTS,
-            Discapacidad = empleado.IdDiscapacidad is null ? null : (await _discapacidadData.Listar()).FirstOrDefault(d => d.IdDiscapacidad == empleado.IdDiscapacidad)?.Descrip_Discapacidad,
-            ViveCon = empleado.IdViveCon is null ? null : (await _viveConData.Listar()).FirstOrDefault(v => v.IdViveCon == empleado.IdViveCon)?.DescripViveCon,
-            Nacionalidad = empleado.IdNacionalidad is null ? null : (await _nacionalidadData.Listar()).FirstOrDefault(n => n.IdNacionalidad == empleado.IdNacionalidad)?.Descripcion,
-            TipoTrabajador = empleado.IdTipoTrabajador is null ? null : (await _tipoTrabajadorData.Listar()).FirstOrDefault(t => t.IdTipoTrabajador == empleado.IdTipoTrabajador)?.Descripcion,
-            RegimenPension = empleado.IdRegimenPen is null ? null : (await _regimenPensionData.Listar()).FirstOrDefault(r => r.IdRegimenPen == empleado.IdRegimenPen)?.LeyRegimen,
+            AFP = empleado.IdAFP is null ? null : (await _afpLogica.Listar()).FirstOrDefault(a => a.IdAFP == empleado.IdAFP)?.DescripAFP,
+            EstadoCivil = empleado.IdEstadoCivil is null ? null : (await _estadoCivilLogica.Listar()).FirstOrDefault(ec => ec.IdEstadoCivil == empleado.IdEstadoCivil)?.DescripEstCivil,
+            TipoSangre = empleado.IdTipoSangre is null ? null : (await _tipoSangreLogica.Listar()).FirstOrDefault(s => s.IdTipoSangre == empleado.IdTipoSangre)?.DescripTS,
+            Discapacidad = empleado.IdDiscapacidad is null ? null : (await _discapacidadLogica.Listar()).FirstOrDefault(d => d.IdDiscapacidad == empleado.IdDiscapacidad)?.Descrip_Discapacidad,
+            ViveCon = empleado.IdViveCon is null ? null : (await _viveConLogica.Listar()).FirstOrDefault(v => v.IdViveCon == empleado.IdViveCon)?.DescripViveCon,
+            Nacionalidad = empleado.IdNacionalidad is null ? null : (await _nacionalidadLogica.Listar()).FirstOrDefault(n => n.IdNacionalidad == empleado.IdNacionalidad)?.Descripcion,
+            TipoTrabajador = empleado.IdTipoTrabajador is null ? null : (await _tipoTrabajadorLogica.Listar()).FirstOrDefault(t => t.IdTipoTrabajador == empleado.IdTipoTrabajador)?.Descripcion,
+            RegimenPension = empleado.IdRegimenPen is null ? null : (await _regimenPensionLogica.Listar()).FirstOrDefault(r => r.IdRegimenPen == empleado.IdRegimenPen)?.LeyRegimen,
             TieneFoto = empleado.Foto is not null
         };
         return View(vm);
@@ -205,7 +207,7 @@ public class EmpleadoController : Controller
     [HttpGet]
     public async Task<IActionResult> Editar(int id)
     {
-        var empleado = await _empleadoData.Obtener(id);
+        var empleado = await _empleadoLogica.Obtener(id);
         if (empleado is null)
             return NotFound();
 
@@ -220,7 +222,7 @@ public class EmpleadoController : Controller
         if (id != empleado.IdEmpleado)
             return NotFound();
 
-        var original = await _empleadoData.Obtener(id);
+        var original = await _empleadoLogica.Obtener(id);
         if (original is null)
             return NotFound();
 
@@ -276,7 +278,7 @@ public class EmpleadoController : Controller
         original.idLocal = empleado.idLocal;
         original.Foto = foto is not null && foto.Length > 0 ? await LeerArchivo(foto) : original.Foto;
 
-        await _empleadoData.Actualizar(original);
+        await _empleadoLogica.Actualizar(original);
 
         await CargarCatalogosEdicion();
         return RedirectToAction(nameof(Detalles), new { id });
@@ -311,34 +313,20 @@ public class EmpleadoController : Controller
 
         if (!string.IsNullOrWhiteSpace(persona.NumDocID))
         {
-            var personas = await _personaData.Listar();
+            var personas = await _personaLogica.Listar();
             if (personas.Any(p => p.NumDocID == persona.NumDocID))
                 ModelState.AddModelError(nameof(modelo.Persona.NumDocID), "Ya existe una persona con ese número de documento.");
         }
 
         if (ModelState.IsValid)
         {
-            Empleado? empleado = null;
-            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
-            {
-                var personas = await _personaData.Listar();
-                persona.IdPersona = personas.Count > 0 ? personas.Max(p => p.IdPersona) + 1 : 1;
-                persona.FechaRegistro = DateTime.Now;
-                await _personaData.Crear(persona);
-
-                var empleados = await _empleadoData.Listar();
-                empleado = modelo.Empleado;
-                empleado.IdEmpleado = empleados.Count > 0 ? empleados.Max(e => e.IdEmpleado) + 1 : 1;
-                empleado.IdPersona = persona.IdPersona;
-                empleado.Foto = foto is not null && foto.Length > 0 ? await LeerArchivo(foto) : null;
-                if (string.IsNullOrWhiteSpace(empleado.Estado))
-                    empleado.Estado = "A";
-                await _empleadoData.Crear(empleado);
-            });
+            var empleado = modelo.Empleado;
+            empleado.Foto = foto is not null && foto.Length > 0 ? await LeerArchivo(foto) : null;
+            var guardo = await _empleadoLogica.RegistrarConPersona(persona, empleado);
             if (guardo)
             {
                 TempData["MensajeExito"] = "Empleado registrado.";
-                return RedirectToAction(nameof(Detalles), new { id = empleado!.IdEmpleado });
+                return RedirectToAction(nameof(Detalles), new { id = empleado.IdEmpleado });
             }
             ModelState.AddModelError("", "No se pudo registrar el empleado: intente nuevamente.");
         }
@@ -349,25 +337,25 @@ public class EmpleadoController : Controller
 
     private async Task CargarCatalogosEdicion()
     {
-        ViewBag.Cargos = await _cargoData.Listar();
-        ViewBag.Horarios = await _horarioData.Listar();
-        ViewBag.Locales = await _localData.Listar();
-        ViewBag.Areas = await _estructOrganizData.Listar();
-        ViewBag.TiposTrabajador = await _tipoTrabajadorData.Listar();
-        ViewBag.Regimenes = await _regimenPensionData.Listar();
-        ViewBag.Afps = await _afpData.Listar();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
-        ViewBag.TiposSangre = await _tipoSangreData.Listar();
-        ViewBag.Discapacidades = await _discapacidadData.Listar();
-        ViewBag.ViveCon = await _viveConData.Listar();
-        ViewBag.Nacionalidades = await _nacionalidadData.Listar();
-        ViewBag.TiposDocumento = await _tipoDocData.Listar();
+        ViewBag.Cargos = await _cargoLogica.Listar();
+        ViewBag.Horarios = await _horarioLogica.Listar();
+        ViewBag.Locales = await _localLogica.Listar();
+        ViewBag.Areas = await _estructOrganizLogica.Listar();
+        ViewBag.TiposTrabajador = await _tipoTrabajadorLogica.Listar();
+        ViewBag.Regimenes = await _regimenPensionLogica.Listar();
+        ViewBag.Afps = await _afpLogica.Listar();
+        ViewBag.EstadosCiviles = await _estadoCivilLogica.Listar();
+        ViewBag.TiposSangre = await _tipoSangreLogica.Listar();
+        ViewBag.Discapacidades = await _discapacidadLogica.Listar();
+        ViewBag.ViveCon = await _viveConLogica.Listar();
+        ViewBag.Nacionalidades = await _nacionalidadLogica.Listar();
+        ViewBag.TiposDocumento = await _tipoDocLogica.Listar();
     }
 
     [HttpGet]
     public async Task<IActionResult> MostrarFoto(int id)
     {
-        var empleado = await _empleadoData.Obtener(id);
+        var empleado = await _empleadoLogica.Obtener(id);
         if (empleado?.Foto is null)
             return NotFound();
         return File(empleado.Foto, "image/jpeg");

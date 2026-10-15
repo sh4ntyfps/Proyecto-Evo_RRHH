@@ -1,5 +1,5 @@
 using Capa_Logica;
-using Proyecto_Evo_RRLL.Utilidades;
+using Capa_Logica.Exportacion;
 using Capa_Datos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +12,13 @@ public class CatalogoController : Controller
 {
     private readonly CatalogoRepositorio _repositorio;
     private readonly BitacoraLogica _bitacora;
+    private readonly ExportadorTablas _exportador;
 
-    public CatalogoController(CatalogoRepositorio repositorio, BitacoraLogica bitacora)
+    public CatalogoController(CatalogoRepositorio repositorio, BitacoraLogica bitacora, ExportadorTablas exportador)
     {
         _repositorio = repositorio;
         _bitacora = bitacora;
+        _exportador = exportador;
     }
 
     [HttpGet]
@@ -174,9 +176,9 @@ public class CatalogoController : Controller
 
     [HttpGet]
     [Authorize(Roles = "Administrador")]
-    public async Task<IActionResult> Exportar(string tabla)
+    public async Task<IActionResult> Exportar(string tabla, string formato = "csv")
     {
-        if (!CatalogoNavegacion.Items.ContainsKey(tabla))
+        if (!CatalogoNavegacion.Items.ContainsKey(tabla) || !_exportador.Soporta(formato))
             return NotFound();
 
         var columnas = _repositorio.Columnas(tabla);
@@ -190,9 +192,9 @@ public class CatalogoController : Controller
             filas.Add(columnas.Select(c => entidad.GetType().GetProperty(c.Nombre)?.GetValue(entidad)?.ToString() ?? string.Empty).ToArray());
         }
 
-        var contenido = string.Join("\r\n", filas.Select(f => string.Join(";", f.Select(CsvUtilidad.EscaparCsv))));
-        var nombre = $"{tabla}_{DateTime.Now:yyyyMMdd_HHmm}.csv";
-        return File(new System.Text.UTF8Encoding(true).GetBytes(contenido), "text/csv; charset=utf-8", nombre);
+        var archivo = _exportador.Exportar(formato, filas);
+        var nombre = $"{tabla}_{DateTime.Now:yyyyMMdd_HHmm}.{archivo.Extension}";
+        return File(archivo.Contenido, archivo.TipoContenido, nombre);
     }
 
 }
