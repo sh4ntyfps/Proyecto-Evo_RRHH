@@ -1,5 +1,6 @@
 ﻿using Capa_Datos;
 using Capa_Entidades;
+using Capa_Entidades.Constantes;
 using Capa_Logica;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -26,7 +27,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("SoloAdministradores", p => p.RequireRole("Administrador"));
+    options.AddPolicy("SoloAdministradores", p => p.RequireRole(ConstantesSeguridad.RolAdministrador));
 });
 
 // Capa de logica y servicios propios de la aplicacion
@@ -80,13 +81,13 @@ static async Task SeedAdminAsync(IServiceProvider servicios, string adminClave)
     if (await usuarioLogica.ObtenerPorLogin(LoginAdmin) is not null)
         return;
 
-    // Rol administrador del sistema RRHH (SistemaOpcion '0500000'); en los datos legados es el rol 13 , usuario admin  , contrasena: Admin.2026
+    // Rol administrador del sistema RRHH; en los datos legados es el rol 13 ("ADMINISTRADOR").
     var rolLogica = servicios.GetRequiredService<RolLogica>();
-    var rol = (await rolLogica.Listar()).FirstOrDefault(r => r.IdSistema?.Trim() == SeguridadController.SistemaRRHH
-        && r.Descripcion != null && r.Descripcion.Trim().ToUpper() == "ADMINISTRADOR");
+    var rol = (await rolLogica.Listar()).FirstOrDefault(r => r.IdSistema?.Trim() == ConstantesSeguridad.SistemaRRHH
+        && string.Equals(r.Descripcion?.Trim(), ConstantesSeguridad.RolAdministrador, StringComparison.OrdinalIgnoreCase));
     if (rol is null)
     {
-        rol = new Rol { Descripcion = "Administrador", IdSistema = SeguridadController.SistemaRRHH };
+        rol = new Rol { Descripcion = ConstantesSeguridad.RolAdministrador, IdSistema = ConstantesSeguridad.SistemaRRHH };
         await rolLogica.Crear(rol);
     }
 

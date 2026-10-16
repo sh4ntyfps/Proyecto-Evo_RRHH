@@ -1,4 +1,5 @@
 using Capa_Logica;
+using Capa_Entidades.Constantes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Proyecto_Evo_RRLL.Models;
@@ -77,7 +78,7 @@ private readonly CargoLogica _cargoLogica;
             var model = new DashboardViewModel
             {
                 Empleados = empleados.Count,
-                EmpleadosActivos = empleados.Count(e => e.Estado == "A"),
+                EmpleadosActivos = empleados.Count(e => e.Estado == EstadosEmpleado.Activo),
                 Personas = personas.Count,
                 asistenciasHoy = await _asistenciaLogica.ContarEntreFechas(hoy, hoy),
                 Areas = estructuras.Count,

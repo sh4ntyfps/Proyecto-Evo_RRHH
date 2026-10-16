@@ -1,4 +1,5 @@
 ﻿using Capa_Entidades;
+using Capa_Entidades.Constantes;
 using Capa_Entidades.Contratos;
 
 namespace Capa_Logica;
@@ -24,7 +25,7 @@ public class EmpleadoLogica : LogicaBase<Empleado>
 
         empleado.IdPersona = persona.IdPersona;
         if (string.IsNullOrWhiteSpace(empleado.Estado))
-            empleado.Estado = "A";
+            empleado.Estado = EstadosEmpleado.Activo;
         await Crear(empleado);
     });
 }

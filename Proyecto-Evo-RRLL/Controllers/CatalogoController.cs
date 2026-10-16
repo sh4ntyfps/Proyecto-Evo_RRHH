@@ -1,4 +1,5 @@
 using Capa_Logica;
+using Capa_Entidades.Constantes;
 using Capa_Logica.Exportacion;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +53,7 @@ public class CatalogoController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = ConstantesSeguridad.RolAdministrador)]
     public async Task<IActionResult> Nuevo(string tabla)
     {
         if (!EsCatalogoEditable(tabla))
@@ -70,7 +71,7 @@ public class CatalogoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = ConstantesSeguridad.RolAdministrador)]
     public async Task<IActionResult> Nuevo(string tabla, IFormCollection form)
     {
         if (!EsCatalogoEditable(tabla))
@@ -91,7 +92,7 @@ public class CatalogoController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = ConstantesSeguridad.RolAdministrador)]
     public async Task<IActionResult> Editar(string tabla, string ids)
     {
         if (!EsCatalogoEditable(tabla))
@@ -120,7 +121,7 @@ public class CatalogoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = ConstantesSeguridad.RolAdministrador)]
     public async Task<IActionResult> Editar(string tabla, string ids, IFormCollection form)
     {
         if (!EsCatalogoEditable(tabla))
@@ -143,7 +144,7 @@ public class CatalogoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = ConstantesSeguridad.RolAdministrador)]
     public async Task<IActionResult> Eliminar(string tabla, string ids)
     {
         if (!EsCatalogoEditable(tabla))
@@ -174,7 +175,7 @@ public class CatalogoController : Controller
         => CatalogoNavegacion.Items.ContainsKey(tabla) && CatalogoLogica.EsEditable(tabla);
 
     [HttpGet]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = ConstantesSeguridad.RolAdministrador)]
     public async Task<IActionResult> Exportar(string tabla, string formato = "csv")
     {
         if (!CatalogoNavegacion.Items.ContainsKey(tabla) || !_exportador.Soporta(formato))

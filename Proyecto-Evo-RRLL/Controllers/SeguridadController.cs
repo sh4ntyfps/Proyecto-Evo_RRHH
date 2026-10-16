@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Capa_Entidades.Constantes;
 using Capa_Logica;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authentication;
@@ -12,9 +13,6 @@ namespace Proyecto_Evo_RRLL.Controllers;
 
 public class SeguridadController : Controller
 {
-    // Codigo del sistema RRHH en SistemaOpcion (el legado solo daba acceso con roles de este sistema)
-    public const string SistemaRRHH = "0500000";
-
     private readonly UsuarioLogica _usuarioLogica;
     private readonly BitacoraLogica _bitacora;
 
@@ -65,7 +63,7 @@ public class SeguridadController : Controller
             new(ClaimTypes.Name, usuario.Login!.Trim()),
             new(ClaimTypes.GivenName, usuario.Descripcion ?? usuario.Login!.Trim())
         };
-        claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, EsAdministradorRRHH(r) ? "Administrador" : r.Descripcion ?? "SinRol")));
+        claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, EsAdministradorRRHH(r) ? ConstantesSeguridad.RolAdministrador : r.Descripcion ?? "SinRol")));
 
         var identidad = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identidad);
@@ -94,6 +92,6 @@ public class SeguridadController : Controller
 
     // El rol legado se llama "ADMINISTRADOR" (mayusculas); la app autoriza con "Administrador"
     private static bool EsAdministradorRRHH(Rol rol) =>
-        rol.IdSistema?.Trim() == SistemaRRHH
-        && string.Equals(rol.Descripcion?.Trim(), "Administrador", StringComparison.OrdinalIgnoreCase);
+        rol.IdSistema?.Trim() == ConstantesSeguridad.SistemaRRHH
+        && string.Equals(rol.Descripcion?.Trim(), ConstantesSeguridad.RolAdministrador, StringComparison.OrdinalIgnoreCase);
 }

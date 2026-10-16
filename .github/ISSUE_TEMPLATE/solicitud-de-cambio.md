@@ -1,7 +1,7 @@
 ---
 name: Solicitud de cambio
 about: Registrar un cambio para evaluarlo antes de implementarlo (ver docs/GESTION-DEL-CAMBIO.md)
-title: "SC-NN: "
+title: "SC-NNN: "
 labels: solicitud-de-cambio
 ---
 
@@ -18,4 +18,4 @@ labels: solicitud-de-cambio
 ---
 *Lo completa el comité de cambios:*
 
-**Decisión:** Aprobado / Rechazado / Postergado (motivo):
+**Decisión:** Aprobado / Rechazado / Diferido (motivo):

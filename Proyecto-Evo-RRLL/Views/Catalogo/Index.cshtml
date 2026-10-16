@@ -1,13 +1,13 @@
 @model CatalogoViewModel
 @{
     ViewData["Title"] = $"Catálogos - {Model.Titulo}";
-    var puedeEditar = Model.Editable && User.IsInRole("Administrador");
+    var puedeEditar = Model.Editable && User.IsInRole(ConstantesSeguridad.RolAdministrador);
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>@Model.Titulo</h3>
     <div class="d-flex gap-2">
-        @if (User.IsInRole("Administrador"))
+        @if (User.IsInRole(ConstantesSeguridad.RolAdministrador))
         {
             <a asp-action="Exportar" asp-route-tabla="@Model.Tabla" class="btn btn-outline-secondary">
                 <i class="bi bi-download me-1"></i> Exportar CSV

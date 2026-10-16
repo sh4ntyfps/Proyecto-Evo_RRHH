@@ -1,4 +1,6 @@
 using Capa_Logica;
+using Capa_Entidades.Constantes;
+using Proyecto_Evo_RRLL.Utilidades;
 using Capa_Logica.Exportacion;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -66,17 +68,16 @@ public class EmpleadoController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(string? q, int pagina = 1)
     {
-        const int tamanoPagina = 25;
         var (filtrados, personasPorId, cargosPorId, areasPorKey) = await FiltrarEmpleadosAsync(q);
 
         var total = filtrados.Count;
-        var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)tamanoPagina));
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)Paginacion.TamanoPagina));
         if (pagina < 1) pagina = 1;
         if (pagina > totalPaginas) pagina = totalPaginas;
 
         var vm = new EmpleadoViewModel { Busqueda = q, Pagina = pagina, TotalPaginas = totalPaginas, Total = total };
 
-        foreach (var e in filtrados.Skip((pagina - 1) * tamanoPagina).Take(tamanoPagina))
+        foreach (var e in filtrados.Skip((pagina - 1) * Paginacion.TamanoPagina).Take(Paginacion.TamanoPagina))
         {
             var persona = e.IdPersona is null ? null : personasPorId.GetValueOrDefault(e.IdPersona.Value);
             var nombre = persona is null
@@ -293,7 +294,7 @@ public class EmpleadoController : Controller
             Empleado = new Empleado
             {
                 Year = DateTime.Now.Year,
-                Estado = "A",
+                Estado = EstadosEmpleado.Activo,
                 FechaIngreso = DateTime.Today
             }
         });

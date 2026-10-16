@@ -65,11 +65,11 @@
                     <td>@e.Area</td>
                     <td>@e.FechaIngreso?.ToString("dd/MM/yyyy")</td>
                     <td>
-                        @if (e.Estado == "A")
+                        @if (e.Estado == EstadosEmpleado.Activo)
                         {
                             <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Activo</span>
                         }
-                        else if (e.Estado == "I")
+                        else if (e.Estado == EstadosEmpleado.Inactivo)
                         {
                             <span class="badge rounded-pill text-bg-secondary"><i class="bi bi-dash-circle me-1"></i>Inactivo</span>
                         }

@@ -155,8 +155,8 @@
                 <div class="col-md-3">
                     <label class="form-label">Estado</label>
                     <select asp-for="Empleado.Estado" class="form-select">
-                        <option value="A" selected="@(Model.Empleado.Estado == "A")">Activo</option>
-                        <option value="I" selected="@(Model.Empleado.Estado == "I")">Inactivo</option>
+                        <option value="@EstadosEmpleado.Activo" selected="@(Model.Empleado.Estado == EstadosEmpleado.Activo)">Activo</option>
+                        <option value="@EstadosEmpleado.Inactivo" selected="@(Model.Empleado.Estado == EstadosEmpleado.Inactivo)">Inactivo</option>
                         <option value="">(otro)</option>
                     </select>
                 </div>

@@ -31,7 +31,7 @@
         var inicialesUsuario = partesNombre.Length >= 2
             ? $"{partesNombre[0][0]}{partesNombre[1][0]}".ToUpper()
             : partesNombre.Length == 1 ? partesNombre[0][..Math.Min(2, partesNombre[0].Length)].ToUpper() : "?";
-        var esAdmin = User.IsInRole("Administrador");
+        var esAdmin = User.IsInRole(ConstantesSeguridad.RolAdministrador);
 
         string Activo(string c) => controlador == c ? "active" : "";
         string? Actual(string c) => controlador == c ? "page" : null;

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Capa_Entidades.Constantes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Capa_Logica;
@@ -7,7 +8,7 @@ using Proyecto_Evo_RRLL.Models.ViewModels;
 
 namespace Proyecto_Evo_RRLL.Controllers;
 
-[Authorize(Roles = "Administrador")]
+[Authorize(Roles = ConstantesSeguridad.RolAdministrador)]
 public class SeguridadAdminController : Controller
 {
     private readonly UsuarioLogica _usuarioLogica;

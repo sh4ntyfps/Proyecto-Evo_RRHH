@@ -2,6 +2,8 @@
 
 Curso: **Evolución y Configuración de Software** (semanas 2 a 9). Para cada tema se indica dónde está la evidencia en el repositorio.
 
+El detalle de cada cambio de código (qué se hizo, por qué y para qué sirve) está en [`CAMBIOS-ARQUITECTURA.md`](CAMBIOS-ARQUITECTURA.md).
+
 | Semana | Tema | Evidencia |
 |---|---|---|
 | 2 | Mantenimiento del software | [Tipos de mantenimiento aplicados](#semana-2--mantenimiento-del-software) |
@@ -38,9 +40,10 @@ Proyecto-Evo-RRLL (controllers, vistas) ──► Capa Logica ──► Capa Ent
 |---|---|
 | Correctivo | Alta de beneficiarios en Familia/Salud: antes se guardaba siempre con N.º 0 y el segundo fallaba. Ahora la Capa Datos lo numera por empleado. |
 | Correctivo | Checkboxes de Permiso (`bool?` con `asp-for`) que daban error 500 al abrir el formulario. |
-| Adaptativo | Base normalizada `RRHH_Normalizado` y su script de migración (`Scripts/bd-Normalizada`). |
+| Adaptativo | Clave del administrador inicial leída de configuración (variable de entorno `Seguridad__AdminClave` en producción). |
 | Perfectivo | Bitácora de actividad, exportación a CSV y dashboard. |
-| Preventivo | Reestructuración por capas con contratos, para que un cambio de BD no se propague a la lógica ni a la interfaz. |
+| Perfectivo | Reestructuración por capas con contratos, para que un cambio de BD no se propague a la lógica ni a la interfaz (SC-006). |
+| Preventivo | Pruebas `ArquitecturaTests`, que fallan si alguna capa vuelve a depender de la base de datos. |
 
 **Deuda técnica conocida** (pendiente, registrada para gestionarla):
 
