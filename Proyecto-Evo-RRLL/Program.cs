@@ -1,8 +1,10 @@
-﻿using Capa_Datos;
+﻿using System.Threading.RateLimiting;
+using Capa_Datos;
 using Capa_Entidades;
 using Capa_Logica;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Proyecto_Evo_RRLL.Filtros;
 
@@ -190,6 +192,34 @@ builder.Services.AddScoped<CatalogoRepositorio>();
 builder.Services.AddScoped<SecuenciaService>();
 builder.Services.AddScoped<Proyecto_Evo_RRLL.Services.EmpleadoServicio>();
 
+// Limite de peticiones: evita que un usuario (o una IP) sature el servidor con demasiadas
+// peticiones seguidas. Global: 100 por minuto por usuario/IP; login: 5 por minuto (anti fuerza bruta).
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(contexto =>
+    {
+        var clave = contexto.User.Identity?.IsAuthenticated == true
+            ? "u:" + contexto.User.Identity!.Name
+            : "ip:" + (contexto.Connection.RemoteIpAddress?.ToString() ?? "anon");
+
+        return RateLimitPartition.GetFixedWindowLimiter(clave, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 100,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        });
+    });
+
+    options.AddFixedWindowLimiter("login", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+});
+
 var app = builder.Build();
 
 // Seed: usuario administrador inicial en BD existente
@@ -217,6 +247,8 @@ app.UseStatusCodePagesWithReExecute("/Home/PaginaNoEncontrada", "?statusCode={0}
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapStaticAssets();
 
