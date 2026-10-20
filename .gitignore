@@ -18,3 +18,7 @@ x86/
 ## Logs y temporales
 *.log
 *.tmp
+
+
+## Scripts
+bd-Datos.sql
