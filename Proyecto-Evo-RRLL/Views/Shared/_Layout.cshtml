@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - RRHH</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -16,7 +16,7 @@
 
     <div id="splashLoader" class="splash-loader">
         <div class="splash-box">
-            <span class="brand-logo splash-logo"><i class="bi bi-person-badge-fill"></i></span>
+            <span class="brand-sparkle-icon splash-logo">✦</span>
             <div class="splash-title">RRHH</div>
             <div class="splash-bar"><span></span></div>
         </div>
@@ -37,16 +37,17 @@
 
         <aside class="sidebar" id="sidebar">
             <a class="sidebar-brand d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
-                <span class="brand-logo"><i class="bi bi-person-badge-fill"></i></span>
-                <span class="fw-bold">RRHH</span>
+                <span class="brand-sparkle-icon">✦</span>
+                <span class="fw-bold tracking-tight">RRHH</span>
+                <span class="badge-bruddle-version ms-auto">PRO</span>
             </a>
-            <div class="sidebar-section">PRINCIPAL</div>
+            <div class="sidebar-section">NAVIGATION</div>
             <nav class="sidebar-nav">
                 <a class="sidebar-link @(controlador == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-speedometer2"></i><span>Inicio</span>
+                    <i class="bi bi-grid-1x2"></i><span>Dashboard</span>
                 </a>
                 <a class="sidebar-link @(controlador == "Empleado" ? "active" : "")" asp-controller="Empleado" asp-action="Index">
-                    <i class="bi bi-people"></i><span>Personal</span>
+                    <i class="bi bi-people"></i><span>Personal</span><span class="sidebar-badge badge-purple">Staff</span>
                 </a>
                 <a class="sidebar-link @(controlador == "Salud" ? "active" : "")" asp-controller="Salud" asp-action="Index">
                     <i class="bi bi-heart-pulse"></i><span>Salud</span>
@@ -55,7 +56,7 @@
                     <i class="bi bi-people-fill"></i><span>Familia</span>
                 </a>
                 <a class="sidebar-link @(controlador == "Asistencia" ? "active" : "")" asp-controller="Asistencia" asp-action="Index">
-                    <i class="bi bi-clock-history"></i><span>Asistencia</span>
+                    <i class="bi bi-clock-history"></i><span>Asistencia</span><span class="sidebar-badge badge-green">Hoy</span>
                 </a>
                 <a class="sidebar-link @(controlador == "Feriado" ? "active" : "")" asp-controller="Feriado" asp-action="Index">
                     <i class="bi bi-calendar-event"></i><span>Feriados</span>
@@ -98,7 +99,7 @@
                 <div class="sidebar-section">ADMINISTRACIÓN</div>
                 <div class="sidebar-submenu">
                     <a class="sidebar-link @(controlador == "Catalogo" ? "active" : "")" data-bs-toggle="collapse" href="#menuCatalogo" role="button" aria-expanded="false" aria-controls="menuCatalogo">
-                        <i class="bi bi-grid-1x2"></i><span>Mantenimiento</span><i class="bi bi-chevron-down ms-auto submenu-caret"></i>
+                        <i class="bi bi-sliders"></i><span>Mantenimiento</span><i class="bi bi-chevron-down ms-auto submenu-caret"></i>
                     </a>
                     <div class="collapse @(controlador == "Catalogo" ? "show" : "")" id="menuCatalogo">
                         <div class="submenu-list">
@@ -114,12 +115,25 @@
                 </div>
             </nav>
             <div class="sidebar-footer">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="brand-logo small"><i class="bi bi-shield-check"></i></div>
-                    <div class="small lh-sm">
-                        <div class="fw-semibold">RRHH</div>
-                        <div class="text-secondary">Sistema de RR.HH.</div>
+                <div class="dropdown dropup w-100">
+                    <div class="sidebar-user-card d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                        <span class="user-avatar-bruddle">@inicialesUsuario</span>
+                        <div class="user-info-bruddle flex-grow-1 overflow-hidden">
+                            <div class="user-name text-truncate">@User.Identity?.Name</div>
+                            <div class="user-role text-truncate">Administrador</div>
+                        </div>
+                        <i class="bi bi-three-dots text-secondary"></i>
                     </div>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow-lg w-100 mb-2">
+                        <li>
+                            <form asp-controller="Seguridad" asp-action="CerrarSesion" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2">
+                                    <i class="bi bi-box-arrow-right"></i><span>Cerrar sesión</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </aside>
@@ -138,12 +152,15 @@
                             <input id="siteSearch" type="search" class="form-control" placeholder="Buscar en esta página..." aria-label="Buscar en esta página" />
                         </div>
                     </form>
+                    <a asp-controller="Empleado" asp-action="Nuevo" class="btn btn-sm btn-primary d-none d-sm-inline-flex align-items-center gap-1">
+                        <i class="bi bi-plus-lg"></i><span>Nuevo empleado</span>
+                    </a>
                     <button id="themeToggle" class="icon-btn" type="button" aria-label="Cambiar tema" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cambiar tema">
                         <i id="themeIcon" class="bi bi-moon-stars"></i>
                     </button>
                     <div class="dropdown">
                         <button class="user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Mi cuenta">
-                            <span class="user-avatar">@inicialesUsuario</span>
+                            <span class="user-avatar-bruddle-sm">@inicialesUsuario</span>
                             <span class="d-none d-sm-inline">@User.Identity?.Name</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">
@@ -161,10 +178,10 @@
     }
     else
     {
-        <nav class="navbar navbar-dark bg-primary shadow-sm auth-navbar">
+        <nav class="navbar navbar-dark bg-dark shadow-sm auth-navbar">
             <div class="container">
-                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
-                    <span class="brand-logo"><i class="bi bi-person-badge-fill"></i></span>
+                <a class="navbar-brand fw-bold d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-sparkle-icon">✦</span>
                     RRHH
                 </a>
                 <button id="themeToggle" class="btn btn-outline-light btn-sm" type="button" aria-label="Cambiar tema">

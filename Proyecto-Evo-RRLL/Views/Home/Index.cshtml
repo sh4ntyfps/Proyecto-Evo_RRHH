@@ -1,6 +1,6 @@
 @model DashboardViewModel
 @{
-    ViewData["Title"] = "Inicio";
+    ViewData["Title"] = "Dashboard";
     var hora = DateTime.Now.Hour;
     var saludo = hora < 12 ? "Buenos días" : hora < 19 ? "Buenas tardes" : "Buenas noches";
     var esCultura = new System.Globalization.CultureInfo("es-ES");
@@ -8,24 +8,31 @@
     fechaHoy = esCultura.TextInfo.ToTitleCase(fechaHoy);
 }
 
+<!-- Cabecera estilo Bruddle -->
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
     <div>
-        <h3 class="mb-1">@saludo, @User.Identity?.Name</h3>
-        <p class="text-secondary small mb-0"><i class="bi bi-calendar3 me-1"></i>@fechaHoy</p>
+        <div class="d-flex align-items-center gap-2">
+            <h2 class="fw-bold mb-0">Dashboard</h2>
+            <span class="badge rounded-pill bg-dark text-white px-3 py-1 fs-6">En vivo</span>
+        </div>
+        <p class="text-secondary small mb-0 mt-1">@saludo, <strong class="text-dark">@User.Identity?.Name</strong> · <i class="bi bi-calendar3 me-1"></i>@fechaHoy</p>
     </div>
-    <a asp-controller="Empleado" asp-action="Nuevo" class="btn btn-primary">
-        <i class="bi bi-person-plus me-1"></i>Nuevo empleado
-    </a>
+    <div class="d-flex gap-2">
+        <a asp-controller="Empleado" asp-action="Nuevo" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Nuevo empleado
+        </a>
+    </div>
 </div>
 
+<!-- Tarjetas Estadísticas Bruddle -->
 <div class="row g-3 mb-4">
     <div class="col-md-4 col-sm-6">
         <a asp-controller="Empleado" asp-action="Index" class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="stat-chip c-primary"><i class="bi bi-people"></i></div>
                 <div>
-                    <div class="text-secondary small text-uppercase">Empleados</div>
-                    <div class="fs-3 fw-bold">@Model.Empleados</div>
+                    <div class="text-secondary small text-uppercase fw-bold" style="font-size: .68rem; letter-spacing: .08em;">Empleados</div>
+                    <div class="fs-2 fw-bold text-dark lh-1 mt-1">@Model.Empleados</div>
                 </div>
                 <i class="bi bi-arrow-right stat-arrow"></i>
             </div>
@@ -34,10 +41,10 @@
     <div class="col-md-4 col-sm-6">
         <div class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-success"><i class="bi bi-person-vcard"></i></div>
+                <div class="stat-chip c-success"><i class="bi bi-person-check"></i></div>
                 <div>
-                    <div class="text-secondary small text-uppercase">Personas</div>
-                    <div class="fs-3 fw-bold">@Model.Personas</div>
+                    <div class="text-secondary small text-uppercase fw-bold" style="font-size: .68rem; letter-spacing: .08em;">Activos</div>
+                    <div class="fs-2 fw-bold text-dark lh-1 mt-1">@Model.EmpleadosActivos</div>
                 </div>
             </div>
         </div>
@@ -47,8 +54,8 @@
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="stat-chip c-info"><i class="bi bi-clock-history"></i></div>
                 <div>
-                    <div class="text-secondary small text-uppercase">Asistencias hoy</div>
-                    <div class="fs-3 fw-bold">@Model.asistenciasHoy</div>
+                    <div class="text-secondary small text-uppercase fw-bold" style="font-size: .68rem; letter-spacing: .08em;">Asistencias hoy</div>
+                    <div class="fs-2 fw-bold text-dark lh-1 mt-1">@Model.asistenciasHoy</div>
                 </div>
                 <i class="bi bi-arrow-right stat-arrow"></i>
             </div>
@@ -59,8 +66,8 @@
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="stat-chip c-violet"><i class="bi bi-diagram-3"></i></div>
                 <div>
-                    <div class="text-secondary small text-uppercase">Áreas</div>
-                    <div class="fs-3 fw-bold">@Model.Areas</div>
+                    <div class="text-secondary small text-uppercase fw-bold" style="font-size: .68rem; letter-spacing: .08em;">Áreas orgánicas</div>
+                    <div class="fs-2 fw-bold text-dark lh-1 mt-1">@Model.Areas</div>
                 </div>
             </div>
         </div>
@@ -70,20 +77,8 @@
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="stat-chip c-danger"><i class="bi bi-briefcase"></i></div>
                 <div>
-                    <div class="text-secondary small text-uppercase">Cargos</div>
-                    <div class="fs-3 fw-bold">@Model.Cargos</div>
-                </div>
-                <i class="bi bi-arrow-right stat-arrow"></i>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-4 col-sm-6">
-        <a asp-controller="Empleado" asp-action="Index" class="card stat-card h-100">
-            <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-chip c-success"><i class="bi bi-person-check"></i></div>
-                <div>
-                    <div class="text-secondary small text-uppercase">Empleados activos</div>
-                    <div class="fs-3 fw-bold">@Model.EmpleadosActivos</div>
+                    <div class="text-secondary small text-uppercase fw-bold" style="font-size: .68rem; letter-spacing: .08em;">Cargos</div>
+                    <div class="fs-2 fw-bold text-dark lh-1 mt-1">@Model.Cargos</div>
                 </div>
                 <i class="bi bi-arrow-right stat-arrow"></i>
             </div>
@@ -94,8 +89,8 @@
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="stat-chip c-warning"><i class="bi bi-calendar-heart"></i></div>
                 <div>
-                    <div class="text-secondary small text-uppercase">Feriados del mes</div>
-                    <div class="fs-3 fw-bold">@Model.FeriadosDelMes</div>
+                    <div class="text-secondary small text-uppercase fw-bold" style="font-size: .68rem; letter-spacing: .08em;">Feriados del mes</div>
+                    <div class="fs-2 fw-bold text-dark lh-1 mt-1">@Model.FeriadosDelMes</div>
                 </div>
             </div>
         </div>
@@ -104,38 +99,47 @@
 
 @if (Model.FeriadosMes.Count > 0)
 {
-    <div class="card mb-3">
-        <div class="card-body py-2 d-flex flex-wrap gap-2 align-items-center">
-            <span class="text-secondary small text-uppercase me-1">Próximos feriados:</span>
+    <div class="card mb-4">
+        <div class="card-body py-3 d-flex flex-wrap gap-2 align-items-center">
+            <span class="text-dark small text-uppercase fw-bold me-1"><i class="bi bi-calendar-event me-1 text-warning"></i>Próximos feriados:</span>
             @foreach (var f in Model.FeriadosMes)
             {
-                <span class="badge text-bg-danger-subtle border border-danger-subtle">@f</span>
+                <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning px-3 py-1">@f</span>
             }
         </div>
     </div>
 }
 
-<div class="row g-3 mb-3">
+<div class="row g-4 mb-4">
     <div class="col-lg-8">
         <div class="card h-100">
+            <div class="card-header bg-body-tertiary fw-bold py-3 border-bottom d-flex align-items-center justify-content-between">
+                <div><i class="bi bi-diagram-3 me-2 text-primary"></i>Empleados por área</div>
+                <span class="badge text-bg-light border text-secondary small">Distribución</span>
+            </div>
             <div class="card-body">
-                <h6 class="fw-semibold mb-3"><i class="bi bi-diagram-3 me-2 text-primary"></i>Empleados por área</h6>
                 <div class="chart-box"><canvas id="chartAreas"></canvas></div>
             </div>
         </div>
     </div>
     <div class="col-lg-4">
         <div class="card h-100">
+            <div class="card-header bg-body-tertiary fw-bold py-3 border-bottom d-flex align-items-center justify-content-between">
+                <div><i class="bi bi-pie-chart me-2 text-warning"></i>Por estado</div>
+                <span class="badge text-bg-light border text-secondary small">Activos vs Inactivos</span>
+            </div>
             <div class="card-body">
-                <h6 class="fw-semibold mb-3"><i class="bi bi-person-badge me-2 text-warning"></i>Empleados por estado</h6>
                 <div class="chart-box"><canvas id="chartEstados"></canvas></div>
             </div>
         </div>
     </div>
     <div class="col-12">
         <div class="card h-100">
+            <div class="card-header bg-body-tertiary fw-bold py-3 border-bottom d-flex align-items-center justify-content-between">
+                <div><i class="bi bi-clock-history me-2 text-success"></i>Asistencias registrados (Últimos 7 días)</div>
+                <span class="badge text-bg-light border text-secondary small">Histórico</span>
+            </div>
             <div class="card-body">
-                <h6 class="fw-semibold mb-3"><i class="bi bi-clock-history me-2 text-success"></i>Asistencias últimos 7 días</h6>
                 <div class="chart-box"><canvas id="chartAsistencia"></canvas></div>
             </div>
         </div>
@@ -146,10 +150,10 @@
     <script src="~/lib/chart.js/chart.umd.min.js"></script>
     <script>
         (function () {
-            var azul = '#4f46e5';   // = --evo-primary (índigo de toda la app)
-            var azulSuave = '#6366f1';
+            var morado = '#7c3aed';   // Bruddle primary
+            var moradoSuave = '#a78bfa';
             var verde = '#10b981';
-            var paleta = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#64748b'];
+            var paleta = ['#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#f97316', '#6366f1', '#84cc16', '#64748b'];
 
             var areasNombres = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AreasNombres));
             var areasData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmpleadosPorArea));
@@ -161,9 +165,9 @@
             function tema() {
                 var oscuro = document.documentElement.getAttribute('data-bs-theme') === 'dark';
                 return {
-                    etiqueta: oscuro ? '#e2e8f0' : '#475569',
-                    grilla: oscuro ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)',
-                    tooltip: oscuro ? '#1e293b' : 'rgba(0,0,0,.8)'
+                    etiqueta: oscuro ? '#e4e4e7' : '#27272a',
+                    grilla: oscuro ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.06)',
+                    tooltip: oscuro ? '#18181b' : '#09090b'
                 };
             }
 
@@ -177,10 +181,10 @@
                     datasets: [{
                         label: 'Empleados',
                         data: areasData,
-                        backgroundColor: azulSuave + 'cc',
-                        borderColor: azul,
-                        borderWidth: 1,
-                        borderRadius: 5
+                        backgroundColor: moradoSuave + 'dd',
+                        borderColor: '#18181b',
+                        borderWidth: 1.5,
+                        borderRadius: 8
                     }]
                 },
                 options: {
@@ -189,11 +193,11 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { backgroundColor: t.tooltip }
+                        tooltip: { backgroundColor: t.tooltip, padding: 10, cornerRadius: 8 }
                     },
                     scales: {
-                        x: { beginAtZero: true, ticks: { precision: 0, color: t.etiqueta }, grid: { color: t.grilla } },
-                        y: { ticks: { color: t.etiqueta, autoSkip: false }, grid: { display: false } }
+                        x: { beginAtZero: true, ticks: { precision: 0, color: t.etiqueta, font: { weight: '600' } }, grid: { color: t.grilla } },
+                        y: { ticks: { color: t.etiqueta, autoSkip: false, font: { weight: '600' } }, grid: { display: false } }
                     }
                 }
             });
@@ -206,16 +210,17 @@
                     datasets: [{
                         data: estadosData,
                         backgroundColor: estadosData.map(function (_, i) { return paleta[i % paleta.length]; }),
-                        borderWidth: 2
+                        borderColor: '#18181b',
+                        borderWidth: 1.5
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '62%',
+                    cutout: '65%',
                     plugins: {
-                        legend: { position: 'bottom', labels: { color: t.etiqueta, padding: 12 } },
-                        tooltip: { backgroundColor: t.tooltip }
+                        legend: { position: 'bottom', labels: { color: t.etiqueta, padding: 14, font: { weight: '600' } } },
+                        tooltip: { backgroundColor: t.tooltip, padding: 10, cornerRadius: 8 }
                     }
                 }
             });
@@ -229,10 +234,14 @@
                         label: 'Asistencias',
                         data: asisData,
                         borderColor: verde,
-                        backgroundColor: verde + '22',
+                        borderWidth: 2.5,
+                        backgroundColor: verde + '18',
                         fill: true,
                         tension: .35,
-                        pointBackgroundColor: verde
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#18181b',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
                     }]
                 },
                 options: {
@@ -240,16 +249,16 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { backgroundColor: t.tooltip }
+                        tooltip: { backgroundColor: t.tooltip, padding: 10, cornerRadius: 8 }
                     },
                     scales: {
-                        x: { ticks: { color: t.etiqueta }, grid: { display: false } },
-                        y: { beginAtZero: true, ticks: { precision: 0, color: t.etiqueta }, grid: { color: t.grilla } }
+                        x: { ticks: { color: t.etiqueta, font: { weight: '600' } }, grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0, color: t.etiqueta, font: { weight: '600' } }, grid: { color: t.grilla } }
                     }
                 }
             });
 
-            // Recolorear los gráficos al cambiar de tema, sin recargar la página
+            // Recolorear gráficos al cambiar de tema
             document.addEventListener('evo:theme', function () {
                 var t = tema();
 
@@ -265,8 +274,8 @@
 
                 chartAsistencia.options.plugins.tooltip.backgroundColor = t.tooltip;
                 chartAsistencia.options.scales.x.ticks.color = t.etiqueta;
+                chartAsistencia.options.scales.x.grid.color = t.grilla;
                 chartAsistencia.options.scales.y.ticks.color = t.etiqueta;
-                chartAsistencia.options.scales.y.grid.color = t.grilla;
                 chartAsistencia.update();
             });
         })();

@@ -3,106 +3,215 @@
     ViewData["Title"] = "Personal";
 }
 
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
-        <h3 class="mb-0">Empleados</h3>
-        <span class="text-secondary small">@Model.Total registro(s)</span>
+        <div class="d-flex align-items-center gap-2">
+            <h2 class="fw-bold mb-0">Personal</h2>
+            <span class="badge rounded-pill bg-dark text-white px-3 py-1 fs-6">@Model.Total</span>
+        </div>
+        <p class="text-secondary small mb-0 mt-1">Directorio de colaboradores y gestión de contratos</p>
     </div>
     <div class="d-flex gap-2">
         <a asp-action="Exportar" asp-route-q="@Model.Busqueda" class="btn btn-outline-secondary">
             <i class="bi bi-download me-1"></i> Exportar CSV
         </a>
-        <a asp-action="Nuevo" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Nuevo empleado</a>
+        <a asp-action="Nuevo" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Nuevo empleado
+        </a>
     </div>
 </div>
 
-<form method="get" class="mb-3 d-flex align-items-center gap-2">
-    <input type="search" name="q" class="form-control" style="max-width:320px" placeholder="Buscar por nombre o documento..." value="@Model.Busqueda" />
-    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>Buscar</button>
-    @if (!string.IsNullOrWhiteSpace(Model.Busqueda))
-    {
-        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x-lg me-1"></i>Limpiar</a>
-    }
-</form>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+    <form method="get" class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 420px;">
+        <div class="input-group search-box w-100">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="search" name="q" class="form-control" placeholder="Buscar por nombre o documento..." value="@Model.Busqueda" />
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+        @if (!string.IsNullOrWhiteSpace(Model.Busqueda))
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary" title="Limpiar"><i class="bi bi-x-lg"></i></a>
+        }
+    </form>
 
-<div class="table-responsive">
-    <table class="table table-hover align-middle" data-search-target>
-        <thead>
-            <tr>
-                <th style="width:56px">Foto</th>
-                <th>Empleado</th>
-                <th>N° documento</th>
-                <th>Cargo</th>
-                <th>Área</th>
-                <th>Ingreso</th>
-                <th>Estado</th>
-                <th style="width:70px">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.Empleados.Count == 0)
-            {
-                <tr><td colspan="8" class="text-center text-secondary py-4">Sin empleados.</td></tr>
-            }
-            @foreach (var e in Model.Empleados)
-            {
+    <div class="bruddle-filter-bar">
+        <button type="button" class="bruddle-pill active" data-filter="all">
+            <span>Todos</span>
+        </button>
+        <button type="button" class="bruddle-pill" data-filter="A">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: .75rem;"></i><span>Activos</span>
+        </button>
+        <button type="button" class="bruddle-pill" data-filter="I">
+            <i class="bi bi-dash-circle-fill text-danger" style="font-size: .75rem;"></i><span>Inactivos</span>
+        </button>
+    </div>
+</div>
+
+<div class="bruddle-table-wrap">
+    <div class="table-responsive">
+        <table class="table align-middle" data-search-target id="tablaEmpleados">
+            <thead>
                 <tr>
-                    <td>
-                        @if (e.TieneFoto)
-                        {
-                            <img src="@Url.Action("MostrarFoto", new { id = e.IdEmpleado })" alt="Foto" class="rounded-circle overflow-hidden object-fit-cover" style="width:40px;height:40px" />
-                        }
-                        else
-                        {
-                            <div class="rounded-circle bg-body-tertiary d-inline-flex align-items-center justify-content-center text-secondary" style="width:40px;height:40px;font-size:1rem">
-                                <i class="bi bi-person"></i>
-                            </div>
-                        }
-                    </td>
-                    <td class="fw-semibold">@e.Nombres</td>
-                    <td>@e.NumDoc</td>
-                    <td>@e.Cargo</td>
-                    <td>@e.Area</td>
-                    <td>@e.FechaIngreso?.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        @if (e.Estado == "A")
-                        {
-                            <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Activo</span>
-                        }
-                        else if (e.Estado == "I")
-                        {
-                            <span class="badge rounded-pill text-bg-secondary"><i class="bi bi-dash-circle me-1"></i>Inactivo</span>
-                        }
-                        else
-                        {
-                            @e.Estado
-                        }
-                    </td>
-                    <td>
-                        <a asp-action="Detalles" asp-route-id="@e.IdEmpleado" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver ficha"><i class="bi bi-eye"></i></a>
-                    </td>
+                    <th style="width:60px">Foto</th>
+                    <th>Empleado</th>
+                    <th>N° documento</th>
+                    <th>Cargo</th>
+                    <th>Área</th>
+                    <th>Ingreso</th>
+                    <th>Estado</th>
+                    <th style="width:90px" class="text-end">Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @if (Model.Empleados.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-secondary py-5">
+                            <i class="bi bi-people fs-1 d-block mb-2 opacity-50"></i>
+                            No se encontraron empleados registrados.
+                        </td>
+                    </tr>
+                }
+                @foreach (var e in Model.Empleados)
+                {
+                    <tr data-estado="@e.Estado">
+                        <td>
+                            @if (e.TieneFoto)
+                            {
+                                <img src="@Url.Action("MostrarFoto", new { id = e.IdEmpleado })" alt="Foto" class="rounded-circle object-fit-cover" style="width:42px;height:42px; border: 1.5px solid #18181b;" />
+                            }
+                            else
+                            {
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-secondary" style="width:42px;height:42px;font-size:1.1rem; background: #FAF8F5; border: 1.5px solid #18181b;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">@e.Nombres</div>
+                            <span class="text-secondary small">ID: #@e.IdEmpleado</span>
+                        </td>
+                        <td><span class="font-monospace fw-semibold">@e.NumDoc</span></td>
+                        <td><span class="badge text-bg-light border text-dark fw-semibold">@(e.Cargo ?? "Sin asignar")</span></td>
+                        <td>@(e.Area ?? "—")</td>
+                        <td><span class="small text-secondary">@e.FechaIngreso?.ToString("dd/MM/yyyy")</span></td>
+                        <td>
+                            @if (e.Estado == "A")
+                            {
+                                <span class="badge-bruddle-active"><i class="bi bi-check-circle-fill me-1"></i>Activo</span>
+                            }
+                            else if (e.Estado == "I")
+                            {
+                                <span class="badge-bruddle-inactive"><i class="bi bi-dash-circle-fill me-1"></i>Inactivo</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-light border">@e.Estado</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-1">
+                                <a asp-action="Detalles" asp-route-id="@e.IdEmpleado" class="btn btn-sm btn-outline-secondary p-1 px-2" title="Ver ficha">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Editar" asp-route-id="@e.IdEmpleado" class="btn btn-sm btn-outline-primary p-1 px-2" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 @if (Model.TotalPaginas > 1)
 {
-    <nav aria-label="Paginación">
-        <ul class="pagination justify-content-center mb-0">
-            <li class="page-item @(Model.Pagina <= 1 ? "disabled" : null)">
-                <a class="page-link" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-pagina="@(Model.Pagina - 1)">&laquo;</a>
-            </li>
-            @for (var p = 1; p <= Model.TotalPaginas; p++)
-            {
-                <li class="page-item @(p == Model.Pagina ? "active" : null)">
-                    <a class="page-link" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-pagina="@p">@p</a>
+    var actual = Model.Pagina;
+    var total = Model.TotalPaginas;
+
+    int startPage, endPage;
+    if (total <= 10)
+    {
+        startPage = 1;
+        endPage = total;
+    }
+    else
+    {
+        if (actual <= 6)
+        {
+            startPage = 1;
+            endPage = 10;
+        }
+        else if (actual + 4 >= total)
+        {
+            startPage = total - 9;
+            endPage = total;
+        }
+        else
+        {
+            startPage = actual - 5;
+            endPage = actual + 4;
+        }
+    }
+
+    <div class="d-flex flex-column align-items-center justify-content-center mt-4 mb-3 gap-2">
+        <nav aria-label="Navegación de páginas">
+            <ul class="pagination bruddle-pagination mb-0">
+                <li class="page-item @(actual <= 1 ? "disabled" : null)">
+                    <a class="page-link" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-pagina="1" title="Primera página" tabindex="@(actual <= 1 ? "-1" : null)">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
                 </li>
-            }
-            <li class="page-item @(Model.Pagina >= Model.TotalPaginas ? "disabled" : null)">
-                <a class="page-link" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-pagina="@(Model.Pagina + 1)">&raquo;</a>
-            </li>
-        </ul>
-    </nav>
+                <li class="page-item @(actual <= 1 ? "disabled" : null)">
+                    <a class="page-link" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-pagina="@(actual - 1)" title="Página anterior" tabindex="@(actual <= 1 ? "-1" : null)">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                @for (var p = startPage; p <= endPage; p++)
+                {
+                    <li class="page-item @(p == actual ? "active" : null)">
+                        <a class="page-link" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-pagina="@p" title="Página @p">@p</a>
+                    </li>
+                }
+
+                <li class="page-item @(actual >= total ? "disabled" : null)">
+                    <a class="page-link" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-pagina="@(actual + 1)" title="Página siguiente" tabindex="@(actual >= total ? "-1" : null)">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item @(actual >= total ? "disabled" : null)">
+                    <a class="page-link" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-pagina="@total" title="Última página (@total)" tabindex="@(actual >= total ? "-1" : null)">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="text-secondary small fw-semibold">
+            Página <strong class="text-dark">@actual</strong> de <strong class="text-dark">@total</strong> · (@Model.Total colaboradores)
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.bruddle-pill[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.bruddle-pill[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filtro = this.getAttribute('data-filter');
+                document.querySelectorAll('#tablaEmpleados tbody tr').forEach(row => {
+                    const estado = row.getAttribute('data-estado');
+                    if (filtro === 'all' || estado === filtro) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 }

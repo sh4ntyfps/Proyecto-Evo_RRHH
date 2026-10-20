@@ -1,4 +1,4 @@
-﻿// EVO RRHH - utilidades del sitio
+// EVO RRHH - utilidades del sitio
 
 (function () {
     'use strict';
@@ -167,34 +167,56 @@
             function dibujarPaginas(total, totalPaginas) {
                 pagesEl.innerHTML = '';
                 if (totalPaginas <= 1) { pagesEl.style.display = 'none'; return; }
-                pagesEl.style.display = 'flex';
+                pagesEl.style.display = 'inline-flex';
 
-                var crearBtn = function (etiqueta, activa, deshabilitada, accion) {
+                var currentPage = state.page;
+                var startPage, endPage;
+
+                if (totalPaginas <= 10) {
+                    startPage = 1;
+                    endPage = totalPaginas;
+                } else {
+                    if (currentPage <= 6) {
+                        startPage = 1;
+                        endPage = 10;
+                    } else if (currentPage + 4 >= totalPaginas) {
+                        startPage = totalPaginas - 9;
+                        endPage = totalPaginas;
+                    } else {
+                        startPage = currentPage - 5;
+                        endPage = currentPage + 4;
+                    }
+                }
+
+                var crearBtn = function (etiqueta, activa, deshabilitada, accion, titulo) {
                     var b = document.createElement('button');
                     b.type = 'button';
-                    b.className = 'dt-page-btn' + (activa ? ' active' : '');
+                    b.className = 'dt-page-btn' + (activa ? ' active' : '') + (deshabilitada ? ' disabled' : '');
                     b.innerHTML = etiqueta;
+                    if (titulo) b.title = titulo;
                     b.disabled = !!deshabilitada;
-                    b.addEventListener('click', accion);
+                    if (!deshabilitada) {
+                        b.addEventListener('click', accion);
+                    }
                     pagesEl.appendChild(b);
                 };
 
-                crearBtn('<i class="bi bi-chevron-left"></i>', false, state.page <= 1, function () { state.page--; aplicar(); });
+                // Primero (First)
+                crearBtn('<i class="bi bi-chevron-double-left"></i>', false, currentPage <= 1, function () { state.page = 1; aplicar(); }, 'Primera página');
+                // Anterior (Previous)
+                crearBtn('<i class="bi bi-chevron-left"></i>', false, currentPage <= 1, function () { state.page--; aplicar(); }, 'Página anterior');
 
-                var MAX = 7;
-                var desde = 1, hasta = totalPaginas;
-                if (totalPaginas > MAX) {
-                    desde = Math.max(1, state.page - Math.floor(MAX / 2));
-                    hasta = Math.min(totalPaginas, desde + MAX - 1);
-                    if (hasta - desde + 1 < MAX) desde = Math.max(1, hasta - MAX + 1);
-                }
-                for (var p = desde; p <= hasta; p++) {
+                // Páginas numeradas (10 páginas continuas como Google / Jason Watmore)
+                for (var p = startPage; p <= endPage; p++) {
                     (function (pp) {
-                        crearBtn(String(pp), pp === state.page, false, function () { state.page = pp; aplicar(); });
+                        crearBtn(String(pp), pp === currentPage, false, function () { state.page = pp; aplicar(); }, 'Página ' + pp);
                     })(p);
                 }
 
-                crearBtn('<i class="bi bi-chevron-right"></i>', false, state.page >= totalPaginas, function () { state.page++; aplicar(); });
+                // Siguiente (Next)
+                crearBtn('<i class="bi bi-chevron-right"></i>', false, currentPage >= totalPaginas, function () { state.page++; aplicar(); }, 'Página siguiente');
+                // Último (Last)
+                crearBtn('<i class="bi bi-chevron-double-right"></i>', false, currentPage >= totalPaginas, function () { state.page = totalPaginas; aplicar(); }, 'Última página (' + totalPaginas + ')');
             }
 
             function aplicar() {
@@ -237,7 +259,7 @@
 
                 var desde = lista.length === 0 ? 0 : inicio + 1;
                 var hasta = Math.min(inicio + PAGE_SIZE, lista.length);
-                if (countEl) countEl.textContent = 'Mostrando ' + desde + '–' + hasta + ' de ' + lista.length;
+                if (countEl) countEl.innerHTML = '<i class="bi bi-list-check me-1 text-primary"></i> Mostrando <strong>' + desde + '–' + hasta + '</strong> de <strong>' + lista.length + '</strong>';
                 dibujarPaginas(lista.length, totalPaginas);
 
                 ths.forEach(function (th, i) {
