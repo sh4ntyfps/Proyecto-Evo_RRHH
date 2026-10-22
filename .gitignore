@@ -29,3 +29,6 @@ Scripts/bd-Normalizada/03-datos-RRHH_Normalizado.sql
 
 ## Dependencias de Node (solo para compilar estilos)
 node_modules/
+
+## Scripts
+bd-Datos.sql
