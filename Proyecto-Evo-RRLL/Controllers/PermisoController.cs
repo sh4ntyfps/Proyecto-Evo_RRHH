@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -8,18 +9,18 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class PermisoController : Controller
 {
-    private readonly PermisoData _permisoData;
-    private readonly Motivo_PermData _motivoData;
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
+    private readonly PermisoLogica _permisoData;
+    private readonly Motivo_PermLogica _motivoData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public PermisoController(
-        PermisoData permisoData,
-        Motivo_PermData motivoData,
-        EmpleadoData empleadoData,
-        PersonaData personaData,
+        PermisoLogica permisoData,
+        Motivo_PermLogica motivoData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {

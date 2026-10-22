@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Proyecto_Evo_RRLL.Models.ViewModels;
@@ -10,28 +11,28 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize(Roles = "Administrador")]
 public class SeguridadAdminController : Controller
 {
-    private readonly UsuarioData _usuarioData;
-    private readonly Usuario_RolData _usuarioRolData;
-    private readonly RolData _rolData;
-    private readonly Rol_AccesoData _rolAccesoData;
-    private readonly SistemaOpcionData _sistemaOpcionData;
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
+    private readonly UsuarioLogica _usuarioData;
+    private readonly Usuario_RolLogica _usuarioRolData;
+    private readonly RolLogica _rolData;
+    private readonly Rol_AccesoLogica _rolAccesoData;
+    private readonly SistemaOpcionLogica _sistemaOpcionData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
-    private readonly BitacoraData _bitacora;
+    private readonly BitacoraLogica _bitacora;
 
     public SeguridadAdminController(
-        UsuarioData usuarioData,
-        Usuario_RolData usuarioRolData,
-        RolData rolData,
-        Rol_AccesoData rolAccesoData,
-        SistemaOpcionData sistemaOpcionData,
-        EmpleadoData empleadoData,
-        PersonaData personaData,
+        UsuarioLogica usuarioData,
+        Usuario_RolLogica usuarioRolData,
+        RolLogica rolData,
+        Rol_AccesoLogica rolAccesoData,
+        SistemaOpcionLogica sistemaOpcionData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados,
-        BitacoraData bitacora)
+        BitacoraLogica bitacora)
     {
         _usuarioData = usuarioData;
         _usuarioRolData = usuarioRolData;

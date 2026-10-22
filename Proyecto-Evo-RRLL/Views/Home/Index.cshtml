@@ -8,21 +8,21 @@
     fechaHoy = esCultura.TextInfo.ToTitleCase(fechaHoy);
 }
 
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
     <div>
         <h3 class="mb-1">@saludo, @User.Identity?.Name</h3>
-        <p class="text-secondary mb-0"></p>
+        <p class="text-secondary small mb-0"><i class="bi bi-calendar3 me-1"></i>@fechaHoy</p>
     </div>
-    <div class="text-secondary small text-lg-end">
-        <i class="bi bi-calendar3 me-1"></i>@fechaHoy
-    </div>
+    <a asp-controller="Empleado" asp-action="Nuevo" class="btn btn-primary">
+        <i class="bi bi-person-plus me-1"></i>Nuevo empleado
+    </a>
 </div>
 
 <div class="row g-3 mb-4">
     <div class="col-md-4 col-sm-6">
         <a asp-controller="Empleado" asp-action="Index" class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-people"></i></div>
+                <div class="stat-chip c-primary"><i class="bi bi-people"></i></div>
                 <div>
                     <div class="text-secondary small text-uppercase">Empleados</div>
                     <div class="fs-3 fw-bold">@Model.Empleados</div>
@@ -34,7 +34,7 @@
     <div class="col-md-4 col-sm-6">
         <div class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-person-vcard"></i></div>
+                <div class="stat-chip c-success"><i class="bi bi-person-vcard"></i></div>
                 <div>
                     <div class="text-secondary small text-uppercase">Personas</div>
                     <div class="fs-3 fw-bold">@Model.Personas</div>
@@ -45,7 +45,7 @@
     <div class="col-md-4 col-sm-6">
         <a asp-controller="Asistencia" asp-action="Index" class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-clock-history"></i></div>
+                <div class="stat-chip c-info"><i class="bi bi-clock-history"></i></div>
                 <div>
                     <div class="text-secondary small text-uppercase">Asistencias hoy</div>
                     <div class="fs-3 fw-bold">@Model.asistenciasHoy</div>
@@ -57,7 +57,7 @@
     <div class="col-md-4 col-sm-6">
         <div class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-diagram-3"></i></div>
+                <div class="stat-chip c-violet"><i class="bi bi-diagram-3"></i></div>
                 <div>
                     <div class="text-secondary small text-uppercase">Áreas</div>
                     <div class="fs-3 fw-bold">@Model.Areas</div>
@@ -68,7 +68,7 @@
     <div class="col-md-4 col-sm-6">
         <a asp-controller="Catalogo" asp-action="Index" asp-route-tabla="Cargo" class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-briefcase"></i></div>
+                <div class="stat-chip c-danger"><i class="bi bi-briefcase"></i></div>
                 <div>
                     <div class="text-secondary small text-uppercase">Cargos</div>
                     <div class="fs-3 fw-bold">@Model.Cargos</div>
@@ -80,7 +80,7 @@
     <div class="col-md-4 col-sm-6">
         <a asp-controller="Empleado" asp-action="Index" class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-person-check"></i></div>
+                <div class="stat-chip c-success"><i class="bi bi-person-check"></i></div>
                 <div>
                     <div class="text-secondary small text-uppercase">Empleados activos</div>
                     <div class="fs-3 fw-bold">@Model.EmpleadosActivos</div>
@@ -92,7 +92,7 @@
     <div class="col-md-4 col-sm-6">
         <div class="card stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-calendar-heart"></i></div>
+                <div class="stat-chip c-warning"><i class="bi bi-calendar-heart"></i></div>
                 <div>
                     <div class="text-secondary small text-uppercase">Feriados del mes</div>
                     <div class="fs-3 fw-bold">@Model.FeriadosDelMes</div>
@@ -146,9 +146,10 @@
     <script src="~/lib/chart.js/chart.umd.min.js"></script>
     <script>
         (function () {
-            var azul = '#2563eb';   // = --evo-primary (mismo azul de toda la app)
+            var azul = '#4f46e5';   // = --evo-primary (índigo de toda la app)
+            var azulSuave = '#6366f1';
             var verde = '#10b981';
-            var paleta = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#64748b'];
+            var paleta = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#64748b'];
 
             var areasNombres = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AreasNombres));
             var areasData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmpleadosPorArea));
@@ -176,10 +177,10 @@
                     datasets: [{
                         label: 'Empleados',
                         data: areasData,
-                        backgroundColor: azul + 'cc',
+                        backgroundColor: azulSuave + 'cc',
                         borderColor: azul,
                         borderWidth: 1,
-                        borderRadius: 4
+                        borderRadius: 5
                     }]
                 },
                 options: {

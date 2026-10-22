@@ -1,21 +1,22 @@
 using System.Security.Claims;
-using Capa_Datos;
+using Capa_Logica;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Proyecto_Evo_RRLL.Models.ViewModels;
 
 namespace Proyecto_Evo_RRLL.Controllers;
 
 public class SeguridadController : Controller
 {
-    private readonly UsuarioData _usuarioData;
-    private readonly BitacoraData _bitacora;
+    private readonly UsuarioLogica _usuarioData;
+    private readonly BitacoraLogica _bitacora;
 
-    public SeguridadController(UsuarioData usuarioData, BitacoraData bitacora)
+    public SeguridadController(UsuarioLogica usuarioData, BitacoraLogica bitacora)
     {
         _usuarioData = usuarioData;
         _bitacora = bitacora;
@@ -32,6 +33,7 @@ public class SeguridadController : Controller
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("login")]
     public async Task<IActionResult> Login(LoginViewModel modelo, string? returnUrl)
     {
         if (!ModelState.IsValid)

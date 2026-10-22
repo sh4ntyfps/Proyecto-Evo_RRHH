@@ -1,3 +1,4 @@
+using Capa_Logica;
 using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
@@ -9,45 +10,45 @@ namespace Proyecto_Evo_RRLL.Controllers;
 [Authorize]
 public class FamiliaSaludController : Controller
 {
-    private readonly EmpleadoData _empleadoData;
-    private readonly PersonaData _personaData;
-    private readonly FamiliarData _familiarData;
-    private readonly RRHH_SaludData _saludData;
-    private readonly RRHH_DinamicaFamiliarData _dinamicaData;
-    private readonly RRHH_AspSocioData _aspSocioData;
-    private readonly RRHH_FuncFamData _funcFamData;
-    private readonly RRHH_AseguradoData _aseguradoData;
+    private readonly EmpleadoLogica _empleadoData;
+    private readonly PersonaLogica _personaData;
+    private readonly FamiliarLogica _familiarData;
+    private readonly RRHH_SaludLogica _saludData;
+    private readonly RRHH_DinamicaFamiliarLogica _dinamicaData;
+    private readonly RRHH_AspSocioLogica _aspSocioData;
+    private readonly RRHH_FuncFamLogica _funcFamData;
+    private readonly RRHH_AseguradoLogica _aseguradoData;
 
-    private readonly RRHH_AcudeEnfermData _acudeEnfermData;
-    private readonly RRHH_TipoFamiliaData _tipoFamiliaData;
-    private readonly RRHH_RelacParejaData _relacParejaData;
-    private readonly RRHH_RelacPHData _relacPHData;
-    private readonly RRHH_RelacHermanoData _relacHermanoData;
-    private readonly TipoFamiliarData _tipoFamiliarData;
-    private readonly EstadoCivilData _estadoCivilData;
-    private readonly TipoSangreData _tipoSangreData;
-    private readonly DiscapacidadData _discapacidadData;
+    private readonly RRHH_AcudeEnfermLogica _acudeEnfermData;
+    private readonly RRHH_TipoFamiliaLogica _tipoFamiliaData;
+    private readonly RRHH_RelacParejaLogica _relacParejaData;
+    private readonly RRHH_RelacPHLogica _relacPHData;
+    private readonly RRHH_RelacHermanoLogica _relacHermanoData;
+    private readonly TipoFamiliarLogica _tipoFamiliarData;
+    private readonly EstadoCivilLogica _estadoCivilData;
+    private readonly TipoSangreLogica _tipoSangreData;
+    private readonly DiscapacidadLogica _discapacidadData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
     public FamiliaSaludController(
-        EmpleadoData empleadoData,
-        PersonaData personaData,
-        FamiliarData familiarData,
-        RRHH_SaludData saludData,
-        RRHH_DinamicaFamiliarData dinamicaData,
-        RRHH_AspSocioData aspSocioData,
-        RRHH_FuncFamData funcFamData,
-        RRHH_AseguradoData aseguradoData,
-        RRHH_AcudeEnfermData acudeEnfermData,
-        RRHH_TipoFamiliaData tipoFamiliaData,
-        RRHH_RelacParejaData relacParejaData,
-        RRHH_RelacPHData relacPHData,
-        RRHH_RelacHermanoData relacHermanoData,
-        TipoFamiliarData tipoFamiliarData,
-        EstadoCivilData estadoCivilData,
-        TipoSangreData tipoSangreData,
-        DiscapacidadData discapacidadData,
+        EmpleadoLogica empleadoData,
+        PersonaLogica personaData,
+        FamiliarLogica familiarData,
+        RRHH_SaludLogica saludData,
+        RRHH_DinamicaFamiliarLogica dinamicaData,
+        RRHH_AspSocioLogica aspSocioData,
+        RRHH_FuncFamLogica funcFamData,
+        RRHH_AseguradoLogica aseguradoData,
+        RRHH_AcudeEnfermLogica acudeEnfermData,
+        RRHH_TipoFamiliaLogica tipoFamiliaData,
+        RRHH_RelacParejaLogica relacParejaData,
+        RRHH_RelacPHLogica relacPHData,
+        RRHH_RelacHermanoLogica relacHermanoData,
+        TipoFamiliarLogica tipoFamiliarData,
+        EstadoCivilLogica estadoCivilData,
+        TipoSangreLogica tipoSangreData,
+        DiscapacidadLogica discapacidadData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {

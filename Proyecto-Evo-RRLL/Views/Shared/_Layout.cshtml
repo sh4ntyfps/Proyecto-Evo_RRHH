@@ -176,6 +176,15 @@
 
     <main id="contenido" role="main" class="main-content @(User.Identity?.IsAuthenticated == true ? "" : "no-topbar")">
         <div class="container-fluid py-4 px-3 px-md-4">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <nav aria-label="breadcrumb" class="breadcrumb-bar">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            }
             @if (TempData["MensajeExito"] is string exito)
             {
                 <div class="alert alert-success alert-dismissible fade show alert-auto shadow-sm" role="alert">
@@ -208,6 +217,8 @@
             <span class="small">Última actualización: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
         </div>
     </footer>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 evo-toasts" id="toastHost" aria-live="polite" aria-atomic="true"></div>
 
     <div id="cookieBanner" class="cookie-banner bg-body-tertiary shadow-lg" role="region" aria-label="Aviso de cookies">
         <div class="container py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
