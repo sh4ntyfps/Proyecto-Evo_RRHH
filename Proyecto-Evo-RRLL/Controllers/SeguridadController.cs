@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Proyecto_Evo_RRLL.Models.ViewModels;
 
 namespace Proyecto_Evo_RRLL.Controllers;
@@ -33,6 +34,7 @@ public class SeguridadController : Controller
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("login")]
     public async Task<IActionResult> Login(LoginViewModel modelo, string? returnUrl)
     {
         if (!ModelState.IsValid)
