@@ -76,19 +76,19 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-check form-switch mt-4">
-                        <input asp-for="Dia" class="form-check-input" type="checkbox" />
+                        <input class="form-check-input" type="checkbox" name="Dia" value="true" id="Dia" @(Model.Dia == true ? "checked" : "") />
                         <label asp-for="Dia" class="form-check-label">Permiso por día</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-check form-switch mt-4">
-                        <input asp-for="Retorno" class="form-check-input" type="checkbox" />
+                        <input class="form-check-input" type="checkbox" name="Retorno" value="true" id="Retorno" @(Model.Retorno == true ? "checked" : "") />
                         <label asp-for="Retorno" class="form-check-label">Con retorno</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-check form-switch mt-4">
-                        <input asp-for="Autorizado" class="form-check-input" type="checkbox" />
+                        <input class="form-check-input" type="checkbox" name="Autorizado" value="true" id="Autorizado" @(Model.Autorizado == true ? "checked" : "") />
                         <label asp-for="Autorizado" class="form-check-label">Autorizado</label>
                     </div>
                 </div>

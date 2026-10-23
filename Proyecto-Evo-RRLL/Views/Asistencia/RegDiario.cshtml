@@ -40,7 +40,7 @@
                     <td class="fw-semibold">@r.Fecha.ToString("dd/MM/yyyy")</td>
                     <td>@emp.Nombre</td>
                     <td>@r.MinNormales</td>
-                    <td>@r.MinTarde</td>
+                    <td>@(r.SegundosTarde is null ? "" : TimeSpan.FromSeconds(r.SegundosTarde.Value).ToString(@"hh\:mm\:ss"))</td>
                     <td>@r.Estado</td>
                     <td>
                         <a asp-action="RegDiarioEditar" asp-route-fecha="@r.Fecha.ToString("yyyy-MM-dd")" asp-route-idEmpleado="@r.IdEmpleado" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>

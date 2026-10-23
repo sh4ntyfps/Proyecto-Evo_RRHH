@@ -17,9 +17,9 @@
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
     <div class="card">
         <div class="card-body">
-            <input type="hidden" asp-for="IdEmpleado" />
             @if (!esNuevo)
             {
+                <input type="hidden" asp-for="IdEmpleado" />
                 <input type="hidden" asp-for="IdTipoEstudios" />
                 <input type="hidden" asp-for="Correlativo" />
             }
@@ -44,11 +44,11 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Año inicio</label>
-                    <input asp-for="AñoInicio" type="date" class="form-control" />
+                    <input asp-for="FechaInicio" type="date" class="form-control" />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Año fin</label>
-                    <input asp-for="AñoTermino" type="date" class="form-control" />
+                    <input asp-for="FechaTermino" type="date" class="form-control" />
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Estado del estudio</label>

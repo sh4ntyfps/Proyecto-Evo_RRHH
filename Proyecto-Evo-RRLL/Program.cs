@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews(options => options.Filters.Add<RegistrarExcepcionFilter>());
 
 builder.Services.AddDbContext<EvoRRLDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("RRHHNuevo")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("RRHHNormalizado")));
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -48,13 +48,9 @@ builder.Services.AddScoped<EstructOrganizData>();
 builder.Services.AddScoped<EstudiosRealizadoData>();
 builder.Services.AddScoped<ExcretasVivData>();
 builder.Services.AddScoped<ExpLaboralData>();
-builder.Services.AddScoped<FamiliaData>();
 builder.Services.AddScoped<FamiliarData>();
 builder.Services.AddScoped<HorarioData>();
 builder.Services.AddScoped<HorarioTemporalData>();
-builder.Services.AddScoped<InconvenienteData>();
-builder.Services.AddScoped<InstitucionData>();
-builder.Services.AddScoped<LimitacionData>();
 builder.Services.AddScoped<LocalData>();
 builder.Services.AddScoped<MarcacionData>();
 builder.Services.AddScoped<MaterialVivData>();
@@ -85,28 +81,37 @@ builder.Services.AddScoped<RRHH_TipoFamiliaData>();
 builder.Services.AddScoped<SistemaOpcionData>();
 builder.Services.AddScoped<TenenciaVivData>();
 builder.Services.AddScoped<TipoComportamientoData>();
-builder.Services.AddScoped<TipoDocData>();
 builder.Services.AddScoped<TipoDocIDData>();
 builder.Services.AddScoped<TipoEstudioData>();
 builder.Services.AddScoped<TipoFamiliarData>();
 builder.Services.AddScoped<TipoInstitucionData>();
-builder.Services.AddScoped<TipoMonedaData>();
-builder.Services.AddScoped<TipoMovimientoData>();
 builder.Services.AddScoped<TipoPermisoData>();
-builder.Services.AddScoped<TipoRecursoData>();
 builder.Services.AddScoped<TipoResolucionData>();
 builder.Services.AddScoped<TipoSangreData>();
 builder.Services.AddScoped<TipoTrabajadorData>();
-builder.Services.AddScoped<TipoTransaccionData>();
 builder.Services.AddScoped<TipoVivData>();
 builder.Services.AddScoped<TitulosEmpleadoData>();
 builder.Services.AddScoped<UbicacionVivData>();
 builder.Services.AddScoped<UbigeoData>();
-builder.Services.AddScoped<UnidadMedidaData>();
 builder.Services.AddScoped<UsuarioData>();
 builder.Services.AddScoped<Usuario_RolData>();
 builder.Services.AddScoped<ViveConData>();
 builder.Services.AddScoped<ViviendaData>();
+builder.Services.AddScoped<DepartamentoData>();
+builder.Services.AddScoped<ProvinciaData>();
+builder.Services.AddScoped<DistritoData>();
+builder.Services.AddScoped<ServicioVivData>();
+builder.Services.AddScoped<ViviendaServicioData>();
+builder.Services.AddScoped<VinculoAseguradoData>();
+builder.Services.AddScoped<RRHH_FuncFamPreguntaData>();
+builder.Services.AddScoped<RRHH_FuncFamRespuestaData>();
+builder.Services.AddScoped<EstadoAsistenciaData>();
+builder.Services.AddScoped<TipoMarcacionData>();
+builder.Services.AddScoped<DispositivoMarcacionData>();
+builder.Services.AddScoped<EmpleadoAreaActualData>();
+builder.Services.AddScoped<EmpleadoResumenFamiliarData>();
+builder.Services.AddScoped<FamiliarDetalleData>();
+builder.Services.AddScoped<EstructOrganizDotacionData>();
 
 // Capa Logica (77)
 builder.Services.AddScoped<AFPLogica>();
@@ -127,13 +132,9 @@ builder.Services.AddScoped<EstructOrganizLogica>();
 builder.Services.AddScoped<EstudiosRealizadoLogica>();
 builder.Services.AddScoped<ExcretasVivLogica>();
 builder.Services.AddScoped<ExpLaboralLogica>();
-builder.Services.AddScoped<FamiliaLogica>();
 builder.Services.AddScoped<FamiliarLogica>();
 builder.Services.AddScoped<HorarioLogica>();
 builder.Services.AddScoped<HorarioTemporalLogica>();
-builder.Services.AddScoped<InconvenienteLogica>();
-builder.Services.AddScoped<InstitucionLogica>();
-builder.Services.AddScoped<LimitacionLogica>();
 builder.Services.AddScoped<LocalLogica>();
 builder.Services.AddScoped<MarcacionLogica>();
 builder.Services.AddScoped<MaterialVivLogica>();
@@ -165,32 +166,42 @@ builder.Services.AddScoped<SistemaOpcionLogica>();
 builder.Services.AddScoped<TenenciaVivLogica>();
 builder.Services.AddScoped<TipoComportamientoLogica>();
 builder.Services.AddScoped<TipoDocIDLogica>();
-builder.Services.AddScoped<TipoDocLogica>();
 builder.Services.AddScoped<TipoEstudioLogica>();
 builder.Services.AddScoped<TipoFamiliarLogica>();
 builder.Services.AddScoped<TipoInstitucionLogica>();
-builder.Services.AddScoped<TipoMonedaLogica>();
-builder.Services.AddScoped<TipoMovimientoLogica>();
 builder.Services.AddScoped<TipoPermisoLogica>();
-builder.Services.AddScoped<TipoRecursoLogica>();
 builder.Services.AddScoped<TipoResolucionLogica>();
 builder.Services.AddScoped<TipoSangreLogica>();
 builder.Services.AddScoped<TipoTrabajadorLogica>();
-builder.Services.AddScoped<TipoTransaccionLogica>();
 builder.Services.AddScoped<TipoVivLogica>();
 builder.Services.AddScoped<TitulosEmpleadoLogica>();
 builder.Services.AddScoped<UbicacionVivLogica>();
 builder.Services.AddScoped<UbigeoLogica>();
-builder.Services.AddScoped<UnidadMedidaLogica>();
 builder.Services.AddScoped<Usuario_RolLogica>();
 builder.Services.AddScoped<UsuarioLogica>();
 builder.Services.AddScoped<ViveConLogica>();
 builder.Services.AddScoped<ViviendaLogica>();
+builder.Services.AddScoped<DepartamentoLogica>();
+builder.Services.AddScoped<ProvinciaLogica>();
+builder.Services.AddScoped<DistritoLogica>();
+builder.Services.AddScoped<ServicioVivLogica>();
+builder.Services.AddScoped<ViviendaServicioLogica>();
+builder.Services.AddScoped<VinculoAseguradoLogica>();
+builder.Services.AddScoped<RRHH_FuncFamPreguntaLogica>();
+builder.Services.AddScoped<RRHH_FuncFamRespuestaLogica>();
+builder.Services.AddScoped<EstadoAsistenciaLogica>();
+builder.Services.AddScoped<TipoMarcacionLogica>();
+builder.Services.AddScoped<DispositivoMarcacionLogica>();
+builder.Services.AddScoped<EmpleadoAreaActualLogica>();
+builder.Services.AddScoped<EmpleadoResumenFamiliarLogica>();
+builder.Services.AddScoped<FamiliarDetalleLogica>();
+builder.Services.AddScoped<EstructOrganizDotacionLogica>();
 
 // Repositorio generico de catalogos
 builder.Services.AddScoped<CatalogoRepositorio>();
 builder.Services.AddScoped<SecuenciaService>();
 builder.Services.AddScoped<Proyecto_Evo_RRLL.Services.EmpleadoServicio>();
+builder.Services.AddScoped<Proyecto_Evo_RRLL.Services.EmpleadoFichaServicio>();
 
 // Limite de peticiones: evita que un usuario (o una IP) sature el servidor con demasiadas
 // peticiones seguidas. Global: 100 por minuto por usuario/IP; login: 5 por minuto (anti fuerza bruta).
@@ -226,8 +237,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<EvoRRLDbContext>();
-    var adminClave = builder.Configuration["Seguridad:AdminClave"] ?? "Admin.2026";
-    await SeedAdminAsync(db, adminClave);
+    // Fuera de desarrollo la clave inicial debe venir de la configuracion (en Azure: Seguridad__AdminClave).
+    var adminClave = builder.Configuration["Seguridad:AdminClave"] ?? (app.Environment.IsDevelopment() ? "Admin.2026" : null);
+    if (adminClave is not null)
+        await SeedAdminAsync(db, adminClave);
 }
 
 if (app.Environment.IsDevelopment())
@@ -266,10 +279,8 @@ static async Task SeedAdminAsync(EvoRRLDbContext db, string adminClave)
         return;
 
     var hasher = new PasswordHasher<Usuario>();
-    var maxIdUsuario = await db.Set<Usuario>().AnyAsync() ? await db.Set<Usuario>().MaxAsync(u => u.IdUsuario) + 1 : 1;
     var admin = new Usuario
     {
-        IdUsuario = maxIdUsuario,
         Login = LoginAdmin,
         Descripcion = "Administrador del Sistema",
         Fecha = DateTime.Now,
@@ -280,8 +291,7 @@ static async Task SeedAdminAsync(EvoRRLDbContext db, string adminClave)
     var rol = await db.Set<Rol>().FirstOrDefaultAsync(r => r.Descripcion != null && r.Descripcion.Trim().Equals("Administrador"));
     if (rol is null)
     {
-        var maxId = await db.Set<Rol>().AnyAsync() ? await db.Set<Rol>().MaxAsync(r => r.IdRol) + 1 : 1;
-        rol = new Rol { IdRol = maxId, Descripcion = "Administrador", IdSistema = "GRLL" };
+        rol = new Rol { Descripcion = "Administrador", IdSistema = "GRLL" };
         db.Set<Rol>().Add(rol);
     }
 

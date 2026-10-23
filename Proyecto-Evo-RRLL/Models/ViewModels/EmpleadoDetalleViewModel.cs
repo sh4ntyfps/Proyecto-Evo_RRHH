@@ -6,7 +6,7 @@ public class EmpleadoDetalleViewModel
 {
     public int IdEmpleado { get; set; }
 
-    public Empleado? Empleado { get; set; }
+    public EmpleadoFicha? Empleado { get; set; }
 
     public Persona? Persona { get; set; }
 
@@ -17,6 +17,8 @@ public class EmpleadoDetalleViewModel
     public string? Cargo { get; set; }
 
     public string? Area { get; set; }
+
+    public string? Ubigeo { get; set; }
 
     public string? Local { get; set; }
 

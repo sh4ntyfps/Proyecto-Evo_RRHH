@@ -52,10 +52,10 @@ else
             <hr />
             <div class="row">
                 <div class="col-md-3">
-                    <span class="badge @(Model.Registro.Telefono == true ? "bg-success" : "bg-secondary")">Teléfono</span>
-                    <span class="badge @(Model.Registro.Cable == true ? "bg-success" : "bg-secondary")">Cable</span>
-                    <span class="badge @(Model.Registro.Internet == true ? "bg-success" : "bg-secondary")">Internet</span>
-                    <span class="badge @(Model.Registro.Otros == true ? "bg-success" : "bg-secondary")">Otros</span>
+                    @foreach (var s in Model.Servicios)
+                    {
+                        <span class="badge @(s.Tiene ? "bg-success" : "bg-secondary")">@s.Servicio.Descripcion</span>
+                    }
                 </div>
             </div>
         </div>

@@ -25,4 +25,6 @@ public class ViviendaViewModel
     public string? Agua { get; set; }
 
     public string? Excretas { get; set; }
+
+    public List<(ServicioViv Servicio, bool Tiene)> Servicios { get; set; } = new();
 }

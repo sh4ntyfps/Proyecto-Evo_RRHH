@@ -35,18 +35,11 @@ public class FeriadoController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Nuevo(RRHH_Feriado modelo)
     {
-        var guardo = await _secuencia.EjecutarConBloqueoAsync(
-            async () =>
-            {
-                var lista = await _feriadoData.Listar();
-                return lista.Count > 0 ? lista.Max(f => f.idFeriado) + 1 : 1;
-            },
-            async id =>
-            {
-                modelo.idFeriado = id;
-                await _feriadoData.Crear(modelo);
-                return true;
-            });
+        var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+        {
+            modelo.idFeriado = 0;
+            await _feriadoData.Crear(modelo);
+        });
         if (!guardo)
             ModelState.AddModelError("", "No se pudo registrar el feriado: intente nuevamente.");
         else

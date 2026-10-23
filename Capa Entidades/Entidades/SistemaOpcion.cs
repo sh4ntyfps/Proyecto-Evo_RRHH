@@ -9,7 +9,5 @@ namespace Capa_Entidades
     [Key]
     public string? IdSistemaOpcion { get; set; }
     public string? Descripcion { get; set; }
-    public bool? ConClave { get; set; }
-    public string? Clave { get; set; }
     }
 }

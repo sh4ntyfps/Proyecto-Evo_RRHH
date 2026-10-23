@@ -6,5 +6,5 @@ public class EmpleadoNuevoViewModel
 {
     public Persona Persona { get; set; } = new();
 
-    public Empleado Empleado { get; set; } = new();
+    public EmpleadoFicha Empleado { get; set; } = new();
 }

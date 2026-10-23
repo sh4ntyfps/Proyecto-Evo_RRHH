@@ -22,13 +22,9 @@ public class EvoRRLDbContext : DbContext
         public DbSet<EstudiosRealizado> EstudiosRealizado { get; set; } = null!;
         public DbSet<ExcretasViv> ExcretasViv { get; set; } = null!;
         public DbSet<ExpLaboral> ExpLaboral { get; set; } = null!;
-        public DbSet<Familia> Familia { get; set; } = null!;
         public DbSet<Familiar> Familiar { get; set; } = null!;
         public DbSet<Horario> Horario { get; set; } = null!;
         public DbSet<HorarioTemporal> HorarioTemporal { get; set; } = null!;
-        public DbSet<Inconveniente> Inconveniente { get; set; } = null!;
-        public DbSet<Institucion> Institucion { get; set; } = null!;
-        public DbSet<Limitacion> Limitacion { get; set; } = null!;
         public DbSet<Local> Local { get; set; } = null!;
         public DbSet<Marcacion> Marcacion { get; set; } = null!;
         public DbSet<MaterialViv> MaterialViv { get; set; } = null!;
@@ -59,28 +55,37 @@ public class EvoRRLDbContext : DbContext
         public DbSet<SistemaOpcion> SistemaOpcion { get; set; } = null!;
         public DbSet<TenenciaViv> TenenciaViv { get; set; } = null!;
         public DbSet<TipoComportamiento> TipoComportamiento { get; set; } = null!;
-        public DbSet<TipoDoc> TipoDoc { get; set; } = null!;
         public DbSet<TipoDocID> TipoDocID { get; set; } = null!;
         public DbSet<TipoEstudio> TipoEstudio { get; set; } = null!;
         public DbSet<TipoFamiliar> TipoFamiliar { get; set; } = null!;
         public DbSet<TipoInstitucion> TipoInstitucion { get; set; } = null!;
-        public DbSet<TipoMoneda> TipoMoneda { get; set; } = null!;
-        public DbSet<TipoMovimiento> TipoMovimiento { get; set; } = null!;
         public DbSet<TipoPermiso> TipoPermiso { get; set; } = null!;
-        public DbSet<TipoRecurso> TipoRecurso { get; set; } = null!;
         public DbSet<TipoResolucion> TipoResolucion { get; set; } = null!;
         public DbSet<TipoSangre> TipoSangre { get; set; } = null!;
         public DbSet<TipoTrabajador> TipoTrabajador { get; set; } = null!;
-        public DbSet<TipoTransaccion> TipoTransaccion { get; set; } = null!;
         public DbSet<TipoViv> TipoViv { get; set; } = null!;
         public DbSet<TitulosEmpleado> TitulosEmpleado { get; set; } = null!;
         public DbSet<UbicacionViv> UbicacionViv { get; set; } = null!;
         public DbSet<Ubigeo> Ubigeo { get; set; } = null!;
-        public DbSet<UnidadMedida> UnidadMedida { get; set; } = null!;
         public DbSet<Usuario> Usuario { get; set; } = null!;
         public DbSet<Usuario_Rol> Usuario_Rol { get; set; } = null!;
         public DbSet<ViveCon> ViveCon { get; set; } = null!;
         public DbSet<Vivienda> Vivienda { get; set; } = null!;
+        public DbSet<Departamento> Departamento { get; set; } = null!;
+        public DbSet<Provincia> Provincia { get; set; } = null!;
+        public DbSet<Distrito> Distrito { get; set; } = null!;
+        public DbSet<ServicioViv> ServicioViv { get; set; } = null!;
+        public DbSet<ViviendaServicio> ViviendaServicio { get; set; } = null!;
+        public DbSet<VinculoAsegurado> VinculoAsegurado { get; set; } = null!;
+        public DbSet<RRHH_FuncFamPregunta> RRHH_FuncFamPregunta { get; set; } = null!;
+        public DbSet<RRHH_FuncFamRespuesta> RRHH_FuncFamRespuesta { get; set; } = null!;
+        public DbSet<EstadoAsistencia> EstadoAsistencia { get; set; } = null!;
+        public DbSet<TipoMarcacion> TipoMarcacion { get; set; } = null!;
+        public DbSet<DispositivoMarcacion> DispositivoMarcacion { get; set; } = null!;
+        public DbSet<EmpleadoAreaActual> EmpleadoAreaActual { get; set; } = null!;
+        public DbSet<EmpleadoResumenFamiliar> EmpleadoResumenFamiliar { get; set; } = null!;
+        public DbSet<FamiliarDetalle> FamiliarDetalle { get; set; } = null!;
+        public DbSet<EstructOrganizDotacion> EstructOrganizDotacion { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -122,18 +127,14 @@ public class EvoRRLDbContext : DbContext
             });
             modelBuilder.Entity<Empleado>(entity =>
             {
-                entity.HasOne<TipoSangre>().WithMany().HasForeignKey(e => e.IdTipoSangre);
+                entity.HasOne<Persona>().WithMany().HasForeignKey(e => e.IdPersona);
                 entity.HasOne<TipoTrabajador>().WithMany().HasForeignKey(e => e.IdTipoTrabajador);
-                entity.HasOne<Nacionalidad>().WithMany().HasForeignKey(e => e.IdNacionalidad);
                 entity.HasOne<ViveCon>().WithMany().HasForeignKey(e => e.IdViveCon);
                 entity.HasOne<RegimenPension>().WithMany().HasForeignKey(e => e.IdRegimenPen);
-                entity.HasOne<EstadoCivil>().WithMany().HasForeignKey(e => e.IdEstadoCivil);
                 entity.HasOne<Horario>().WithMany().HasForeignKey(e => e.idHorario);
                 entity.HasOne<Local>().WithMany().HasForeignKey(e => e.idLocal);
-                entity.HasOne<EstructOrganiz>().WithMany().HasForeignKey(e => new { e.Year, e.idAreaOrganiz });
                 entity.HasOne<AFP>().WithMany().HasForeignKey(e => e.IdAFP);
                 entity.HasOne<Cargo>().WithMany().HasForeignKey(e => e.IdCargo);
-                entity.HasOne<Discapacidad>().WithMany().HasForeignKey(e => e.IdDiscapacidad);
             });
             modelBuilder.Entity<Empleado_Area>(entity =>
             {
@@ -167,16 +168,12 @@ public class EvoRRLDbContext : DbContext
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
                 entity.HasOne<TipoInstitucion>().WithMany().HasForeignKey(e => e.IdTipoInstitucion);
             });
-            modelBuilder.Entity<Familia>(entity =>
-            {
-                entity.HasKey(e => new { e.IdFamilia, e.IdClase, e.IdGrupo });
-            });
             modelBuilder.Entity<Familiar>(entity =>
             {
                 entity.HasKey(e => new { e.IdEmpleado, e.IdPersona });
-                entity.HasOne<Discapacidad>().WithMany().HasForeignKey(e => e.IdDiscapacidad);
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
-                entity.HasOne<EstadoCivil>().WithMany().HasForeignKey(e => e.IdEstadoCivil);
+                entity.HasOne<Persona>().WithMany().HasForeignKey(e => e.IdPersona);
+                entity.HasOne<TipoFamiliar>().WithMany().HasForeignKey(e => e.IdTipoFam);
             });
             modelBuilder.Entity<Horario>(entity =>
             {
@@ -187,16 +184,6 @@ public class EvoRRLDbContext : DbContext
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.idEmpleado);
                 entity.HasOne<Horario>().WithMany().HasForeignKey(e => e.HorarioAsignado);
             });
-            modelBuilder.Entity<Inconveniente>(entity =>
-            {
-                entity.HasKey(e => new { e.IdObjetivo, e.Id_Actividad, e.IdInconveniente });
-            });
-            modelBuilder.Entity<Institucion>(entity =>
-            {
-            });
-            modelBuilder.Entity<Limitacion>(entity =>
-            {
-            });
             modelBuilder.Entity<Local>(entity =>
             {
             });
@@ -205,6 +192,8 @@ public class EvoRRLDbContext : DbContext
                 entity.HasKey(e => new { e.Fecha, e.IdEmpleado });
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
                 entity.HasOne<Horario>().WithMany().HasForeignKey(e => e.idHorario);
+                entity.HasOne<TipoMarcacion>().WithMany().HasForeignKey(e => e.TipoMarcacion);
+                entity.HasOne<DispositivoMarcacion>().WithMany().HasForeignKey(e => e.CodDispositivo);
             });
             modelBuilder.Entity<MaterialViv>(entity =>
             {
@@ -232,13 +221,18 @@ public class EvoRRLDbContext : DbContext
             });
             modelBuilder.Entity<Persona>(entity =>
             {
-                entity.HasOne<Ubigeo>().WithMany().HasForeignKey(e => e.IdUbigeo);
+                entity.HasOne<Distrito>().WithMany().HasForeignKey(e => e.IdUbigeo);
                 entity.HasOne<TipoDocID>().WithMany().HasForeignKey(e => e.TipoDocID);
+                entity.HasOne<EstadoCivil>().WithMany().HasForeignKey(e => e.IdEstadoCivil);
+                entity.HasOne<Nacionalidad>().WithMany().HasForeignKey(e => e.IdNacionalidad);
+                entity.HasOne<TipoSangre>().WithMany().HasForeignKey(e => e.IdTipoSangre);
+                entity.HasOne<Discapacidad>().WithMany().HasForeignKey(e => e.IdDiscapacidad);
             });
             modelBuilder.Entity<RegAsisDiario>(entity =>
             {
                 entity.HasKey(e => new { e.Fecha, e.IdEmpleado });
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
+                entity.HasOne<EstadoAsistencia>().WithMany().HasForeignKey(e => e.Estado);
             });
             modelBuilder.Entity<RegimenPension>(entity =>
             {
@@ -262,6 +256,7 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.HasKey(e => new { e.IdRol, e.IdSistemaOpcion });
                 entity.HasOne<Rol>().WithMany().HasForeignKey(e => e.IdRol);
+                entity.HasOne<SistemaOpcion>().WithMany().HasForeignKey(e => e.IdSistemaOpcion);
             });
             modelBuilder.Entity<Rotacion>(entity =>
             {
@@ -276,9 +271,9 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.HasKey(e => new { e.idEmpleado, e.NroBeneficiario });
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.idEmpleado);
-                entity.HasOne<EstadoCivil>().WithMany().HasForeignKey(e => e.idEstadoCivil);
                 entity.HasOne<MotivoBaja>().WithMany().HasForeignKey(e => e.idMotivoBaja);
                 entity.HasOne<Persona>().WithMany().HasForeignKey(e => e.idPersona);
+                entity.HasOne<VinculoAsegurado>().WithMany().HasForeignKey(e => e.IdVinculoAsegurado);
             });
             modelBuilder.Entity<RRHH_AspSocio>(entity =>
             {
@@ -293,7 +288,7 @@ public class EvoRRLDbContext : DbContext
             });
             modelBuilder.Entity<RRHH_FuncFam>(entity =>
             {
-                entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
+                entity.ToView("vw_RRHH_FuncFam");
             });
             modelBuilder.Entity<RRHH_RelacHermano>(entity =>
             {
@@ -321,10 +316,6 @@ public class EvoRRLDbContext : DbContext
             modelBuilder.Entity<TipoComportamiento>(entity =>
             {
             });
-            modelBuilder.Entity<TipoDoc>(entity =>
-            {
-                entity.HasKey(e => new { e.IdTipodoc, e.Anio });
-            });
             modelBuilder.Entity<TipoDocID>(entity =>
             {
             });
@@ -337,17 +328,7 @@ public class EvoRRLDbContext : DbContext
             modelBuilder.Entity<TipoInstitucion>(entity =>
             {
             });
-            modelBuilder.Entity<TipoMoneda>(entity =>
-            {
-            });
-            modelBuilder.Entity<TipoMovimiento>(entity =>
-            {
-                entity.HasKey(e => new { e.IdTipoMovimiento, e.IdTipodoc });
-            });
             modelBuilder.Entity<TipoPermiso>(entity =>
-            {
-            });
-            modelBuilder.Entity<TipoRecurso>(entity =>
             {
             });
             modelBuilder.Entity<TipoResolucion>(entity =>
@@ -358,10 +339,6 @@ public class EvoRRLDbContext : DbContext
             });
             modelBuilder.Entity<TipoTrabajador>(entity =>
             {
-            });
-            modelBuilder.Entity<TipoTransaccion>(entity =>
-            {
-                entity.HasKey(e => new { e.IdTipoTransaccion, e.Anio });
             });
             modelBuilder.Entity<TipoViv>(entity =>
             {
@@ -375,9 +352,7 @@ public class EvoRRLDbContext : DbContext
             });
             modelBuilder.Entity<Ubigeo>(entity =>
             {
-            });
-            modelBuilder.Entity<UnidadMedida>(entity =>
-            {
+                entity.ToView("vw_Ubigeo");
             });
             modelBuilder.Entity<Usuario>(entity =>
             {
@@ -403,6 +378,44 @@ public class EvoRRLDbContext : DbContext
                 entity.HasOne<TenenciaViv>().WithMany().HasForeignKey(e => e.IdTenencia);
                 entity.HasOne<TipoViv>().WithMany().HasForeignKey(e => e.IdTipo);
                 entity.HasOne<UbicacionViv>().WithMany().HasForeignKey(e => e.IdUbicacion);
+            });
+            modelBuilder.Entity<Provincia>(entity =>
+            {
+                entity.HasKey(e => new { e.CodDepartamento, e.CodProvincia });
+                entity.HasOne<Departamento>().WithMany().HasForeignKey(e => e.CodDepartamento);
+            });
+            modelBuilder.Entity<Distrito>(entity =>
+            {
+                entity.HasOne<Provincia>().WithMany().HasForeignKey(e => new { e.CodDepartamento, e.CodProvincia });
+            });
+            modelBuilder.Entity<ViviendaServicio>(entity =>
+            {
+                entity.HasKey(e => new { e.IdVivienda, e.IdServicio });
+                entity.HasOne<Vivienda>().WithMany().HasForeignKey(e => e.IdVivienda);
+                entity.HasOne<ServicioViv>().WithMany().HasForeignKey(e => e.IdServicio);
+            });
+            modelBuilder.Entity<RRHH_FuncFamPregunta>(entity =>
+            {
+                entity.Property(e => e.IdPregunta).ValueGeneratedNever();
+            });
+            modelBuilder.Entity<RRHH_FuncFamRespuesta>(entity =>
+            {
+                entity.HasKey(e => new { e.IdEmpleado, e.IdPregunta });
+                entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
+                entity.HasOne<RRHH_FuncFamPregunta>().WithMany().HasForeignKey(e => e.IdPregunta);
+            });
+            // Vistas de solo lectura con los datos derivados que antes se guardaban en las tablas.
+            modelBuilder.Entity<EmpleadoAreaActual>(entity => entity.ToView("vw_EmpleadoAreaActual"));
+            modelBuilder.Entity<EmpleadoResumenFamiliar>(entity => entity.ToView("vw_EmpleadoResumenFamiliar"));
+            modelBuilder.Entity<FamiliarDetalle>(entity =>
+            {
+                entity.ToView("vw_FamiliarDetalle");
+                entity.HasKey(e => new { e.IdEmpleado, e.IdPersona });
+            });
+            modelBuilder.Entity<EstructOrganizDotacion>(entity =>
+            {
+                entity.ToView("vw_EstructOrganizDotacion");
+                entity.HasKey(e => new { e.Year, e.idAreaOrganiz });
             });
     }
 }

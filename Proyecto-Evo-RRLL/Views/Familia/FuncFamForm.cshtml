@@ -1,7 +1,7 @@
 @model RRHH_FuncFam
 @{
     ViewData["Title"] = "Funcionalidad familiar";
-    var esNuevo = Model.idFuncFamiliar == 0;
+    var esNuevo = ViewBag.EsNuevo as bool? ?? false;
     var empleados = ViewBag.Empleados as List<(int Id, string Nombre)> ?? new List<(int, string)>();
 }
 
@@ -16,12 +16,12 @@
         <div class="card-body">
             @if (!esNuevo)
             {
-                <input type="hidden" asp-for="idFuncFamiliar" />
+                <input type="hidden" asp-for="IdEmpleado" />
             }
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Empleado *</label>
-                    <select asp-for="IdEmpleado" class="form-select" required>
+                    <select asp-for="IdEmpleado" class="form-select" required disabled="@(esNuevo ? null : "disabled")">
                         <option value="">(seleccionar)</option>
                         @foreach (var e in empleados)
                         {

@@ -20,7 +20,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row g-3">
-                @foreach (var col in Model.Columnas.Where(c => !c.EsArchivo))
+                @foreach (var col in Model.Columnas.Where(c => !c.EsArchivo && (esEdicion || !c.EsAutonumerico)))
                 {
                     var valorActual = Model.Valores!.TryGetValue(col.Nombre, out var v) ? v : null;
 
@@ -37,13 +37,18 @@
                                 <label class="form-check-label" for="@col.Nombre">Activo</label>
                             </div>
                         }
+                        else if (col.Tipo == "TimeOnly")
+                        {
+                            var hora = valorActual is TimeOnly t ? t.ToString("HH:mm") : "";
+                            <input type="time" class="form-control" name="@col.Nombre" value="@hora" />
+                        }
                         else if (col.Tipo is "DateTime" or "DateOnly")
                         {
                             var fecha = valorActual is DateTime dt ? dt.ToString("yyyy-MM-dd") :
                                         valorActual is DateOnly d ? d.ToString("yyyy-MM-dd") : "";
                             <input type="date" class="form-control" name="@col.Nombre" value="@fecha" @(esEdicion && col.EsClave ? "readonly" : "") />
                         }
-                        else if (col.Tipo is "Int32" or "Int64" or "Decimal" or "Double" or "Int16")
+                        else if (col.Tipo is "Int32" or "Int64" or "Decimal" or "Double" or "Int16" or "Byte")
                         {
                             <input type="text" inputmode="decimal" class="form-control" name="@col.Nombre" value="@(valorActual?.ToString() ?? "")" @(esEdicion && col.EsClave ? "readonly" : "") />
                         }

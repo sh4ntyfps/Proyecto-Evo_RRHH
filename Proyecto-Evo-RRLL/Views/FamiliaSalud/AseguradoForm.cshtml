@@ -15,6 +15,7 @@
 <form asp-action="@(esEdicion ? "AseguradoEditar" : "AseguradoCrear")" method="post">
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
     @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="idEmpleado" />
     <div class="card">
         <div class="card-body">
             <div class="row g-3">
@@ -23,24 +24,16 @@
                     <input asp-for="NroBeneficiario" type="number" class="form-control" readonly="@(esEdicion ? "" : null)" />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Id Persona</label>
-                    <input asp-for="idPersona" type="number" class="form-control" placeholder="Opcional" />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Sexo</label>
-                    <input asp-for="Sexo" class="form-control" />
+                    <label class="form-label">Id Persona *</label>
+                    <input asp-for="idPersona" type="number" class="form-control" required />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Vínculo familiar</label>
-                    <input asp-for="VinculoFamiliar" class="form-control" />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Estado civil</label>
-                    <select asp-for="idEstadoCivil" class="form-select">
+                    <select asp-for="IdVinculoAsegurado" class="form-select">
                         <option value="">(sin especificar)</option>
-                        @foreach (var e in ViewBag.EstadosCiviles as List<EstadoCivil> ?? new List<EstadoCivil>())
+                        @foreach (var v in ViewBag.Vinculos as List<VinculoAsegurado> ?? new List<VinculoAsegurado>())
                         {
-                            <option value="@e.IdEstadoCivil">@e.DescripEstCivil</option>
+                            <option value="@v.IdVinculoAsegurado">@v.Descripcion</option>
                         }
                     </select>
                 </div>

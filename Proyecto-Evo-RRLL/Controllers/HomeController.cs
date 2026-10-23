@@ -16,6 +16,7 @@ namespace Proyecto_Evo_RRLL.Controllers
         private readonly EstructOrganizLogica _estructOrganizData;
 private readonly CargoLogica _cargoData;
     private readonly RRHH_FeriadoLogica _feriadoData;
+    private readonly EmpleadoAreaActualLogica _areaActualData;
 
     public HomeController(
         EmpleadoLogica empleadoData,
@@ -23,7 +24,8 @@ private readonly CargoLogica _cargoData;
         AsistenciaLogica asistenciaData,
         EstructOrganizLogica estructuraOrganizData,
         CargoLogica cargoData,
-        RRHH_FeriadoLogica feriadoData)
+        RRHH_FeriadoLogica feriadoData,
+        EmpleadoAreaActualLogica areaActualData)
     {
         _empleadoData = empleadoData;
         _personaData = personaData;
@@ -31,6 +33,7 @@ private readonly CargoLogica _cargoData;
         _estructOrganizData = estructuraOrganizData;
         _cargoData = cargoData;
         _feriadoData = feriadoData;
+        _areaActualData = areaActualData;
     }
 
         public async Task<IActionResult> Index()
@@ -41,16 +44,15 @@ private readonly CargoLogica _cargoData;
             var cargos = await _cargoData.Listar();
 
             // Empleados por área
-            var areaPorKey = estructuras.ToDictionary(e => $"{e.Year}|{e.idAreaOrganiz}", e => e.AreaOrganizacional ?? $"Área {e.idAreaOrganiz}");
-            var porArea = empleados
-                .GroupBy(e => $"{e.Year}|{e.idAreaOrganiz}")
+            var porArea = (await _areaActualData.Listar())
+                .GroupBy(a => a.AreaOrganizacional ?? $"Área {a.idAreaOrganiz}")
                 .OrderByDescending(g => g.Count())
                 .Take(8);
             var areasNombres = new List<string>();
             var areasCounts = new List<int>();
             foreach (var g in porArea)
             {
-                areasNombres.Add(areaPorKey.TryGetValue(g.Key, out var nombre) ? nombre : g.Key);
+                areasNombres.Add(g.Key);
                 areasCounts.Add(g.Count());
             }
 
@@ -68,7 +70,7 @@ private readonly CargoLogica _cargoData;
             // Empleados por estado
             var estadosNombres = new List<string>();
             var estadosCounts = new List<int>();
-            foreach (var g in empleados.GroupBy(e => string.IsNullOrWhiteSpace(e.Estado) ? "Sin estado" : e.Estado!).OrderByDescending(x => x.Count()))
+            foreach (var g in empleados.GroupBy(e => e.Estado switch { true => "Activo", false => "Inactivo", null => "Sin estado" }).OrderByDescending(x => x.Count()))
             {
                 estadosNombres.Add(g.Key);
                 estadosCounts.Add(g.Count());
@@ -77,7 +79,7 @@ private readonly CargoLogica _cargoData;
             var model = new DashboardViewModel
             {
                 Empleados = empleados.Count,
-                EmpleadosActivos = empleados.Count(e => e.Estado == "A"),
+                EmpleadosActivos = empleados.Count(e => e.Estado == true),
                 Personas = personas.Count,
                 asistenciasHoy = await _asistenciaData.ContarEntreFechas(hoy, hoy),
                 Areas = estructuras.Count,

@@ -11,7 +11,8 @@ namespace Capa_Entidades
     [Key]
     public int idResolucion { get; set; }
     public int? idTipoResolucion { get; set; }
-    public DateOnly? FechaResolucion { get; set; }
     public string? NumeroResolucion { get; set; }
+    public DateOnly? FechaResolucion { get; set; }
+    public DateOnly? FechaVigencia { get; set; }
     }
 }

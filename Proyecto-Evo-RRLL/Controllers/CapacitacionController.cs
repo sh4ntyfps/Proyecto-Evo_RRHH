@@ -12,12 +12,10 @@ public class CapacitacionController : Controller
     private readonly CapacitacionLogica _capacitacionData;
     private readonly EstudiosRealizadoLogica _estudiosData;
     private readonly TitulosEmpleadoLogica _titulosData;
-    private readonly InstitucionLogica _institucionData;
     private readonly TipoEstudioLogica _tipoEstudioData;
     private readonly EstadoEstudioLogica _estadoEstudioData;
     private readonly EmpleadoLogica _empleadoData;
     private readonly PersonaLogica _personaData;
-    private readonly TipoInstitucionLogica _tipoInstitucionData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
@@ -25,24 +23,20 @@ public class CapacitacionController : Controller
         CapacitacionLogica capacitacionData,
         EstudiosRealizadoLogica estudiosData,
         TitulosEmpleadoLogica titulosData,
-        InstitucionLogica institucionData,
         TipoEstudioLogica tipoEstudioData,
         EstadoEstudioLogica estadoEstudioData,
         EmpleadoLogica empleadoData,
         PersonaLogica personaData,
-        TipoInstitucionLogica tipoInstitucionData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {
         _capacitacionData = capacitacionData;
         _estudiosData = estudiosData;
         _titulosData = titulosData;
-        _institucionData = institucionData;
         _tipoEstudioData = tipoEstudioData;
         _estadoEstudioData = estadoEstudioData;
         _empleadoData = empleadoData;
         _personaData = personaData;
-        _tipoInstitucionData = tipoInstitucionData;
         _secuencia = secuencia;
         _empleados = empleados;
     }
@@ -75,25 +69,9 @@ public class CapacitacionController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Nuevo(Capacitacion modelo)
     {
-        var guardo = await _secuencia.EjecutarConBloqueoAsync(
-            async () =>
-            {
-                var lista = await _capacitacionData.Listar();
-                return lista.Count > 0 ? lista.Max(x => x.IdCapacitacion) + 1 : 1;
-            },
-            async id =>
-            {
-                modelo.IdCapacitacion = id;
-                await _capacitacionData.Crear(modelo);
-                return true;
-            });
-        if (guardo)
-            return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
-
-        ViewBag.IdEmpleado = modelo.IdEmpleado;
-        ViewBag.Empleados = await EmpleadosAsync();
-        ModelState.AddModelError("", "No se pudo registrar la capacitación: intente nuevamente.");
-        return View("Form", modelo);
+        modelo.IdCapacitacion = 0;
+        await _capacitacionData.Crear(modelo);
+        return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
     }
 
     [HttpGet]
@@ -222,9 +200,9 @@ public class CapacitacionController : Controller
             return NotFound();
 
         actual.CentroEstudios = modelo.CentroEstudios;
-        actual.AñoInicio = modelo.AñoInicio;
+        actual.FechaInicio = modelo.FechaInicio;
         actual.Especialidad = modelo.Especialidad;
-        actual.AñoTermino = modelo.AñoTermino;
+        actual.FechaTermino = modelo.FechaTermino;
         actual.IdEstadoEstudio = modelo.IdEstadoEstudio;
         await _estudiosData.Actualizar(actual);
 
@@ -268,14 +246,15 @@ public class CapacitacionController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> TituloNuevo(TitulosEmpleado modelo)
     {
+        modelo.IdTitulo = 0;
         await _titulosData.Crear(modelo);
         return RedirectToAction(nameof(Titulos), new { idEmpleado = modelo.IdEmpleado });
     }
 
     [HttpGet]
-    public async Task<IActionResult> TituloEditar(string numColegiatura)
+    public async Task<IActionResult> TituloEditar(int id)
     {
-        var registro = await _titulosData.Obtener(numColegiatura);
+        var registro = await _titulosData.Obtener(id);
         if (registro is null)
             return NotFound();
 
@@ -286,12 +265,13 @@ public class CapacitacionController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> TituloEditar(string numColegiatura, TitulosEmpleado modelo)
+    public async Task<IActionResult> TituloEditar(int id, TitulosEmpleado modelo)
     {
-        var actual = await _titulosData.Obtener(numColegiatura);
+        var actual = await _titulosData.Obtener(id);
         if (actual is null)
             return NotFound();
 
+        actual.NumColegiatura = modelo.NumColegiatura;
         actual.DenominacionGrado = modelo.DenominacionGrado;
         actual.Institucion = modelo.Institucion;
         actual.Fecha = modelo.Fecha;
@@ -303,89 +283,12 @@ public class CapacitacionController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> TituloEliminar(string numColegiatura, int? idEmpleado)
+    public async Task<IActionResult> TituloEliminar(int id, int? idEmpleado)
     {
-        var actual = await _titulosData.Obtener(numColegiatura);
+        var actual = await _titulosData.Obtener(id);
         if (actual is not null)
             await _titulosData.Eliminar(actual);
         return RedirectToAction(nameof(Titulos), new { idEmpleado });
-    }
-
-    // ---------- Instituciones ----------
-
-    [HttpGet]
-    public async Task<IActionResult> Instituciones()
-    {
-        var instituciones = (await _institucionData.Listar()).OrderBy(i => i.Descripcion);
-        ViewBag.TiposInstitucion = await _tipoInstitucionData.Listar();
-        return View(instituciones.ToList());
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> InstitucionNuevo()
-    {
-        ViewBag.TiposInstitucion = await _tipoInstitucionData.Listar();
-        return View("InstitucionForm", new Institucion());
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> InstitucionNuevo(Institucion modelo)
-    {
-        var guardo = await _secuencia.EjecutarConBloqueoAsync(
-            async () =>
-            {
-                var lista = await _institucionData.Listar();
-                return lista.Count > 0 ? lista.Max(x => x.IdInstitucion) + 1 : 1;
-            },
-            async id =>
-            {
-                modelo.IdInstitucion = id;
-                await _institucionData.Crear(modelo);
-                return true;
-            });
-        if (guardo)
-            return RedirectToAction(nameof(Instituciones));
-
-        ViewBag.TiposInstitucion = await _tipoInstitucionData.Listar();
-        ModelState.AddModelError("", "No se pudo registrar la institución: intente nuevamente.");
-        return View("InstitucionForm", modelo);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> InstitucionEditar(int id)
-    {
-        var registro = await _institucionData.Obtener(id);
-        if (registro is null)
-            return NotFound();
-
-        ViewBag.TiposInstitucion = await _tipoInstitucionData.Listar();
-        return View("InstitucionForm", registro);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> InstitucionEditar(int id, Institucion modelo)
-    {
-        var actual = await _institucionData.Obtener(id);
-        if (actual is null)
-            return NotFound();
-
-        actual.Descripcion = modelo.Descripcion;
-        actual.Direccion = modelo.Direccion;
-        await _institucionData.Actualizar(actual);
-
-        return RedirectToAction(nameof(Instituciones));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> InstitucionEliminar(int id)
-    {
-        var actual = await _institucionData.Obtener(id);
-        if (actual is not null)
-            await _institucionData.Eliminar(actual);
-        return RedirectToAction(nameof(Instituciones));
     }
 
     // ---------- Utilidades ----------

@@ -21,6 +21,8 @@ public class ViviendaController : Controller
     private readonly ConservacionVivLogica _conservacionVivData;
     private readonly ExcretasVivLogica _excretasVivData;
     private readonly MaterialVivLogica _materialVivData;
+    private readonly ServicioVivLogica _servicioVivData;
+    private readonly ViviendaServicioLogica _viviendaServicioData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
@@ -36,6 +38,8 @@ public class ViviendaController : Controller
         ConservacionVivLogica conservacionVivData,
         ExcretasVivLogica excretasVivData,
         MaterialVivLogica materialVivData,
+        ServicioVivLogica servicioVivData,
+        ViviendaServicioLogica viviendaServicioData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {
@@ -50,6 +54,8 @@ public class ViviendaController : Controller
         _conservacionVivData = conservacionVivData;
         _excretasVivData = excretasVivData;
         _materialVivData = materialVivData;
+        _servicioVivData = servicioVivData;
+        _viviendaServicioData = viviendaServicioData;
         _secuencia = secuencia;
         _empleados = empleados;
     }
@@ -89,7 +95,8 @@ public class ViviendaController : Controller
             Ubicacion = registro?.IdUbicacion is null ? null : ubicaciones.FirstOrDefault(u => u.IdUbicacion == registro.IdUbicacion)?.DescripUbicacion,
             Alumbrado = registro?.IdAlumbrado is null ? null : alumbrados.FirstOrDefault(a => a.IdAlumbrado == registro.IdAlumbrado)?.DescripAlumbrado,
             Agua = registro?.IdAgua is null ? null : aguas.FirstOrDefault(a => a.IdAgua == registro.IdAgua)?.DescripAgua,
-            Excretas = registro?.IdExcretas is null ? null : excretas.FirstOrDefault(e => e.IdExcretas == registro.IdExcretas)?.DescripExcretas
+            Excretas = registro?.IdExcretas is null ? null : excretas.FirstOrDefault(e => e.IdExcretas == registro.IdExcretas)?.DescripExcretas,
+            Servicios = await ServiciosAsync(registro?.IdVivienda)
         };
 
         return View(vm);
@@ -113,29 +120,24 @@ public class ViviendaController : Controller
         ViewBag.Conservaciones = await _conservacionVivData.Listar();
         ViewBag.Excretas = await _excretasVivData.Listar();
         ViewBag.Materiales = await _materialVivData.Listar();
+        ViewBag.Servicios = await ServiciosAsync(registro.IdVivienda == 0 ? null : registro.IdVivienda);
         return View(registro);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ViviendaForm(Vivienda modelo)
+    public async Task<IActionResult> ViviendaForm(Vivienda modelo, int[] servicios)
     {
         var actual = (await _viviendaData.Listar()).FirstOrDefault(v => v.IdEmpleado == modelo.IdEmpleado);
 
         if (actual is null)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _viviendaData.Listar();
-                    return lista.Count > 0 ? lista.Max(x => x.IdVivienda) + 1 : 1;
-                },
-                async id =>
-                {
-                    modelo.IdVivienda = id;
-                    await _viviendaData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                modelo.IdVivienda = 0;
+                await _viviendaData.Crear(modelo);
+                await GuardarServiciosAsync(modelo.IdVivienda, servicios);
+            });
             if (!guardo)
             {
                 ViewBag.IdEmpleado = modelo.IdEmpleado;
@@ -148,6 +150,8 @@ public class ViviendaController : Controller
                 ViewBag.Conservaciones = await _conservacionVivData.Listar();
                 ViewBag.Excretas = await _excretasVivData.Listar();
                 ViewBag.Materiales = await _materialVivData.Listar();
+                ViewBag.Servicios = (await _servicioVivData.Listar())
+                    .Select(s => (Servicio: s, Tiene: servicios.Contains(s.IdServicio))).ToList();
                 ModelState.AddModelError("", "No se pudo guardar la vivienda: intente nuevamente.");
                 return View(modelo);
             }
@@ -156,6 +160,7 @@ public class ViviendaController : Controller
         {
             Copiar(actual, modelo);
             await _viviendaData.Actualizar(actual);
+            await GuardarServiciosAsync(actual.IdVivienda, servicios);
         }
 
         return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
@@ -179,6 +184,26 @@ public class ViviendaController : Controller
     private async Task<string?> NombreEmpleadoAsync(int idEmpleado)
         => await _empleados.NombreEmpleadoAsync(idEmpleado);
 
+    private async Task<List<(ServicioViv Servicio, bool Tiene)>> ServiciosAsync(int? idVivienda)
+    {
+        var marcados = idVivienda is null
+            ? new HashSet<int>()
+            : (await _viviendaServicioData.Listar()).Where(s => s.IdVivienda == idVivienda).Select(s => s.IdServicio).ToHashSet();
+        return (await _servicioVivData.Listar())
+            .OrderBy(s => s.IdServicio)
+            .Select(s => (s, marcados.Contains(s.IdServicio)))
+            .ToList();
+    }
+
+    private async Task GuardarServiciosAsync(int idVivienda, int[] servicios)
+    {
+        var actuales = (await _viviendaServicioData.Listar()).Where(s => s.IdVivienda == idVivienda).ToList();
+        foreach (var s in actuales.Where(s => !servicios.Contains(s.IdServicio)))
+            await _viviendaServicioData.Eliminar(s);
+        foreach (var id in servicios.Distinct().Where(id => actuales.All(s => s.IdServicio != id)))
+            await _viviendaServicioData.Crear(new ViviendaServicio { IdVivienda = idVivienda, IdServicio = id });
+    }
+
     private static void Copiar(Vivienda destino, Vivienda origen)
     {
         destino.IdEmpleado = origen.IdEmpleado;
@@ -198,9 +223,5 @@ public class ViviendaController : Controller
         destino.NumCompart = origen.NumCompart;
         destino.Observacion = origen.Observacion;
         destino.NumPerDorm = origen.NumPerDorm;
-        destino.Telefono = origen.Telefono;
-        destino.Cable = origen.Cable;
-        destino.Internet = origen.Internet;
-        destino.Otros = origen.Otros;
     }
 }

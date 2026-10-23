@@ -4,7 +4,7 @@
     var esNuevo = Model.NroBeneficiario == 0;
     var empleados = ViewBag.Empleados as List<(int Id, string Nombre)> ?? new List<(int, string)>();
     var personas = ViewBag.Personas as List<(int Id, string Nombre)> ?? new List<(int, string)>();
-    var estados = ViewBag.EstadosCiviles as List<EstadoCivil> ?? new List<EstadoCivil>();
+    var vinculos = ViewBag.Vinculos as List<VinculoAsegurado> ?? new List<VinculoAsegurado>();
     var motivos = ViewBag.MotivosBaja as List<MotivoBaja> ?? new List<MotivoBaja>();
 }
 
@@ -34,8 +34,8 @@
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Familiar / beneficiario</label>
-                    <select asp-for="idPersona" class="form-select">
+                    <label class="form-label">Familiar / beneficiario *</label>
+                    <select asp-for="idPersona" class="form-select" required>
                         <option value="">(seleccionar persona)</option>
                         @foreach (var p in personas)
                         {
@@ -45,23 +45,11 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Vínculo familiar</label>
-                    <input asp-for="VinculoFamiliar" class="form-control" placeholder="Ej. Cónyuge, Hijo..." />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Sexo</label>
-                    <select asp-for="Sexo" class="form-select">
+                    <select asp-for="IdVinculoAsegurado" class="form-select">
                         <option value="">(sin asignar)</option>
-                        <option value="M" selected="@(Model.Sexo == "M")">Masculino</option>
-                        <option value="F" selected="@(Model.Sexo == "F")">Femenino</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Estado civil</label>
-                    <select asp-for="idEstadoCivil" class="form-select">
-                        <option value="">(sin asignar)</option>
-                        @foreach (var ec in estados)
+                        @foreach (var v in vinculos)
                         {
-                            <option value="@ec.IdEstadoCivil">@ec.DescripEstCivil</option>
+                            <option value="@v.IdVinculoAsegurado">@v.Descripcion</option>
                         }
                     </select>
                 </div>

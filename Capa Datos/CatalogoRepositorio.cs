@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Capa_Datos;
 
-public record CatalogoColumna(string Nombre, string Tipo, bool EsClave, bool EsArchivo);
+// EsAutonumerico: clave IDENTITY, la genera SQL Server al crear.
+public record CatalogoColumna(string Nombre, string Tipo, bool EsClave, bool EsArchivo, bool EsAutonumerico = false);
 
 public class CatalogoRepositorio
 {
@@ -15,11 +16,11 @@ public class CatalogoRepositorio
         "Cargo", "MotivoBaja", "EstadoCivil", "TipoDocID", "TipoTrabajador",
         "TipoSangre", "Nacionalidad", "RegimenPension", "ViveCon", "TipoPermiso",
         "Motivo_Perm", "TipoEstudio", "TipoInstitucion", "Discapacidad",
-        "Limitacion", "TipoComportamiento", "TipoResolucion", "Familia",
+        "TipoComportamiento", "TipoResolucion",
         "TipoFamiliar", "RRHH_TipoFamilia", "RRHH_RelacPareja", "RRHH_RelacPH",
         "RRHH_RelacHermano", "AFP", "AguaViv", "AlumbradoViv", "ConservacionViv",
         "ExcretasViv", "MaterialViv", "TenenciaViv", "TipoViv", "UbicacionViv",
-        "RRHH_AcudeEnferm", "TipoMoneda", "TipoRecurso", "UnidadMedida", "Horario"
+        "RRHH_AcudeEnferm", "Horario", "VinculoAsegurado", "ServicioViv"
     };
 
     private readonly EvoRRLDbContext _contexto;
@@ -66,7 +67,8 @@ public class CatalogoRepositorio
                     p.Name,
                     tipoClase.Name,
                     claves.Contains(p.Name),
-                    tipoClase == typeof(byte[]));
+                    tipoClase == typeof(byte[]),
+                    EsAutonumerico(p));
             })
             .ToList();
     }
@@ -78,7 +80,7 @@ public class CatalogoRepositorio
 
         var tipo = ObtenerTipo(tabla);
         var entidad = Activator.CreateInstance(tipo)!;
-        AplicarValores(tipo, entidad, datos);
+        AplicarValores(tipo, entidad, datos, omitirAutonumerico: true);
         _contexto.Add(entidad);
         await _contexto.SaveChangesAsync();
     }
@@ -146,13 +148,14 @@ public class CatalogoRepositorio
         return valores;
     }
 
-    private void AplicarValores(Type tipo, object entidad, IReadOnlyDictionary<string, string> datos)
+    private void AplicarValores(Type tipo, object entidad, IReadOnlyDictionary<string, string> datos, bool omitirAutonumerico = false)
     {
         var entityType = _contexto.Model.FindEntityType(tipo)!;
         foreach (var propiedad in entityType.GetProperties())
         {
             var columna = propiedad.GetColumnName();
             if (columna is null) continue;
+            if (omitirAutonumerico && EsAutonumerico(propiedad)) continue;
             if (!datos.TryGetValue(propiedad.Name, out var texto)) continue;
             if (propiedad.ClrType == typeof(byte[])) continue;
 
@@ -174,9 +177,16 @@ public class CatalogoRepositorio
         }
     }
 
+    private static bool EsAutonumerico(IReadOnlyProperty propiedad)
+        => propiedad.IsPrimaryKey() && propiedad.ValueGenerated == ValueGenerated.OnAdd;
+
     private static object? Convertir(Type tipo, string texto)
     {
         if (string.IsNullOrWhiteSpace(texto)) return null;
-        return Convert.ChangeType(texto, Nullable.GetUnderlyingType(tipo) ?? tipo, CultureInfo.InvariantCulture);
+        var destino = Nullable.GetUnderlyingType(tipo) ?? tipo;
+        if (destino == typeof(TimeOnly)) return TimeOnly.Parse(texto, CultureInfo.InvariantCulture);
+        if (destino == typeof(DateOnly)) return DateOnly.Parse(texto, CultureInfo.InvariantCulture);
+        if (destino == typeof(bool)) return texto.Split(',')[0].Equals("true", StringComparison.OrdinalIgnoreCase);
+        return Convert.ChangeType(texto, destino, CultureInfo.InvariantCulture);
     }
 }

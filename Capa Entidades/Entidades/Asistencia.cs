@@ -10,10 +10,10 @@ namespace Capa_Entidades
     public DateTime Fecha { get; set; }
     [Key]
     public int IdEmpleado { get; set; }
-    public string? Hor_Ent { get; set; }
-    public string? Hor_Sal { get; set; }
-    public string? Alm_Sal { get; set; }
-    public string? Alm_Ent { get; set; }
+    public TimeOnly? Hor_Ent { get; set; }
+    public TimeOnly? Hor_Sal { get; set; }
+    public TimeOnly? Alm_Sal { get; set; }
+    public TimeOnly? Alm_Ent { get; set; }
     public bool? Flag_Ent { get; set; }
     public bool? Flag_Sal { get; set; }
     public bool? Estado { get; set; }

@@ -3,6 +3,7 @@ using Capa_Datos;
 using Capa_Entidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Proyecto_Evo_RRLL.Models.ViewModels;
 
 namespace Proyecto_Evo_RRLL.Controllers;
 
@@ -22,6 +23,7 @@ public class FamiliaController : Controller
     private readonly EstadoCivilLogica _estadoCivilData;
     private readonly DiscapacidadLogica _discapacidadData;
     private readonly TipoSangreLogica _tipoSangreData;
+    private readonly FamiliarDetalleLogica _familiarDetalleData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
@@ -39,6 +41,7 @@ public class FamiliaController : Controller
         EstadoCivilLogica estadoCivilData,
         DiscapacidadLogica discapacidadData,
         TipoSangreLogica tipoSangreData,
+        FamiliarDetalleLogica familiarDetalleData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {
@@ -55,6 +58,7 @@ public class FamiliaController : Controller
         _estadoCivilData = estadoCivilData;
         _discapacidadData = discapacidadData;
         _tipoSangreData = tipoSangreData;
+        _familiarDetalleData = familiarDetalleData;
         _secuencia = secuencia;
         _empleados = empleados;
     }
@@ -67,7 +71,12 @@ public class FamiliaController : Controller
         var familiares = (await _familiarData.Listar())
             .Where(f => idEmpleado is null || f.IdEmpleado == idEmpleado)
             .OrderBy(f => f.IdEmpleado)
-            .ThenBy(f => f.IdPersona);
+            .ThenBy(f => f.IdPersona)
+            .ToList();
+        var personas = (await _personaData.Listar()).ToDictionary(p => p.IdPersona);
+        var fichas = familiares
+            .Select(f => FamiliarFicha.Desde(f, personas.GetValueOrDefault(f.IdPersona), null))
+            .ToList();
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
@@ -76,7 +85,7 @@ public class FamiliaController : Controller
         ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
         ViewBag.Discapacidades = await _discapacidadData.Listar();
         ViewBag.TiposSangre = await _tipoSangreData.Listar();
-        return View(familiares.ToList());
+        return View(fichas);
     }
 
     [HttpGet]
@@ -89,19 +98,27 @@ public class FamiliaController : Controller
         ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
         ViewBag.Discapacidades = await _discapacidadData.Listar();
         ViewBag.TiposSangre = await _tipoSangreData.Listar();
-        return View("FamiliarForm", new Familiar { IdEmpleado = idEmpleado ?? 0 });
+        return View("FamiliarForm", new FamiliarFicha { IdEmpleado = idEmpleado ?? 0 });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> FamiliarNuevo(Familiar modelo)
+    public async Task<IActionResult> FamiliarNuevo(FamiliarFicha modelo)
     {
         if (await _familiarData.Obtener(modelo.IdEmpleado, modelo.IdPersona) is not null)
             ModelState.AddModelError("", "Ese familiar ya está registrado para el empleado.");
 
+        var persona = await _personaData.Obtener(modelo.IdPersona);
+        if (persona is null)
+            ModelState.AddModelError(nameof(modelo.IdPersona), "Seleccione una persona válida.");
+
         if (ModelState.IsValid)
         {
-            await _familiarData.Crear(modelo);
+            var familiar = new Familiar { IdEmpleado = modelo.IdEmpleado, IdPersona = modelo.IdPersona };
+            modelo.AplicarA(familiar);
+            modelo.AplicarA(persona!);
+            await _familiarData.Crear(familiar);
+            await _personaData.Actualizar(persona!);
             TempData["MensajeExito"] = "Familiar registrado.";
             return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
         }
@@ -119,9 +136,11 @@ public class FamiliaController : Controller
     [HttpGet]
     public async Task<IActionResult> FamiliarEditar(int idEmpleado, int idPersona)
     {
-        var registro = await _familiarData.Obtener(idEmpleado, idPersona);
-        if (registro is null)
+        var familiar = await _familiarData.Obtener(idEmpleado, idPersona);
+        if (familiar is null)
             return NotFound();
+        var registro = FamiliarFicha.Desde(familiar, await _personaData.Obtener(idPersona),
+            (await _familiarDetalleData.Obtener(idEmpleado, idPersona))?.LaboraInstitucion);
 
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
@@ -134,27 +153,19 @@ public class FamiliaController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> FamiliarEditar(Familiar modelo)
+    public async Task<IActionResult> FamiliarEditar(FamiliarFicha modelo)
     {
         var actual = await _familiarData.Obtener(modelo.IdEmpleado, modelo.IdPersona);
         if (actual is null)
             return NotFound();
 
-        actual.FamSexo = modelo.FamSexo;
-        actual.FamLugTrab = modelo.FamLugTrab;
-        actual.IdEstadoCivil = modelo.IdEstadoCivil;
-        actual.NumAutogenSalud = modelo.NumAutogenSalud;
-        actual.FamOcupacion = modelo.FamOcupacion;
-        actual.FamGradoInstruc = modelo.FamGradoInstruc;
-        actual.IdTipoFam = modelo.IdTipoFam;
-        actual.ViveCasa = modelo.ViveCasa;
-        actual.LaboraInstitucion = modelo.LaboraInstitucion;
-        actual.IdDiscapacidad = modelo.IdDiscapacidad;
-        actual.Procedencia = modelo.Procedencia;
-        actual.Enfermedad = modelo.Enfermedad;
-        actual.TiempoEnfermedad = modelo.TiempoEnfermedad;
-        actual.IdTipoSangre = modelo.IdTipoSangre;
+        modelo.AplicarA(actual);
         await _familiarData.Actualizar(actual);
+        if (await _personaData.Obtener(modelo.IdPersona) is { } persona)
+        {
+            modelo.AplicarA(persona);
+            await _personaData.Actualizar(persona);
+        }
         TempData["MensajeExito"] = "Familiar actualizado.";
         return RedirectToAction(nameof(Index), new { idEmpleado = modelo.IdEmpleado });
     }
@@ -208,18 +219,11 @@ public class FamiliaController : Controller
     {
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _dinamicaData.Listar();
-                    return lista.Count == 0 ? 1 : lista.Max(d => d.idDinamica) + 1;
-                },
-                async id =>
-                {
-                    modelo.idDinamica = id;
-                    await _dinamicaData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                modelo.idDinamica = 0;
+                await _dinamicaData.Crear(modelo);
+            });
             if (guardo)
             {
                 TempData["MensajeExito"] = "Dinámica familiar guardada.";
@@ -292,7 +296,7 @@ public class FamiliaController : Controller
     {
         var registros = (await _funcFamData.Listar())
             .Where(f => idEmpleado is null || f.IdEmpleado == idEmpleado)
-            .OrderByDescending(f => f.idFuncFamiliar);
+            .OrderBy(f => f.IdEmpleado);
 
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
@@ -304,35 +308,25 @@ public class FamiliaController : Controller
     {
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
-        return View("FuncFamForm", new RRHH_FuncFam { IdEmpleado = idEmpleado });
+        ViewBag.EsNuevo = true;
+        return View("FuncFamForm", new RRHH_FuncFam { IdEmpleado = idEmpleado ?? 0 });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> FuncFamNuevo(RRHH_FuncFam modelo)
     {
+        if (await _funcFamData.Obtener(modelo.IdEmpleado) is not null)
+            ModelState.AddModelError("", "El empleado ya tiene una evaluación de funcionalidad familiar: edítela.");
+
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _funcFamData.Listar();
-                    return lista.Count == 0 ? 1 : lista.Max(f => f.idFuncFamiliar) + 1;
-                },
-                async id =>
-                {
-                    modelo.idFuncFamiliar = id;
-                    await _funcFamData.Crear(modelo);
-                    return true;
-                });
-            if (guardo)
-            {
-                TempData["MensajeExito"] = "Funcionalidad familiar guardada.";
-                return RedirectToAction(nameof(FuncFam), new { idEmpleado = modelo.IdEmpleado });
-            }
-            ModelState.AddModelError("", "No se pudo guardar la funcionalidad familiar: intente nuevamente.");
+            await _funcFamData.Crear(modelo);
+            TempData["MensajeExito"] = "Funcionalidad familiar guardada.";
+            return RedirectToAction(nameof(FuncFam), new { idEmpleado = modelo.IdEmpleado });
         }
 
+        ViewBag.EsNuevo = true;
         ViewBag.IdEmpleado = modelo.IdEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         return View("FuncFamForm", modelo);
@@ -354,11 +348,10 @@ public class FamiliaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> FuncFamEditar(RRHH_FuncFam modelo)
     {
-        var actual = await _funcFamData.Obtener(modelo.idFuncFamiliar);
+        var actual = await _funcFamData.Obtener(modelo.IdEmpleado);
         if (actual is null)
             return NotFound();
 
-        actual.IdEmpleado = modelo.IdEmpleado;
         actual.Com1 = modelo.Com1;
         actual.Com2 = modelo.Com2;
         actual.Afec1 = modelo.Afec1;

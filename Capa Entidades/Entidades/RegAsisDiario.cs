@@ -10,8 +10,8 @@ namespace Capa_Entidades
     public DateTime Fecha { get; set; }
     [Key]
     public int IdEmpleado { get; set; }
-    public string? MinNormales { get; set; }
-    public string? MinTarde { get; set; }
+    public short? MinNormales { get; set; }
+    public int? SegundosTarde { get; set; }
     public string? Estado { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-@model Empleado
+@model EmpleadoFicha
 @{
     ViewData["Title"] = "Editar empleado";
     var areas = ViewBag.Areas as List<EstructOrganiz> ?? new List<EstructOrganiz>();
@@ -163,10 +163,6 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">N° seguro</label>
-                    <input asp-for="NroSeguro" class="form-control" />
-                </div>
-                <div class="col-md-3">
                     <label class="form-label">N° RUC</label>
                     <input asp-for="NumRUC" class="form-control" />
                 </div>
@@ -250,7 +246,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">N° hijos</label>
-                    <input asp-for="NumHijos" class="form-control" />
+                    <input value="@Model.NumHijos" class="form-control" readonly title="Se calcula a partir de los familiares registrados" />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Vive con</label>
@@ -298,12 +294,6 @@
         <div class="card-header fw-semibold"><i class="bi bi-file-earmark-text me-2"></i>Resoluciones y fechas institucionales</div>
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-4"><label class="form-label">Resol. cese</label><input asp-for="NumResolCese" class="form-control" /></div>
-                <div class="col-md-4"><label class="form-label">Fecha cese</label><input asp-for="FechaResolCese" type="date" class="form-control" /></div>
-                <div class="col-md-4"><label class="form-label">Resol. D.L. 20530</label><input asp-for="NumResol20530" class="form-control" /></div>
-                <div class="col-md-4"><label class="form-label">Fecha D.L. 20530</label><input asp-for="FechaResol20530" type="date" class="form-control" /></div>
-                <div class="col-md-4"><label class="form-label">Resol. pensión menores</label><input asp-for="NumResolPenMen" class="form-control" /></div>
-                <div class="col-md-4"><label class="form-label">Fecha pensión menores</label><input asp-for="FechaResolPenMen" type="date" class="form-control" /></div>
                 <div class="col-md-4"><label class="form-label">Resol. ingreso Estado</label><input asp-for="NumResoIngreEsta" class="form-control" /></div>
                 <div class="col-md-4"><label class="form-label">Ingreso Estado</label><input asp-for="FechaIngreEstado" type="date" class="form-control" /></div>
                 <div class="col-md-4"><label class="form-label">Fecha resol. ing. Estado</label><input asp-for="FechaResolIngreEsta" type="date" class="form-control" /></div>

@@ -8,7 +8,6 @@ namespace Capa_Entidades
     {
     [Key]
     public int IdRol { get; set; }
-    public string? Permiso { get; set; }
     [Key]
     public string? IdSistemaOpcion { get; set; }
     }

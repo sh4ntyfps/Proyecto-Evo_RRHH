@@ -16,6 +16,7 @@ public class SaludController : Controller
     private readonly PersonaLogica _personaData;
     private readonly EstadoCivilLogica _estadoCivilData;
     private readonly MotivoBajaLogica _motivoBajaData;
+    private readonly VinculoAseguradoLogica _vinculoData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
@@ -27,6 +28,7 @@ public class SaludController : Controller
         PersonaLogica personaData,
         EstadoCivilLogica estadoCivilData,
         MotivoBajaLogica motivoBajaData,
+        VinculoAseguradoLogica vinculoData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {
@@ -37,6 +39,7 @@ public class SaludController : Controller
         _personaData = personaData;
         _estadoCivilData = estadoCivilData;
         _motivoBajaData = motivoBajaData;
+        _vinculoData = vinculoData;
         _secuencia = secuencia;
         _empleados = empleados;
     }
@@ -71,18 +74,11 @@ public class SaludController : Controller
     {
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _saludData.Listar();
-                    return lista.Count == 0 ? 1 : lista.Max(s => s.idSalud) + 1;
-                },
-                async id =>
-                {
-                    modelo.idSalud = id;
-                    await _saludData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                modelo.idSalud = 0;
+                await _saludData.Crear(modelo);
+            });
             if (guardo)
             {
                 TempData["MensajeExito"] = "Ficha de salud guardada.";
@@ -156,6 +152,8 @@ public class SaludController : Controller
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
+        ViewBag.Vinculos = await _vinculoData.Listar();
+        ViewBag.SexoPorPersona = (await _personaData.Listar()).ToDictionary(p => p.IdPersona, p => p.Sexo);
         return View(registros.ToList());
     }
 
@@ -165,7 +163,7 @@ public class SaludController : Controller
         ViewBag.IdEmpleado = idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
+        ViewBag.Vinculos = await _vinculoData.Listar();
         ViewBag.MotivosBaja = await _motivoBajaData.Listar();
         return View("AseguradoForm", new RRHH_Asegurado { idEmpleado = idEmpleado ?? 0 });
     }
@@ -197,7 +195,7 @@ public class SaludController : Controller
         ViewBag.IdEmpleado = modelo.idEmpleado;
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
+        ViewBag.Vinculos = await _vinculoData.Listar();
         ViewBag.MotivosBaja = await _motivoBajaData.Listar();
         return View("AseguradoForm", modelo);
     }
@@ -211,7 +209,7 @@ public class SaludController : Controller
 
         ViewBag.Empleados = await EmpleadosAsync();
         ViewBag.Personas = await PersonasAsync();
-        ViewBag.EstadosCiviles = await _estadoCivilData.Listar();
+        ViewBag.Vinculos = await _vinculoData.Listar();
         ViewBag.MotivosBaja = await _motivoBajaData.Listar();
         return View("AseguradoForm", registro);
     }
@@ -225,9 +223,7 @@ public class SaludController : Controller
             return NotFound();
 
         actual.idPersona = modelo.idPersona;
-        actual.idEstadoCivil = modelo.idEstadoCivil;
-        actual.Sexo = modelo.Sexo;
-        actual.VinculoFamiliar = modelo.VinculoFamiliar;
+        actual.IdVinculoAsegurado = modelo.IdVinculoAsegurado;
         actual.NroPartida = modelo.NroPartida;
         actual.NroResolMayorIndiscap = modelo.NroResolMayorIndiscap;
         actual.FechaInicioVinculo = modelo.FechaInicioVinculo;
@@ -275,18 +271,11 @@ public class SaludController : Controller
     {
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _acudeEnfermData.Listar();
-                    return lista.Count == 0 ? 1 : lista.Max(a => a.idAcudeEnferm) + 1;
-                },
-                async id =>
-                {
-                    modelo.idAcudeEnferm = id;
-                    await _acudeEnfermData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                modelo.idAcudeEnferm = 0;
+                await _acudeEnfermData.Crear(modelo);
+            });
             if (guardo)
             {
                 TempData["MensajeExito"] = "Opción agregada.";

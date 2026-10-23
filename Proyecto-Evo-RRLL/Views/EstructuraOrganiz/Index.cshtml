@@ -41,7 +41,6 @@
                 <th>Depende de</th>
                 <th>Jefe</th>
                 <th>N. trabajadores</th>
-                <th>Presupuesto anual</th>
                 <th style="width:150px">Acciones</th>
             </tr>
         </thead>
@@ -59,7 +58,6 @@
                     <td>@a.DependeDe</td>
                     <td>@a.Jefe</td>
                     <td>@a.NroTrabajaUO</td>
-                    <td>@a.PresupAnual?.ToString("N2")</td>
                     <td>
                         <a asp-action="Detalles" asp-route-year="@a.Year" asp-route-idAreaOrganiz="@a.IdAreaOrganiz" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver detalle"><i class="bi bi-eye"></i></a>
                         <a asp-action="Editar" asp-route-year="@a.Year" asp-route-idAreaOrganiz="@a.IdAreaOrganiz" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>

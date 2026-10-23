@@ -1,4 +1,4 @@
-@model Familiar
+@model FamiliarFicha
 @{
     ViewData["Title"] = "Familiar";
     var esNuevo = Model.IdPersona == 0;
@@ -115,14 +115,14 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-check form-switch mt-4">
-                        <input asp-for="ViveCasa" class="form-check-input" type="checkbox" />
+                        <input class="form-check-input" type="checkbox" name="ViveCasa" value="true" id="ViveCasa" @(Model.ViveCasa == true ? "checked" : "") />
                         <label asp-for="ViveCasa" class="form-check-label">Vive en casa</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-check form-switch mt-4">
-                        <input asp-for="LaboraInstitucion" class="form-check-input" type="checkbox" />
-                        <label asp-for="LaboraInstitucion" class="form-check-label">Labora en la institución</label>
+                        <input class="form-check-input" type="checkbox" disabled @(Model.LaboraInstitucion == true ? "checked" : "") title="Se calcula a partir de los vínculos laborales activos" />
+                        <label class="form-check-label">Labora en la institución</label>
                     </div>
                 </div>
                 <div class="col-md-3">

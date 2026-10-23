@@ -16,6 +16,7 @@ public class EstructuraOrganizController : Controller
     private readonly LocalLogica _localData;
     private readonly EmpleadoLogica _empleadoData;
     private readonly PersonaLogica _personaData;
+    private readonly EstructOrganizDotacionLogica _dotacionData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
@@ -26,6 +27,7 @@ public class EstructuraOrganizController : Controller
         LocalLogica localData,
         EmpleadoLogica empleadoData,
         PersonaLogica personaData,
+        EstructOrganizDotacionLogica dotacionData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {
@@ -35,6 +37,7 @@ public class EstructuraOrganizController : Controller
         _localData = localData;
         _empleadoData = empleadoData;
         _personaData = personaData;
+        _dotacionData = dotacionData;
         _secuencia = secuencia;
         _empleados = empleados;
     }
@@ -46,6 +49,7 @@ public class EstructuraOrganizController : Controller
         var anios = areas.Select(a => a.Year).Distinct().OrderByDescending(x => x).ToList();
         var anio = year ?? anios.FirstOrDefault();
         var empleados = await EmpleadosAsync();
+        var dotacion = (await _dotacionData.Listar()).Where(d => d.Year == anio).ToDictionary(d => d.idAreaOrganiz);
 
         var lista = areas
             .Where(a => a.Year == anio)
@@ -59,8 +63,7 @@ public class EstructuraOrganizController : Controller
                 Sigla = a.Sigla,
                 DependeDe = areas.FirstOrDefault(d => d.Year == a.YearDe && d.idAreaOrganiz == a.idDependeDe)?.AreaOrganizacional,
                 Jefe = a.IdEmpleado is null ? null : empleados.FirstOrDefault(e => e.Id == a.IdEmpleado).Nombre,
-                NroTrabajaUO = a.NroTrabajaUO,
-                PresupAnual = a.PresupAnual
+                NroTrabajaUO = dotacion.GetValueOrDefault(a.idAreaOrganiz)?.NroTrabajaUO
             })
             .ToList();
 
@@ -94,6 +97,8 @@ public class EstructuraOrganizController : Controller
                 async id =>
                 {
                     modelo.idAreaOrganiz = id;
+                    modelo.Abrev ??= string.Empty;
+                    modelo.Sigla ??= string.Empty;
                     await _areaData.Crear(modelo);
                     return true;
                 });
@@ -129,22 +134,13 @@ public class EstructuraOrganizController : Controller
             return NotFound();
 
         actual.AreaOrganizacional = modelo.AreaOrganizacional;
-        actual.Abrev = modelo.Abrev;
-        actual.Sigla = modelo.Sigla;
-        actual.PresupAnual = modelo.PresupAnual;
-        actual.PromedMensSueld = modelo.PromedMensSueld;
-        actual.NroTrabajaUO = modelo.NroTrabajaUO;
+        actual.Abrev = modelo.Abrev ?? string.Empty;
+        actual.Sigla = modelo.Sigla ?? string.Empty;
         actual.Mision = modelo.Mision;
         actual.Vision = modelo.Vision;
-        actual.IdPresupuesto = modelo.IdPresupuesto;
         actual.YearDe = modelo.YearDe;
         actual.idDependeDe = modelo.idDependeDe;
         actual.IdEmpleado = modelo.IdEmpleado;
-        actual.InversPublic = modelo.InversPublic;
-        actual.ApruebaPedido = modelo.ApruebaPedido;
-        actual.MontoAprobacion = modelo.MontoAprobacion;
-        actual.PresupCompra = modelo.PresupCompra;
-        actual.PresupUtilizado = modelo.PresupUtilizado;
         await _areaData.Actualizar(actual);
 
         TempData["MensajeExito"] = "Unidad orgánica actualizada.";
@@ -178,6 +174,7 @@ public class EstructuraOrganizController : Controller
             .ToList();
 
         ViewBag.Area = area;
+        ViewBag.NroTrabajaUO = (await _dotacionData.Obtener(year, idAreaOrganiz))?.NroTrabajaUO;
         ViewBag.DependeDe = areas.FirstOrDefault(d => d.Year == area.YearDe && d.idAreaOrganiz == area.idDependeDe)?.AreaOrganizacional;
         ViewBag.Jefe = area.IdEmpleado is null ? null : empleados.FirstOrDefault(e => e.Id == area.IdEmpleado).Nombre;
         ViewBag.Empleados = empleados;
@@ -215,24 +212,9 @@ public class EstructuraOrganizController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResponsableNuevo(ResponsableXUO modelo)
     {
-        var guardo = await _secuencia.EjecutarConBloqueoAsync(
-            async () =>
-            {
-                var lista = await _responsableData.Listar();
-                return lista.Count > 0 ? lista.Max(r => r.IdResponsable) + 1 : 1;
-            },
-            async id =>
-            {
-                modelo.IdResponsable = id;
-                modelo.AreaOrganizacional = (await _areaData.Obtener(modelo.Year ?? 0, modelo.idAreaOrganiz ?? 0))?.AreaOrganizacional;
-                await _responsableData.Crear(modelo);
-                return true;
-            });
-        if (guardo)
-        {
-            TempData["MensajeExito"] = "Responsable asignado.";
-            return RedirectToAction(nameof(Detalles), new { year = modelo.Year, idAreaOrganiz = modelo.idAreaOrganiz });
-        }
+        modelo.IdResponsable = 0;
+        await _responsableData.Crear(modelo);
+        TempData["MensajeExito"] = "Responsable asignado.";
         return RedirectToAction(nameof(Detalles), new { year = modelo.Year, idAreaOrganiz = modelo.idAreaOrganiz });
     }
 
@@ -261,20 +243,8 @@ public class EstructuraOrganizController : Controller
 
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _localData.Listar();
-                    return lista.Count > 0 ? lista.Max(l => l.idLocal) + 1 : 1;
-                },
-                async id =>
-                {
-                    modelo.idLocal = id;
-                    await _localData.Crear(modelo);
-                    return true;
-                });
-            if (!guardo)
-                ModelState.AddModelError(nameof(modelo.NombreLocal), "No se pudo registrar el local: intente nuevamente.");
+            modelo.idLocal = 0;
+            await _localData.Crear(modelo);
         }
         return RedirectToAction(nameof(Locales));
     }

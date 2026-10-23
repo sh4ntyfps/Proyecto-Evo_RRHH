@@ -64,18 +64,11 @@ public class ComportamientoController : Controller
 
         if (ModelState.IsValid)
         {
-            var guardo = await _secuencia.EjecutarConBloqueoAsync(
-                async () =>
-                {
-                    var lista = await _comportamientoData.Listar();
-                    return lista.Count > 0 ? lista.Max(c => c.idComportamiento) + 1 : 1;
-                },
-                async id =>
-                {
-                    modelo.idComportamiento = id;
-                    await _comportamientoData.Crear(modelo);
-                    return true;
-                });
+            var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
+            {
+                modelo.idComportamiento = 0;
+                await _comportamientoData.Crear(modelo);
+            });
             if (guardo)
             {
                 TempData["MensajeExito"] = "Comportamiento registrado.";

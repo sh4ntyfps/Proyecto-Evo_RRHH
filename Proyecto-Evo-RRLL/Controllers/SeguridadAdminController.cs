@@ -109,8 +109,7 @@ public class SeguridadAdminController : Controller
         {
             var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
             {
-                var lista = await _usuarioData.Listar();
-                modelo.IdUsuario = lista.Count == 0 ? 1 : lista.Max(u => u.IdUsuario) + 1;
+                modelo.IdUsuario = 0;
                 modelo.Login = modelo.Login!.Trim();
                 modelo.PasswordHash = new PasswordHasher<Usuario>().HashPassword(modelo, clave);
                 modelo.Fecha = DateTime.Now;
@@ -142,7 +141,7 @@ public class SeguridadAdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UsuarioEditar(Usuario modelo, string clave)
+    public async Task<IActionResult> UsuarioEditar(Usuario modelo, string? clave)
     {
         var actual = await _usuarioData.Obtener(modelo.IdUsuario);
         if (actual is null)
@@ -264,8 +263,7 @@ public class SeguridadAdminController : Controller
         {
             var guardo = await _secuencia.EjecutarTransaccionalAsync(async () =>
             {
-                var lista = await _rolData.Listar();
-                modelo.IdRol = lista.Count == 0 ? 1 : lista.Max(r => r.IdRol) + 1;
+                modelo.IdRol = 0;
                 await _rolData.Crear(modelo);
             });
             if (guardo)
@@ -367,7 +365,7 @@ public class SeguridadAdminController : Controller
         {
             if (actuales.Any(a => a.IdSistemaOpcion == o))
                 continue;
-            await _rolAccesoData.Crear(new Rol_Acceso { IdRol = id, IdSistemaOpcion = o, Permiso = "A" });
+            await _rolAccesoData.Crear(new Rol_Acceso { IdRol = id, IdSistemaOpcion = o });
         }
 
         TempData["MensajeExito"] = "Permisos del rol actualizados.";

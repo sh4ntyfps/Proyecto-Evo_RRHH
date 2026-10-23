@@ -8,10 +8,11 @@ namespace Capa_Entidades
     {
     [Key]
     public DateTime Fecha { get; set; }
-    public string? Estado { get; set; }
     [Key]
     public int IdEmpleado { get; set; }
-    public string? Lugar { get; set; }
+    public byte NroMarcacion { get; set; } = 1;
+    public string TipoMarcacion { get; set; } = "N";
+    public string? CodDispositivo { get; set; }
     public int? idHorario { get; set; }
     }
 }

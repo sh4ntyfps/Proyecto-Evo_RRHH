@@ -11,9 +11,9 @@ public class TitulosEmpleadoData
 
     public async Task<List<TitulosEmpleado>> Listar() => await _contexto.Set<TitulosEmpleado>().ToListAsync();
 
-    public async Task<TitulosEmpleado?> Obtener(string NumColegiaturaParam)
+    public async Task<TitulosEmpleado?> Obtener(int IdTituloParam)
     {
-        return await _contexto.Set<TitulosEmpleado>().FindAsync(NumColegiaturaParam);
+        return await _contexto.Set<TitulosEmpleado>().FindAsync(IdTituloParam);
     }
 
     public async Task Crear(TitulosEmpleado registro)

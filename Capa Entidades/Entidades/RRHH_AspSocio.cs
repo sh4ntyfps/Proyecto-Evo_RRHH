@@ -9,12 +9,16 @@ namespace Capa_Entidades
     [Key]
     public int idAspSocio { get; set; }
     public int? IdEmpleado { get; set; }
-    public int? idPregunta1 { get; set; }
-    public int? idPregunta2 { get; set; }
-    public int? idPregunta3 { get; set; }
     public string? PrincipProblemas { get; set; }
     public string? PropMejoraInstitu { get; set; }
     public string? hobby { get; set; }
     public string? ActRecreaInstitu { get; set; }
+    public string? ObsFam { get; set; }
+    public string? AspecSalud { get; set; }
+    public string? AspecEducacion { get; set; }
+    public string? AspecRecreacion { get; set; }
+    public string? AspecPsico { get; set; }
+    public string? AspecSocial { get; set; }
+    public string? DiagnosSocial { get; set; }
     }
 }

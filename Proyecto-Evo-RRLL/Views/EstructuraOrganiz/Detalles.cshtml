@@ -27,10 +27,7 @@
             <div class="col-md-3"><label class="text-secondary">Abreviatura</label><div class="fw-semibold">@area?.Abrev</div></div>
             <div class="col-md-3"><label class="text-secondary">Depende de</label><div class="fw-semibold">@dependencia</div></div>
             <div class="col-md-3"><label class="text-secondary">Jefe de unidad</label><div class="fw-semibold">@jefe</div></div>
-            <div class="col-md-3"><label class="text-secondary">N. trabajadores</label><div class="fw-semibold">@area?.NroTrabajaUO</div></div>
-            <div class="col-md-3"><label class="text-secondary">Presupuesto anual</label><div class="fw-semibold">@area?.PresupAnual?.ToString("N2")</div></div>
-            <div class="col-md-3"><label class="text-secondary">Aprueba pedido</label><div class="fw-semibold">@(area?.ApruebaPedido == "S" ? "Sí" : area?.ApruebaPedido == "N" ? "No" : "")</div></div>
-            <div class="col-md-3"><label class="text-secondary">Monto aprobación</label><div class="fw-semibold">@area?.MontoAprobacion?.ToString("N2")</div></div>
+            <div class="col-md-3"><label class="text-secondary">N. trabajadores</label><div class="fw-semibold">@ViewBag.NroTrabajaUO</div></div>
             <div class="col-md-12"><label class="text-secondary">Misión</label><div class="fw-semibold">@area?.Mision</div></div>
             <div class="col-md-12"><label class="text-secondary">Visión</label><div class="fw-semibold">@area?.Vision</div></div>
         </div>

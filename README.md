@@ -2,38 +2,64 @@
 
 Sistema de Recursos Humanos (RR.HH.) en ASP.NET Core MVC (net10.0), arquitectura por capas: Entidades, Datos y Lógica.
 
+La aplicación trabaja sobre la base de datos normalizada **`RRHH_Normalizado`** (ver `Scripts/bd-Normalizada/NORMALIZACION.md`).
+
 ## Requisitos
 
 - .NET 10 SDK
-- SQL Server LocalDB (`(localdb)\MSSQLLocalDB`) o SQL Server
-- Visual Studio 2022+ o SSMS para los scripts
+- SQL Server (o LocalDB)
+- SSMS o `sqlcmd` para los scripts
 
-## Cómo levantar el proyecto
+## Cómo levantar el proyecto en local
 
-1. Clonar el repositorio (o descargarlo como ZIP).
-2. Abrir `Scripts/bd-evo-RRLL.sql` en SQL Server Management Studio y ejecutarlo.
-   - Crea la base de datos `RRHH_Nuevo` con sus 76 tablas y claves foráneas.
-3. Descomprimir `Scripts/bd-Datos.zip` y ejecutar el `bd-Datos.sql` resultante sobre `RRHH_Nuevo`.
-   - Carga los datos del sistema (puede tardar unos minutos).
-4. Abrir el proyecto en Visual Studio y presionar **F5**
-5. Iniciar sesión con el usuario creado automáticamente al arrancar:
+1. Clonar el repositorio.
+2. Crear la BD vacía: ejecutar `Scripts/bd-Normalizada/01-esquema-RRHH_Normalizado.sql`.
+3. Cargar los datos: ejecutar `Scripts/bd-Normalizada/03-datos-RRHH_Normalizado.sql` (~160 MB, no está en GitHub; pídelo al equipo).
+   Para archivos tan grandes es mejor `sqlcmd` que SSMS:
+   ```
+   sqlcmd -S . -E -C -i Scripts\bd-Normalizada\03-datos-RRHH_Normalizado.sql
+   ```
+4. Revisar la cadena de conexión en `Proyecto-Evo-RRLL/appsettings.Development.json`.
+5. Abrir el proyecto en Visual Studio y presionar **F5**.
+6. Iniciar sesión con el usuario creado automáticamente al arrancar:
    - **Usuario:** `admin`
-   - **Contraseña:** `Admin.2026`
+   - **Contraseña:** `Admin.2026` (solo en desarrollo)
 
 ## Conexión a la base de datos
 
-El archivo que hay que editar es `Proyecto-Evo-RRLL/appsettings.json`:
+En local se usa `Proyecto-Evo-RRLL/appsettings.Development.json`:
 
 ```json
 "ConnectionStrings": {
-  "RRHHNuevo": "Server=(localdb)\\MSSQLLocalDB;Database=RRHH_Nuevo;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
+  "RRHHNormalizado": "Server=.;Database=RRHH_Normalizado;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
 }
 ```
 
-Cambia el valor de `Server=` según tu caso:
+Cambia `Server=` según tu caso (`(localdb)\\MSSQLLocalDB`, `NOMBRE-PC\\SQLEXPRESS`, `IP,1433`, o `User Id=...;Password=...;` en vez de `Trusted_Connection`).
 
-- LocalDB/instalado en tu PC: `Server=LOCALHOST` o `Server=NOMBRE-PC\SQLEXPRESS`
-- Otra máquina: `Server=IP_O_NOMBRE,1433`
-- Con usuario/contraseña en vez de Windows: `Server=...;User Id=sa;Password=tuclave;`
+En producción (Azure) la cadena y la clave inicial del admin **no** están en el repositorio: se configuran en la Web App
+(`ConnectionStrings:RRHHNormalizado` y `Seguridad__AdminClave`).
 
-La clase de conexión (`EvoRRLDbContext`) está en `Capa Datos` y recibe esta cadena automáticamente; no hay que tocar nada más.
+## Despliegue en Azure
+
+Recursos (grupo `RRHH`, región **Brazil South**):
+
+- Web App `rrhh-gobierno-regional` (plan `ASP-RRHH-8913`, gratis), con implementación continua desde GitHub:
+  el portal agrega el workflow en `.github/workflows/` y publica en cada push a `main`.
+- Azure SQL Database `RRHH_Normalizado` con la oferta gratuita (serverless, auto-pausa),
+  creada desde el portal con collation `Modern_Spanish_CI_AS`, "Allow Azure services" activado
+  y una regla de firewall para la IP de quien sube la BD.
+
+Subir la BD (desde la PC con `RRHH_Normalizado` cargada en local):
+
+```powershell
+dotnet tool install -g microsoft.sqlpackage
+.\Scripts\azure\02-subir-bd.ps1 -Servidor <servidor-sql> -AdminSql <usuario> -ClaveSql '<clave>'
+```
+
+Configurar la Web App (Settings > Environment variables):
+
+- Connection string `RRHHNormalizado`, tipo **SQLAzure**:
+  `Server=tcp:<servidor-sql>.database.windows.net,1433;Database=RRHH_Normalizado;User ID=<usuario>;Password=<clave>;Encrypt=True;TrustServerCertificate=False;MultipleActiveResultSets=True;Connection Timeout=60`
+- App setting `Seguridad__AdminClave`: clave inicial del usuario `admin` (se crea en el primer arranque).
+- App setting `ASPNETCORE_ENVIRONMENT` = `Production`.

@@ -18,10 +18,8 @@ public static class CatalogoNavegacion
         ["TipoEstudio"] = "Tipos de Estudio",
         ["TipoInstitucion"] = "Tipos de Institución",
         ["Discapacidad"] = "Discapacidades",
-        ["Limitacion"] = "Limitaciones",
         ["TipoComportamiento"] = "Tipos de Comportamiento",
         ["TipoResolucion"] = "Tipos de Resolución",
-        ["Familia"] = "Clasificación de Familias",
         ["TipoFamiliar"] = "Tipos de Familiar",
         ["RRHH_TipoFamilia"] = "Tipos de Familia",
         ["RRHH_RelacPareja"] = "Relación con Pareja",
@@ -37,9 +35,8 @@ public static class CatalogoNavegacion
         ["TipoViv"] = "Tipos de Vivienda",
         ["UbicacionViv"] = "Ubicación de Vivienda",
         ["RRHH_AcudeEnferm"] = "A quién acudir en enfermedad",
-        ["TipoMoneda"] = "Tipos de Moneda",
-        ["TipoRecurso"] = "Tipos de Recurso",
-        ["UnidadMedida"] = "Unidades de Medida",
-        ["Horario"] = "Horarios"
+        ["Horario"] = "Horarios",
+        ["VinculoAsegurado"] = "Vínculos de Asegurado",
+        ["ServicioViv"] = "Servicios de Vivienda"
     };
 }

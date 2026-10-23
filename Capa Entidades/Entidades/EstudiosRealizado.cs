@@ -13,9 +13,9 @@ namespace Capa_Entidades
     [Key]
     public int Correlativo { get; set; }
     public string? CentroEstudios { get; set; }
-    public DateTime? AñoInicio { get; set; }
     public string? Especialidad { get; set; }
-    public DateTime? AñoTermino { get; set; }
+    public DateTime? FechaInicio { get; set; }
+    public DateTime? FechaTermino { get; set; }
     public int? IdEstadoEstudio { get; set; }
     }
 }

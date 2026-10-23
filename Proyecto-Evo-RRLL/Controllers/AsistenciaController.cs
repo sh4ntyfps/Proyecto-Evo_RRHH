@@ -17,6 +17,9 @@ public class AsistenciaController : Controller
     private readonly HorarioLogica _horarioData;
     private readonly EmpleadoLogica _empleadoData;
     private readonly PersonaLogica _personaData;
+    private readonly TipoMarcacionLogica _tipoMarcacionData;
+    private readonly DispositivoMarcacionLogica _dispositivoData;
+    private readonly EstadoAsistenciaLogica _estadoAsistenciaData;
     private readonly SecuenciaService _secuencia;
     private readonly Services.EmpleadoServicio _empleados;
 
@@ -28,6 +31,9 @@ public class AsistenciaController : Controller
         HorarioLogica horarioData,
         EmpleadoLogica empleadoData,
         PersonaLogica personaData,
+        TipoMarcacionLogica tipoMarcacionData,
+        DispositivoMarcacionLogica dispositivoData,
+        EstadoAsistenciaLogica estadoAsistenciaData,
         SecuenciaService secuencia,
         Services.EmpleadoServicio empleados)
     {
@@ -38,6 +44,9 @@ public class AsistenciaController : Controller
         _horarioData = horarioData;
         _empleadoData = empleadoData;
         _personaData = personaData;
+        _tipoMarcacionData = tipoMarcacionData;
+        _dispositivoData = dispositivoData;
+        _estadoAsistenciaData = estadoAsistenciaData;
         _secuencia = secuencia;
         _empleados = empleados;
     }
@@ -72,10 +81,10 @@ public class AsistenciaController : Controller
                 Fecha = r.Fecha,
                 IdEmpleado = r.IdEmpleado,
                 Empleado = nombre,
-                HorEntrada = r.Hor_Ent,
-                HorSalida = r.Hor_Sal,
-                AlmSalida = r.Alm_Sal,
-                AlmEntrada = r.Alm_Ent,
+                HorEntrada = r.Hor_Ent?.ToString("HH:mm:ss"),
+                HorSalida = r.Hor_Sal?.ToString("HH:mm:ss"),
+                AlmSalida = r.Alm_Sal?.ToString("HH:mm:ss"),
+                AlmEntrada = r.Alm_Ent?.ToString("HH:mm:ss"),
                 Estado = r.Estado
             });
 
@@ -113,8 +122,7 @@ public class AsistenciaController : Controller
     [HttpGet]
     public async Task<IActionResult> MarcacionNuevo()
     {
-        ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        await CargarCatalogosMarcacion();
         return View("MarcacionForm", new Marcacion { Fecha = DateTime.Today });
     }
 
@@ -127,12 +135,13 @@ public class AsistenciaController : Controller
 
         if (ModelState.IsValid)
         {
+            if (string.IsNullOrWhiteSpace(modelo.CodDispositivo))
+                modelo.CodDispositivo = null;
             await _marcacionData.Crear(modelo);
             return RedirectToAction(nameof(Marcaciones), new { idEmpleado = modelo.IdEmpleado });
         }
 
-        ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        await CargarCatalogosMarcacion();
         return View("MarcacionForm", modelo);
     }
 
@@ -143,8 +152,7 @@ public class AsistenciaController : Controller
         if (registro is null)
             return NotFound();
 
-        ViewBag.Empleados = await EmpleadosAsync();
-        ViewBag.Horarios = await _horarioData.Listar();
+        await CargarCatalogosMarcacion();
         return View("MarcacionForm", registro);
     }
 
@@ -156,8 +164,9 @@ public class AsistenciaController : Controller
         if (actual is null)
             return NotFound();
 
-        actual.Estado = modelo.Estado;
-        actual.Lugar = modelo.Lugar;
+        actual.NroMarcacion = modelo.NroMarcacion;
+        actual.TipoMarcacion = modelo.TipoMarcacion;
+        actual.CodDispositivo = string.IsNullOrWhiteSpace(modelo.CodDispositivo) ? null : modelo.CodDispositivo;
         actual.idHorario = modelo.idHorario;
         await _marcacionData.Actualizar(actual);
 
@@ -197,7 +206,7 @@ public class AsistenciaController : Controller
     [HttpGet]
     public async Task<IActionResult> RegDiarioNuevo()
     {
-        ViewBag.Empleados = await EmpleadosAsync();
+        await CargarCatalogosRegDiario();
         return View("RegDiarioForm", new RegAsisDiario { Fecha = DateTime.Today });
     }
 
@@ -214,7 +223,7 @@ public class AsistenciaController : Controller
             return RedirectToAction(nameof(RegDiario), new { idEmpleado = modelo.IdEmpleado });
         }
 
-        ViewBag.Empleados = await EmpleadosAsync();
+        await CargarCatalogosRegDiario();
         return View("RegDiarioForm", modelo);
     }
 
@@ -225,7 +234,7 @@ public class AsistenciaController : Controller
         if (registro is null)
             return NotFound();
 
-        ViewBag.Empleados = await EmpleadosAsync();
+        await CargarCatalogosRegDiario();
         return View("RegDiarioForm", registro);
     }
 
@@ -238,7 +247,7 @@ public class AsistenciaController : Controller
             return NotFound();
 
         actual.MinNormales = modelo.MinNormales;
-        actual.MinTarde = modelo.MinTarde;
+        actual.SegundosTarde = modelo.SegundosTarde;
         actual.Estado = modelo.Estado;
         await _regAsisData.Actualizar(actual);
 
@@ -348,6 +357,20 @@ public class AsistenciaController : Controller
     }
 
     // ---------- Utilidades ----------
+
+    private async Task CargarCatalogosMarcacion()
+    {
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.Horarios = await _horarioData.Listar();
+        ViewBag.TiposMarcacion = await _tipoMarcacionData.Listar();
+        ViewBag.Dispositivos = await _dispositivoData.Listar();
+    }
+
+    private async Task CargarCatalogosRegDiario()
+    {
+        ViewBag.Empleados = await EmpleadosAsync();
+        ViewBag.EstadosAsistencia = await _estadoAsistenciaData.Listar();
+    }
 
     private async Task<List<(int Id, string Nombre)>> EmpleadosAsync()
         => await _empleados.EmpleadosAsync();

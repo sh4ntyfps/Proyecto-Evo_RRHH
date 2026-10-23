@@ -17,6 +17,4 @@ public class AreaOrganizFila
     public string? Jefe { get; set; }
 
     public int? NroTrabajaUO { get; set; }
-
-    public decimal? PresupAnual { get; set; }
 }

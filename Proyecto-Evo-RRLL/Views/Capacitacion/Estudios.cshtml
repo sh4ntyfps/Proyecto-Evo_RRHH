@@ -44,8 +44,8 @@
                     <td class="fw-semibold">@tipo?.DescripTipoEst</td>
                     <td>@e.CentroEstudios</td>
                     <td>@e.Especialidad</td>
-                    <td>@e.AñoInicio?.ToString("dd/MM/yyyy")</td>
-                    <td>@e.AñoTermino?.ToString("dd/MM/yyyy")</td>
+                    <td>@e.FechaInicio?.ToString("dd/MM/yyyy")</td>
+                    <td>@e.FechaTermino?.ToString("dd/MM/yyyy")</td>
                     <td>
                         @{ var emp = empleados.FirstOrDefault(x => x.Id == e.IdEmpleado); }
                         @emp.Nombre
@@ -67,5 +67,4 @@
 <div class="d-flex gap-2 mt-3">
     <a asp-action="Index" asp-route-idEmpleado="@idEmpleado" class="btn btn-outline-secondary btn-sm"><i class="bi bi-mortarboard me-1"></i>Capacitaciones</a>
     <a asp-action="Titulos" asp-route-idEmpleado="@idEmpleado" class="btn btn-outline-secondary btn-sm"><i class="bi bi-award me-1"></i>Títulos</a>
-    <a asp-action="Instituciones" class="btn btn-outline-secondary btn-sm"><i class="bi bi-building me-1"></i>Instituciones</a>
 </div>

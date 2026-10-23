@@ -72,13 +72,11 @@
                     <div class="col-md-4"><label class="text-secondary">Nacionalidad</label><div class="fw-semibold">@Model.Nacionalidad</div></div>
                     <div class="col-md-4"><label class="text-secondary">Tipo persona</label><div class="fw-semibold">@p?.TipoPersona</div></div>
                     <div class="col-md-4"><label class="text-secondary">Dirección</label><div class="fw-semibold">@p?.Direccion</div></div>
-                    <div class="col-md-4"><label class="text-secondary">Ubigeo</label><div class="fw-semibold" style="word-break:break-all">@p?.IdUbigeo</div></div>
+                    <div class="col-md-4"><label class="text-secondary">Ubigeo</label><div class="fw-semibold" style="word-break:break-all">@(Model.Ubigeo ?? p?.IdUbigeo)</div></div>
                     <div class="col-md-4"><label class="text-secondary">Ubigeo dirección</label><div class="fw-semibold">@p?.UbigeoDireccion</div></div>
                     <div class="col-md-4"><label class="text-secondary">Teléfono</label><div class="fw-semibold">@p?.Telefono</div></div>
                     <div class="col-md-4"><label class="text-secondary">Celular</label><div class="fw-semibold">@p?.NumCelular</div></div>
-                    <div class="col-md-4"><label class="text-secondary">Fax</label><div class="fw-semibold">@p?.Fax</div></div>
                     <div class="col-md-4"><label class="text-secondary">Email</label><div class="fw-semibold" style="word-break:break-all">@p?.Email</div></div>
-                    <div class="col-md-4"><label class="text-secondary">Tel. centro lab.</label><div class="fw-semibold">@p?.FonoCentroLab</div></div>
                 </div>
             </div>
         </div>
@@ -113,7 +111,6 @@
                     <div class="col-md-3"><label class="text-secondary">N° AFP</label><div class="fw-semibold">@e?.NroAFP</div></div>
                     <div class="col-md-3"><label class="text-secondary">Fecha AFP</label><div class="fw-semibold">@e?.FechaAFP?.ToString("dd/MM/yyyy")</div></div>
                     <div class="col-md-3"><label class="text-secondary">Régimen pensión</label><div class="fw-semibold">@Model.RegimenPension</div></div>
-                    <div class="col-md-3"><label class="text-secondary">N° seguro</label><div class="fw-semibold">@e?.NroSeguro</div></div>
                     <div class="col-md-3"><label class="text-secondary">N° RUC</label><div class="fw-semibold">@e?.NumRUC</div></div>
                     <div class="col-md-3"><label class="text-secondary">Autogenerado salud</label><div class="fw-semibold">@e?.NumAutogenSalud</div></div>
                     <div class="col-md-3"><label class="text-secondary">Tipo sangre</label><div class="fw-semibold">@Model.TipoSangre</div></div>
@@ -145,12 +142,6 @@
             <div class="card-header fw-semibold"><i class="bi bi-file-earmark-text me-2"></i>Resoluciones y fechas institucionales</div>
             <div class="card-body">
                 <div class="row g-3 small">
-                    <div class="col-md-4"><label class="text-secondary">Resol. cese</label><div class="fw-semibold">@e?.NumResolCese</div></div>
-                    <div class="col-md-4"><label class="text-secondary">Fecha cese</label><div class="fw-semibold">@e?.FechaResolCese?.ToString("dd/MM/yyyy")</div></div>
-                    <div class="col-md-4"><label class="text-secondary">Resol. D.L. 20530</label><div class="fw-semibold">@e?.NumResol20530</div></div>
-                    <div class="col-md-4"><label class="text-secondary">Fecha D.L. 20530</label><div class="fw-semibold">@e?.FechaResol20530?.ToString("dd/MM/yyyy")</div></div>
-                    <div class="col-md-4"><label class="text-secondary">Resol. pensión menores</label><div class="fw-semibold">@e?.NumResolPenMen</div></div>
-                    <div class="col-md-4"><label class="text-secondary">Fecha pensión menores</label><div class="fw-semibold">@e?.FechaResolPenMen?.ToString("dd/MM/yyyy")</div></div>
                     <div class="col-md-4"><label class="text-secondary">Resol. ingreso Estado</label><div class="fw-semibold">@e?.NumResoIngreEsta</div></div>
                     <div class="col-md-4"><label class="text-secondary">Ingreso Estado</label><div class="fw-semibold">@e?.FechaIngreEstado?.ToString("dd/MM/yyyy")</div></div>
                     <div class="col-md-4"><label class="text-secondary">Fecha resol. ing. Estado</label><div class="fw-semibold">@e?.FechaResolIngreEsta?.ToString("dd/MM/yyyy")</div></div>
