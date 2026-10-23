@@ -45,8 +45,8 @@
                     <td>@m.Lugar</td>
                     <td>@hor?.Descrip_Horario</td>
                     <td>
-                        <a asp-action="MarcacionEditar" asp-route-fecha="@m.Fecha.ToString("yyyy-MM-dd")" asp-route-idEmpleado="@m.IdEmpleado" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                        <form asp-action="MarcacionEliminar" asp-route-fecha="@m.Fecha.ToString("yyyy-MM-dd")" asp-route-idEmpleado="@m.IdEmpleado" method="post" class="d-inline" data-confirmar="¿Eliminar esta marcación?">
+                        <a asp-action="MarcacionEditar" asp-route-fecha="@m.Fecha.ToString("yyyy-MM-ddTHH:mm:ss")" asp-route-idEmpleado="@m.IdEmpleado" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
+                        <form asp-action="MarcacionEliminar" asp-route-fecha="@m.Fecha.ToString("yyyy-MM-ddTHH:mm:ss")" asp-route-idEmpleado="@m.IdEmpleado" method="post" class="d-inline" data-confirmar="¿Eliminar esta marcación?">
                             <button type="submit" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

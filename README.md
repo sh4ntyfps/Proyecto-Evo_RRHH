@@ -16,7 +16,12 @@ Sistema de Recursos Humanos (RR.HH.) en ASP.NET Core MVC (net10.0), arquitectura
 3. Descomprimir `Scripts/bd-Datos.zip` y ejecutar el `bd-Datos.sql` resultante sobre `RRHH_Nuevo`.
    - Carga los datos del sistema (puede tardar unos minutos). Por su tamaño, conviene ejecutarlo con
      `sqlcmd -S "(localdb)\MSSQLLocalDB" -E -f 65001 -i bd-Datos.sql`.
-4. Ejecutar `Scripts/crear_bitacora.sql` sobre `RRHH_Nuevo` (tabla de la bitácora de actividad).
+4. Crear la base normalizada `RRHH_Normalizado`, que es la que usa la aplicación (ver `Scripts/bd-Normalizada/NORMALIZACION.md`):
+   - Ejecutar `Scripts/bd-Normalizada/01-esquema-RRHH_Normalizado.sql`.
+   - Descomprimir `Scripts/bd-Normalizada/03-datos-RRHH_Normalizado.zip` y ejecutar el `.sql` resultante
+     (`sqlcmd -S . -E -C -f 65001 -i 03-datos-RRHH_Normalizado.sql`).
+   - Ejecutar `Scripts/bd-Normalizada/04-tablas-no-migradas.sql`: copia desde `RRHH_Nuevo` las tablas de
+     Instituciones, Inconvenientes y catálogos de logística, que no se normalizaron.
 5. Abrir el proyecto en Visual Studio y presionar **F5**
 6. Iniciar sesión con el usuario creado automáticamente al arrancar:
    - **Usuario:** `admin`
@@ -69,7 +74,7 @@ El archivo que hay que editar es `Proyecto-Evo-RRLL/appsettings.json`:
 
 ```json
 "ConnectionStrings": {
-  "RRHHNuevo": "Server=(localdb)\\MSSQLLocalDB;Database=RRHH_Nuevo;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
+  "RRHHNormalizado": "Server=.;Database=RRHH_Normalizado;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
 }
 ```
 

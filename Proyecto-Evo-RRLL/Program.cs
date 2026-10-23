@@ -16,7 +16,7 @@ builder.Services.AddControllersWithViews(options => options.Filters.Add<Registra
 
 // Capa Datos: unica pieza ligada a la base de datos. Para usar otra BD se cambia esa capa
 // (y la cadena de conexion); la logica, los controllers y las vistas no se tocan.
-builder.Services.AgregarCapaDatos(builder.Configuration.GetConnectionString("RRHHNuevo")!);
+builder.Services.AgregarCapaDatos(builder.Configuration.GetConnectionString("RRHHNormalizado")!);
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

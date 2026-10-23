@@ -5,31 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Capa_Datos;
 
-// Claves que genera el sistema con "maximo + 1" (1 si no hay registros), como en la BD legada.
-// Es un detalle de esta base de datos: con una BD que use IDENTITY, este archivo cambia
-// y la Capa Logica no se entera.
+// Claves que genera el sistema con "maximo + 1" (1 si no hay registros).
+// En RRHH_Normalizado las claves simples son IDENTITY (las genera SQL Server) y no estan aqui;
+// quedan los correlativos dentro de un grupo y las tablas copiadas de RRHH_Nuevo sin IDENTITY.
+// La Capa Logica no se entera del cambio.
 internal static class Numeracion
 {
     private static readonly Dictionary<Type, object> Reglas = new();
 
     static Numeracion()
     {
-        Global<Capacitacion>(x => x.IdCapacitacion);
-        Global<Comportamiento>(x => x.idComportamiento);
-        Global<Empleado>(x => x.IdEmpleado);
         Global<Institucion>(x => x.IdInstitucion);
-        Global<Local>(x => x.idLocal);
-        Global<Persona>(x => x.IdPersona);
-        Global<ResponsableXUO>(x => x.IdResponsable);
-        Global<Rol>(x => x.IdRol);
-        Global<RRHH_AcudeEnferm>(x => x.idAcudeEnferm);
-        Global<RRHH_AspSocio>(x => x.idAspSocio);
-        Global<RRHH_DinamicaFamiliar>(x => x.idDinamica);
-        Global<RRHH_Feriado>(x => x.idFeriado);
-        Global<RRHH_FuncFam>(x => x.idFuncFamiliar);
-        Global<RRHH_Salud>(x => x.idSalud);
-        Global<Usuario>(x => x.IdUsuario);
-        Global<Vivienda>(x => x.IdVivienda);
 
         // Correlativos dentro de un grupo: el maximo se toma solo entre los registros del grupo.
         PorGrupo<EstructOrganiz>(x => x.idAreaOrganiz, r => x => x.Year == r.Year);

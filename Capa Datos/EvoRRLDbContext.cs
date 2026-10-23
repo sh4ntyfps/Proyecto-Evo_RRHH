@@ -50,7 +50,6 @@ public class EvoRRLDbContext : DbContext
         public DbSet<RRHH_AspSocio> RRHH_AspSocio { get; set; } = null!;
         public DbSet<RRHH_DinamicaFamiliar> RRHH_DinamicaFamiliar { get; set; } = null!;
         public DbSet<RRHH_Feriado> RRHH_Feriado { get; set; } = null!;
-        public DbSet<RRHH_FuncFam> RRHH_FuncFam { get; set; } = null!;
         public DbSet<RRHH_RelacHermano> RRHH_RelacHermano { get; set; } = null!;
         public DbSet<RRHH_RelacPareja> RRHH_RelacPareja { get; set; } = null!;
         public DbSet<RRHH_RelacPH> RRHH_RelacPH { get; set; } = null!;
@@ -81,6 +80,18 @@ public class EvoRRLDbContext : DbContext
         public DbSet<Usuario_Rol> Usuario_Rol { get; set; } = null!;
         public DbSet<ViveCon> ViveCon { get; set; } = null!;
         public DbSet<Vivienda> Vivienda { get; set; } = null!;
+    // Columnas de Persona sin propiedad en la entidad (los datos personales que antes estaban
+    // en Empleado y Familiar). Las usan EmpleadoData y FamiliarData.
+    internal static readonly (string Columna, Type Tipo)[] ColumnasPersona =
+    {
+        ("Sexo", typeof(string)), ("IdEstadoCivil", typeof(int?)), ("IdNacionalidad", typeof(int?)),
+        ("IdTipoSangre", typeof(int?)), ("IdDiscapacidad", typeof(int?)), ("NumAutogenSalud", typeof(string)),
+        ("NumRUC", typeof(string)), ("Brevete", typeof(string)), ("NumLibretaMilitar", typeof(string)),
+        ("GradoInstruccion", typeof(string)), ("Profesion", typeof(string)), ("Ocupacion", typeof(string)),
+        ("LugarTrabajo", typeof(string)), ("Procedencia", typeof(string)), ("Enfermedad", typeof(string)),
+        ("TiempoEnfermedad", typeof(string)), ("Foto", typeof(byte[]))
+    };
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -110,12 +121,17 @@ public class EvoRRLDbContext : DbContext
                 entity.HasKey(e => new { e.Fecha, e.IdEmpleado });
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
                 entity.HasOne<Horario>().WithMany().HasForeignKey(e => e.idHorario);
+                entity.Property(e => e.Hor_Ent).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
+                entity.Property(e => e.Hor_Sal).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
+                entity.Property(e => e.Alm_Sal).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
+                entity.Property(e => e.Alm_Ent).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
             });
             modelBuilder.Entity<Capacitacion>(entity =>
             {
                 entity.ToTable("Capacitacion");
                 entity.HasKey(e => e.IdCapacitacion);
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
+                entity.Property(e => e.NumHoras).HasConversion(v => Conversiones.AShort(v), v => Conversiones.DeNumero(v));
             });
             modelBuilder.Entity<Cargo>(entity =>
             {
@@ -144,19 +160,41 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("Empleado");
                 entity.HasKey(e => e.IdEmpleado);
+                entity.Property(e => e.Estado).HasConversion(v => Conversiones.AEstado(v), v => Conversiones.DeEstado(v));
+                entity.Property(e => e.CargaFam).HasConversion(v => Conversiones.AByte(v), v => Conversiones.DeNumero(v));
+                // En RRHH_Normalizado estos datos viven en otras tablas: los traduce EmpleadoData.
+                //   Persona: datos personales | Empleado_Area: area actual | RRHH_AspSocio: aspectos sociales
+                //   Resolucion: ingreso al Estado / a la institucion | vw_EmpleadoResumenFamiliar: NumHijos
+                entity.Ignore(e => e.Year);
+                entity.Ignore(e => e.idAreaOrganiz);
+                foreach (var propiedad in EmpleadoData.DatosDePersona.Keys)
+                    entity.Ignore(propiedad);
+                foreach (var propiedad in EmpleadoData.DatosDeAspSocio)
+                    entity.Ignore(propiedad);
+                entity.Ignore(e => e.NumHijos);
+                entity.Ignore(e => e.NumResoIngreEsta);
+                entity.Ignore(e => e.FechaIngreEstado);
+                entity.Ignore(e => e.FechaResolIngreEsta);
+                entity.Ignore(e => e.NumResoIngreInstitu);
+                entity.Ignore(e => e.FechaResoIngreInstitu);
+                // Sin datos en la BD legada; no se migraron.
+                entity.Ignore(e => e.IdSeguro);
+                entity.Ignore(e => e.NroSeguro);
+                entity.Ignore(e => e.NumResolCese);
+                entity.Ignore(e => e.FechaResolCese);
+                entity.Ignore(e => e.NumResol20530);
+                entity.Ignore(e => e.FechaResol20530);
+                entity.Ignore(e => e.NumResolPenMen);
+                entity.Ignore(e => e.FechaResolPenMen);
                 entity.Ignore(e => e.Userid);
-                entity.HasOne<TipoSangre>().WithMany().HasForeignKey(e => e.IdTipoSangre);
+                entity.HasOne<Persona>().WithMany().HasForeignKey(e => e.IdPersona);
                 entity.HasOne<TipoTrabajador>().WithMany().HasForeignKey(e => e.IdTipoTrabajador);
-                entity.HasOne<Nacionalidad>().WithMany().HasForeignKey(e => e.IdNacionalidad);
                 entity.HasOne<ViveCon>().WithMany().HasForeignKey(e => e.IdViveCon);
                 entity.HasOne<RegimenPension>().WithMany().HasForeignKey(e => e.IdRegimenPen);
-                entity.HasOne<EstadoCivil>().WithMany().HasForeignKey(e => e.IdEstadoCivil);
                 entity.HasOne<Horario>().WithMany().HasForeignKey(e => e.idHorario);
                 entity.HasOne<Local>().WithMany().HasForeignKey(e => e.idLocal);
-                entity.HasOne<EstructOrganiz>().WithMany().HasForeignKey(e => new { e.Year, e.idAreaOrganiz });
                 entity.HasOne<AFP>().WithMany().HasForeignKey(e => e.IdAFP);
                 entity.HasOne<Cargo>().WithMany().HasForeignKey(e => e.IdCargo);
-                entity.HasOne<Discapacidad>().WithMany().HasForeignKey(e => e.IdDiscapacidad);
             });
             modelBuilder.Entity<Empleado_Area>(entity =>
             {
@@ -180,6 +218,16 @@ public class EvoRRLDbContext : DbContext
                 entity.ToTable("EstructOrganiz");
                 entity.HasKey(e => new { e.Year, e.idAreaOrganiz });
                 entity.HasOne<EstructOrganiz>().WithMany().HasPrincipalKey(e => new { e.Year, e.idAreaOrganiz }).HasForeignKey(e => new { e.YearDe, e.idDependeDe });
+                // Presupuesto: sin datos en la BD legada, no se migro. NroTrabajaUO se calcula (vw_EstructOrganizDotacion).
+                entity.Ignore(e => e.PresupAnual);
+                entity.Ignore(e => e.PromedMensSueld);
+                entity.Ignore(e => e.IdPresupuesto);
+                entity.Ignore(e => e.InversPublic);
+                entity.Ignore(e => e.ApruebaPedido);
+                entity.Ignore(e => e.MontoAprobacion);
+                entity.Ignore(e => e.PresupCompra);
+                entity.Ignore(e => e.PresupUtilizado);
+                entity.Ignore(e => e.NroTrabajaUO);
             });
             modelBuilder.Entity<EstudiosRealizado>(entity =>
             {
@@ -187,6 +235,8 @@ public class EvoRRLDbContext : DbContext
                 entity.HasKey(e => new { e.IdTipoEstudios, e.IdEmpleado, e.Correlativo });
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
                 entity.HasOne<EstadoEstudio>().WithMany().HasForeignKey(e => e.IdEstadoEstudio);
+                entity.Property(e => e.AñoInicio).HasColumnName("FechaInicio");
+                entity.Property(e => e.AñoTermino).HasColumnName("FechaTermino");
             });
             modelBuilder.Entity<ExcretasViv>(entity =>
             {
@@ -209,14 +259,22 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("Familiar");
                 entity.HasKey(e => new { e.IdEmpleado, e.IdPersona });
-                entity.HasOne<Discapacidad>().WithMany().HasForeignKey(e => e.IdDiscapacidad);
+                // Los datos personales del familiar viven en Persona y LaboraInstitucion se calcula
+                // (vw_FamiliarDetalle): los traduce FamiliarData.
+                foreach (var propiedad in FamiliarData.DatosDePersona.Keys)
+                    entity.Ignore(propiedad);
+                entity.Ignore(e => e.LaboraInstitucion);
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
-                entity.HasOne<EstadoCivil>().WithMany().HasForeignKey(e => e.IdEstadoCivil);
+                entity.HasOne<Persona>().WithMany().HasForeignKey(e => e.IdPersona);
             });
             modelBuilder.Entity<Horario>(entity =>
             {
                 entity.ToTable("Horario");
                 entity.HasKey(e => e.idHorario);
+                entity.Property(e => e.Ingreso1).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
+                entity.Property(e => e.Salida1).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
+                entity.Property(e => e.Ingreso2).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
+                entity.Property(e => e.Salida2).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
             });
             modelBuilder.Entity<HorarioTemporal>(entity =>
             {
@@ -235,11 +293,13 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("Institucion");
                 entity.HasKey(e => e.IdInstitucion);
+                entity.Property(e => e.IdInstitucion).ValueGeneratedNever();
             });
             modelBuilder.Entity<Limitacion>(entity =>
             {
                 entity.ToTable("Limitacion");
                 entity.HasKey(e => e.IdLimitacion);
+                entity.Property(e => e.IdLimitacion).ValueGeneratedNever();
             });
             modelBuilder.Entity<Local>(entity =>
             {
@@ -250,6 +310,11 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("Marcacion");
                 entity.HasKey(e => new { e.Fecha, e.IdEmpleado });
+                // Estado '1N' se guarda separado en NroMarcacion + TipoMarcacion (lo traduce MarcacionData).
+                entity.Ignore(e => e.Estado);
+                entity.Property<byte>("NroMarcacion");
+                entity.Property<string>("TipoMarcacion").HasMaxLength(1);
+                entity.Property(e => e.Lugar).HasColumnName("CodDispositivo");
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
                 entity.HasOne<Horario>().WithMany().HasForeignKey(e => e.idHorario);
             });
@@ -286,18 +351,31 @@ public class EvoRRLDbContext : DbContext
                 entity.HasKey(e => new { e.IdEmpleado, e.NPermiso });
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
                 entity.HasOne<Motivo_Perm>().WithMany().HasForeignKey(e => e.idMotivo);
+                entity.Property(e => e.Hora_Sal).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
+                entity.Property(e => e.Hora_Ret).HasConversion(v => Conversiones.AHora(v), v => Conversiones.DeHora(v));
             });
             modelBuilder.Entity<Persona>(entity =>
             {
                 entity.ToTable("Persona");
                 entity.HasKey(e => e.IdPersona);
-                entity.HasOne<Ubigeo>().WithMany().HasForeignKey(e => e.IdUbigeo);
+                // Sin datos en la BD legada; no se migraron.
+                // Obligatoria en RRHH_Normalizado: si la app no la indica, SQL Server pone 'N' (natural).
+                entity.Property(e => e.TipoPersona).HasDefaultValue("N");
+                entity.Ignore(e => e.Fax);
+                entity.Ignore(e => e.FonoCentroLab);
+                // Columnas que en RRHH_Nuevo estaban repetidas en Empleado y Familiar: aqui no tienen
+                // propiedad en la entidad (shadow) y las leen/escriben EmpleadoData y FamiliarData.
+                foreach (var (columna, tipo) in ColumnasPersona)
+                    entity.Property(tipo, columna);
                 entity.HasOne<TipoDocID>().WithMany().HasForeignKey(e => e.TipoDocID);
             });
             modelBuilder.Entity<RegAsisDiario>(entity =>
             {
                 entity.ToTable("RegAsisDiario");
                 entity.HasKey(e => new { e.Fecha, e.IdEmpleado });
+                entity.Property(e => e.MinNormales).HasConversion(v => Conversiones.AShort(v), v => Conversiones.DeNumero(v));
+                entity.Property(e => e.MinTarde).HasColumnName("SegundosTarde")
+                    .HasConversion(v => Conversiones.ASegundos(v), v => Conversiones.DeSegundos(v));
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
             });
             modelBuilder.Entity<RegimenPension>(entity =>
@@ -311,6 +389,7 @@ public class EvoRRLDbContext : DbContext
                 entity.HasKey(e => new { e.idEmpleado, e.idResolucion });
                 entity.HasOne<TipoResolucion>().WithMany().HasForeignKey(e => e.idTipoResolucion);
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.idEmpleado);
+                entity.Property<DateOnly?>("FechaVigencia");
             });
             modelBuilder.Entity<ResponsableXUO>(entity =>
             {
@@ -318,6 +397,9 @@ public class EvoRRLDbContext : DbContext
                 entity.HasKey(e => e.IdResponsable);
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
                 entity.HasOne<EstructOrganiz>().WithMany().HasForeignKey(e => new { e.Year, e.idAreaOrganiz });
+                // Se derivan del area (EstructOrganiz): los llena ResponsableXUOData.
+                entity.Ignore(e => e.AreaOrganizacional);
+                entity.Ignore(e => e.idDependeDe);
             });
             modelBuilder.Entity<Rol>(entity =>
             {
@@ -330,6 +412,7 @@ public class EvoRRLDbContext : DbContext
                 entity.ToTable("Rol_Acceso");
                 entity.HasKey(e => new { e.IdRol, e.IdSistemaOpcion });
                 entity.HasOne<Rol>().WithMany().HasForeignKey(e => e.IdRol);
+                entity.Ignore(e => e.Permiso);
             });
             modelBuilder.Entity<Rotacion>(entity =>
             {
@@ -347,8 +430,13 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("RRHH_Asegurado");
                 entity.HasKey(e => new { e.idEmpleado, e.NroBeneficiario });
+                // Sexo y estado civil vienen de la Persona asegurada; VinculoFamiliar es el catalogo
+                // VinculoAsegurado. Los traduce RRHH_AseguradoData.
+                entity.Ignore(e => e.Sexo);
+                entity.Ignore(e => e.idEstadoCivil);
+                entity.Ignore(e => e.VinculoFamiliar);
+                entity.Property<int?>("IdVinculoAsegurado");
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.idEmpleado);
-                entity.HasOne<EstadoCivil>().WithMany().HasForeignKey(e => e.idEstadoCivil);
                 entity.HasOne<MotivoBaja>().WithMany().HasForeignKey(e => e.idMotivoBaja);
                 entity.HasOne<Persona>().WithMany().HasForeignKey(e => e.idPersona);
             });
@@ -356,6 +444,13 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("RRHH_AspSocio");
                 entity.HasKey(e => e.idAspSocio);
+                // idPregunta1..3 no tenian catalogo de preguntas: no se migraron.
+                entity.Ignore(e => e.idPregunta1);
+                entity.Ignore(e => e.idPregunta2);
+                entity.Ignore(e => e.idPregunta3);
+                // Aspectos sociales del empleado (antes en Empleado): los escribe EmpleadoData.
+                foreach (var columna in EmpleadoData.DatosDeAspSocio)
+                    entity.Property<string>(columna);
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
             });
             modelBuilder.Entity<RRHH_DinamicaFamiliar>(entity =>
@@ -368,12 +463,6 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("RRHH_Feriado");
                 entity.HasKey(e => e.idFeriado);
-            });
-            modelBuilder.Entity<RRHH_FuncFam>(entity =>
-            {
-                entity.ToTable("RRHH_FuncFam");
-                entity.HasKey(e => e.idFuncFamiliar);
-                entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
             });
             modelBuilder.Entity<RRHH_RelacHermano>(entity =>
             {
@@ -406,6 +495,8 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("SistemaOpcion");
                 entity.HasKey(e => e.IdSistemaOpcion);
+                entity.Ignore(e => e.ConClave);
+                entity.Ignore(e => e.Clave);
             });
             modelBuilder.Entity<TenenciaViv>(entity =>
             {
@@ -447,6 +538,7 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("TipoMoneda");
                 entity.HasKey(e => e.IdTipoMoneda);
+                entity.Property(e => e.IdTipoMoneda).ValueGeneratedNever();
             });
             modelBuilder.Entity<TipoMovimiento>(entity =>
             {
@@ -462,6 +554,7 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("TipoRecurso");
                 entity.HasKey(e => e.IdTipoRecurso);
+                entity.Property(e => e.IdTipoRecurso).ValueGeneratedNever();
             });
             modelBuilder.Entity<TipoResolucion>(entity =>
             {
@@ -491,7 +584,10 @@ public class EvoRRLDbContext : DbContext
             modelBuilder.Entity<TitulosEmpleado>(entity =>
             {
                 entity.ToTable("TitulosEmpleado");
-                entity.HasKey(e => e.NumColegiatura);
+                // La clave es IdTitulo (IDENTITY), sin propiedad en la entidad; la app sigue
+                // identificando el titulo por NumColegiatura (TitulosEmpleadoData).
+                entity.Property<int>("IdTitulo");
+                entity.HasKey("IdTitulo");
                 entity.HasOne<Empleado>().WithMany().HasForeignKey(e => e.IdEmpleado);
             });
             modelBuilder.Entity<UbicacionViv>(entity =>
@@ -501,13 +597,15 @@ public class EvoRRLDbContext : DbContext
             });
             modelBuilder.Entity<Ubigeo>(entity =>
             {
-                entity.ToTable("Ubigeo");
+                // Ubigeo se normalizo en Departamento / Provincia / Distrito; se lee de la vista.
+                entity.ToView("vw_Ubigeo");
                 entity.HasKey(e => e.IdUbigeo);
             });
             modelBuilder.Entity<UnidadMedida>(entity =>
             {
                 entity.ToTable("UnidadMedida");
                 entity.HasKey(e => e.IdUnidadMedida);
+                entity.Property(e => e.IdUnidadMedida).ValueGeneratedNever();
             });
             modelBuilder.Entity<Usuario>(entity =>
             {
@@ -531,6 +629,13 @@ public class EvoRRLDbContext : DbContext
             {
                 entity.ToTable("Vivienda");
                 entity.HasKey(e => e.IdVivienda);
+                entity.Property(e => e.NumDormitorio).HasConversion(v => Conversiones.AByte(v), v => Conversiones.DeNumero(v));
+                entity.Property(e => e.NumServHig).HasConversion(v => Conversiones.AByte(v), v => Conversiones.DeNumero(v));
+                entity.Property(e => e.NumCompart).HasConversion(v => Conversiones.AByte(v), v => Conversiones.DeNumero(v));
+                entity.Property(e => e.NumPerDorm).HasConversion(v => Conversiones.AByte(v), v => Conversiones.DeNumero(v));
+                // Telefono, Cable, Internet y Otros son filas de ViviendaServicio (las traduce ViviendaData).
+                foreach (var propiedad in ViviendaData.Servicios.Keys)
+                    entity.Ignore(propiedad);
                 entity.HasOne<AguaViv>().WithMany().HasForeignKey(e => e.IdAgua);
                 entity.HasOne<AlumbradoViv>().WithMany().HasForeignKey(e => e.IdAlumbrado);
                 entity.HasOne<ConservacionViv>().WithMany().HasForeignKey(e => e.IdConservacion);
@@ -541,5 +646,28 @@ public class EvoRRLDbContext : DbContext
                 entity.HasOne<TipoViv>().WithMany().HasForeignKey(e => e.IdTipo);
                 entity.HasOne<UbicacionViv>().WithMany().HasForeignKey(e => e.IdUbicacion);
             });
+
+        // Tablas y vistas de RRHH_Normalizado sin entidad propia (ver Tablas.cs).
+        modelBuilder.Entity<VinculoAseguradoFila>(entity =>
+        {
+            entity.ToTable("VinculoAsegurado");
+            entity.HasKey(e => e.IdVinculoAsegurado);
+        });
+        modelBuilder.Entity<ViviendaServicioFila>(entity =>
+        {
+            entity.ToTable("ViviendaServicio");
+            entity.HasKey(e => new { e.IdVivienda, e.IdServicio });
+        });
+        modelBuilder.Entity<FuncFamPreguntaFila>(entity =>
+        {
+            entity.ToTable("RRHH_FuncFamPregunta");
+            entity.HasKey(e => e.IdPregunta);
+            entity.Property(e => e.IdPregunta).ValueGeneratedNever();
+        });
+        modelBuilder.Entity<FuncFamRespuestaFila>(entity =>
+        {
+            entity.ToTable("RRHH_FuncFamRespuesta");
+            entity.HasKey(e => new { e.IdEmpleado, e.IdPregunta });
+        });
     }
 }

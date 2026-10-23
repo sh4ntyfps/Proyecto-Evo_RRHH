@@ -51,7 +51,8 @@ public class CatalogoRepositorio : ICatalogoRepositorio
                     p.Name,
                     tipoClase.Name,
                     claves.Contains(p.Name),
-                    tipoClase == typeof(byte[]));
+                    tipoClase == typeof(byte[]),
+                    EsAutonumerico(p));
             })
             .ToList();
     }
@@ -61,6 +62,9 @@ public class CatalogoRepositorio : ICatalogoRepositorio
         var tipo = ObtenerTipo(tabla);
         var entidad = Activator.CreateInstance(tipo)!;
         AplicarValores(tipo, entidad, datos);
+        // La clave IDENTITY la genera SQL Server: se descarta lo que venga en el formulario.
+        foreach (var clave in _contexto.Model.FindEntityType(tipo)!.FindPrimaryKey()!.Properties.Where(EsAutonumerico))
+            clave.PropertyInfo!.SetValue(entidad, Activator.CreateInstance(clave.ClrType));
         _contexto.Add(entidad);
         await _contexto.SaveChangesAsync();
     }
@@ -149,6 +153,9 @@ public class CatalogoRepositorio : ICatalogoRepositorio
             }
         }
     }
+
+    private static bool EsAutonumerico(IProperty propiedad)
+        => propiedad.IsPrimaryKey() && propiedad.ValueGenerated == ValueGenerated.OnAdd && propiedad.PropertyInfo is not null;
 
     private static object? Convertir(Type tipo, string texto)
     {

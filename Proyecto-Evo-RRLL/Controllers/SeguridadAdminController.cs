@@ -134,7 +134,7 @@ public class SeguridadAdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UsuarioEditar(Usuario modelo, string clave)
+    public async Task<IActionResult> UsuarioEditar(Usuario modelo, string? clave)
     {
         var actual = await _usuarioLogica.Obtener(modelo.IdUsuario);
         if (actual is null)

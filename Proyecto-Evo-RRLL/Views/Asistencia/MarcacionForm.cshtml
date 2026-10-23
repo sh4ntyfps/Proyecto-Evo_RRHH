@@ -17,14 +17,14 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label">Fecha *</label>
+                    <label class="form-label">Fecha y hora *</label>
                     @if (esNuevo)
                     {
-                        <input asp-for="Fecha" type="date" class="form-control" required />
+                        <input asp-for="Fecha" type="datetime-local" step="1" class="form-control" required />
                     }
                     else
                     {
-                        <input asp-for="Fecha" type="date" class="form-control" required readonly />
+                        <input asp-for="Fecha" type="datetime-local" step="1" class="form-control" required readonly />
                     }
                 </div>
                 <div class="col-md-4">

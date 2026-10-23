@@ -1,6 +1,7 @@
 namespace Capa_Entidades.Contratos;
 
-public record CatalogoColumna(string Nombre, string Tipo, bool EsClave, bool EsArchivo);
+// EsAutonumerico: clave que genera la base de datos (IDENTITY); no se pide al crear.
+public record CatalogoColumna(string Nombre, string Tipo, bool EsClave, bool EsArchivo, bool EsAutonumerico = false);
 
 // Mantenimiento generico de catalogos por nombre de entidad (ej. "Cargo").
 public interface ICatalogoRepositorio

@@ -20,7 +20,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row g-3">
-                @foreach (var col in Model.Columnas.Where(c => !c.EsArchivo))
+                @foreach (var col in Model.Columnas.Where(c => !c.EsArchivo && !(c.EsAutonumerico && !esEdicion)))
                 {
                     var valorActual = Model.Valores!.TryGetValue(col.Nombre, out var v) ? v : null;
 

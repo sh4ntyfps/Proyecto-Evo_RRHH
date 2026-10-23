@@ -288,15 +288,15 @@ SELECT * FROM RRHH_Normalizado.mig.Incidencia ORDER BY Tabla, Accion;
 
 ---
 
-## 9. Impacto en la aplicación (para cuando se migre)
+## 9. Impacto en la aplicación (migración hecha)
 
-La aplicación **sigue apuntando a `RRHH_Nuevo`**. Con la arquitectura actual, pasarla a `RRHH_Normalizado` **solo cambia la Capa Datos** y la cadena de conexión. Las entidades, la lógica, los controllers y las vistas no se tocan; las pruebas `ArquitecturaTests` vigilan que siga así.
+La aplicación **apunta a `RRHH_Normalizado`** (cadena `RRHHNormalizado` en `appsettings.json`). Como estaba previsto, **solo cambió la Capa Datos**: las entidades, la lógica, los controllers y las vistas siguen igual, y las pruebas `ArquitecturaTests` lo vigilan.
 
 Cambios dentro de `Capa Datos`:
 
-1. **`EvoRRLDbContext`**: mapear las tablas nuevas con Fluent API. Donde la tabla coincide con la entidad (la mayoría de catálogos) basta con `ToTable`/`HasKey`.
-2. **Repositorios que traducen**: donde la tabla ya no coincide con la entidad, se crean clases de tabla internas en `Capa Datos` y el repositorio convierte entre la tabla y la entidad. Por ejemplo, `EmpleadoData` lee `Empleado` + `Persona` y entrega el mismo `Empleado` de siempre. Aplica a `Empleado`, `Familiar` y `RRHH_Asegurado` (datos personales en `Persona`), `Marcacion` (`Estado` → `NroMarcacion` + `TipoMarcacion`), `Ubigeo` (→ `Distrito`/`vw_Ubigeo`) y `RRHH_FuncFam` (→ `RRHH_FuncFamRespuesta`).
-3. **`Numeracion.cs`**: quitar las claves que ahora genera `IDENTITY`. Los correlativos por grupo (ej. `NPermiso` por empleado) se mantienen.
-4. **Cadena de conexión**: `Database=RRHH_Normalizado` en `appsettings.json`.
+1. **`EvoRRLDbContext`**: mapeo con Fluent API. Columnas renombradas (`HasColumnName`), tipos distintos con conversiones (`Conversiones.cs`: texto ↔ `time`/`smallint`/`tinyint`, `Estado` 'A'/'I' ↔ `bit`, `MinTarde` ↔ `SegundosTarde`), columnas sin propiedad en la entidad como *shadow* (`Persona.Sexo`…, `Marcacion.NroMarcacion`…) y propiedades sin columna con `Ignore`. `Ubigeo` se lee de `vw_Ubigeo`.
+2. **Repositorios que traducen** (sobrescriben `Completar`, `AntesDeGuardar` y `DespuesDeGuardar` de `RepositorioBase`): `EmpleadoData` (`Persona`, `Empleado_Area`, `RRHH_AspSocio`, `Resolucion` de ingreso, `NumHijos` calculado), `FamiliarData` y `RRHH_AseguradoData` (datos personales en `Persona`; vínculo → `VinculoAsegurado`), `MarcacionData` (`Estado` '1N' → `NroMarcacion` + `TipoMarcacion`), `ViviendaData` (servicios → `ViviendaServicio`), `RRHH_FuncFamData` (→ `RRHH_FuncFamRespuesta`, una evaluación por empleado), `TitulosEmpleadoData` (clave `IdTitulo`), `EstructOrganizData` y `ResponsableXUOData` (datos calculados). Las tablas nuevas sin entidad están en `Tablas.cs`.
+3. **`Numeracion.cs`**: se quitaron las claves que ahora genera `IDENTITY`; quedan los correlativos por grupo.
+4. **Tablas excluidas** (sección 6): para conservar sus pantallas (Instituciones, Inconvenientes y catálogos de logística), `04-tablas-no-migradas.sql` las copia desde `RRHH_Nuevo` a `RRHH_Normalizado`.
 
-**Excepción (decisión funcional, no técnica):** las 10 tablas excluidas (sección 6) no existen en la BD nueva. `Institucion` e `Inconveniente` tienen pantallas, así que antes de migrar hay que decidir una de dos: agregarlas al esquema normalizado o retirar esas pantallas.
+Datos que no tienen columna en la BD normalizada (estaban vacíos en la legada) se muestran vacíos y no se guardan: cese, D.L. 20530, pensión de menores, N° de seguro, `Fax`, `FonoCentroLab`, presupuesto de áreas, `idPregunta1..3`, `Rol_Acceso.Permiso` y la clave de `SistemaOpcion`.

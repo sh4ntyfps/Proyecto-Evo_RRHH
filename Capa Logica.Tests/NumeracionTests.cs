@@ -1,6 +1,7 @@
 using Capa_Datos;
 using Capa_Entidades;
 using Capa_Logica.Tests.Soporte;
+using Microsoft.EntityFrameworkCore;
 
 namespace Capa_Logica.Tests;
 
@@ -120,15 +121,18 @@ public class FichaSocialTests
     public async Task Guardar_crea_las_tres_partes_y_luego_las_actualiza()
     {
         using var bd = new BaseDatosPrueba();
+        // Catalogo de preguntas de RRHH_Normalizado (tabla interna de la Capa Datos).
+        await bd.Contexto.Database.ExecuteSqlRawAsync("INSERT INTO RRHH_FuncFamPregunta (IdPregunta, Codigo) VALUES (1, 'Com1')");
         var logica = new FichaSocialLogica(new RRHH_DinamicaFamiliarData(bd.Contexto), new RRHH_AspSocioData(bd.Contexto),
             new RRHH_FuncFamData(bd.Contexto), new UnidadDeTrabajo(bd.Contexto));
 
-        Assert.True(await logica.Guardar(5, new RRHH_DinamicaFamiliar { Observacion = "primera" }, new RRHH_AspSocio { hobby = "futbol" }, new RRHH_FuncFam()));
-        Assert.True(await logica.Guardar(5, new RRHH_DinamicaFamiliar { Observacion = "segunda" }, new RRHH_AspSocio { hobby = "ajedrez" }, new RRHH_FuncFam()));
+        Assert.True(await logica.Guardar(5, new RRHH_DinamicaFamiliar { Observacion = "primera" }, new RRHH_AspSocio { hobby = "futbol" }, new RRHH_FuncFam { Com1 = "S" }));
+        Assert.True(await logica.Guardar(5, new RRHH_DinamicaFamiliar { Observacion = "segunda" }, new RRHH_AspSocio { hobby = "ajedrez" }, new RRHH_FuncFam { Com1 = "N" }));
 
         var dinamica = Assert.Single(await new RRHH_DinamicaFamiliarData(bd.Contexto).Listar());
         Assert.Equal((5, 1, "segunda"), (dinamica.IdEmpleado ?? 0, dinamica.idDinamica, dinamica.Observacion));
         Assert.Equal("ajedrez", Assert.Single(await new RRHH_AspSocioData(bd.Contexto).Listar()).hobby);
-        Assert.Single(await new RRHH_FuncFamData(bd.Contexto).Listar());
+        // Una evaluacion por empleado, guardada como una fila por respuesta.
+        Assert.Equal((5, "N"), Assert.Single(await new RRHH_FuncFamData(bd.Contexto).Listar()) is var f ? (f.IdEmpleado ?? 0, f.Com1) : default);
     }
 }

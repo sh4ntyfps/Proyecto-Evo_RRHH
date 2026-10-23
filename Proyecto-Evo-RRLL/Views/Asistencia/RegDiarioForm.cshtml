@@ -1,7 +1,7 @@
 @model RegAsisDiario
 @{
     ViewData["Title"] = "Registro diario";
-    var esNuevo = Model.MinNormales is null;
+    var esNuevo = Model.IdEmpleado == 0;
     var empleados = ViewBag.Empleados as List<(int Id, string Nombre)> ?? new List<(int, string)>();
 }
 
